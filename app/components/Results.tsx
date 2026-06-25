@@ -19,8 +19,9 @@
 // =============================================================================
 
 import type { ResultsProps, Badge, BadgeCategory, Comp } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTilt } from "@/lib/useTilt";
+import { useIsMobile } from "@/lib/useIsMobile";
 
 // ---- creator / B2B links (muted, scouting-doc style) ------------------------
 // TODO(maurice): confirm the real creator URL before launch. Defaults to the
@@ -135,19 +136,12 @@ export default function Results({
 // no longer read it here: the card URL is now derived from a slim, 414-safe
 // payload below (see cardUrl / encodeCardComp).
 ResultsProps) {
-  // Match the desktop (>=) vs 390px mobile artboard with one component.
-  const [isMobile, setIsMobile] = useState(false);
+  // Match the desktop vs 390px mobile artboard with one component, flipping live
+  // across the shared 768px breakpoint (see @/lib/useIsMobile).
+  const isMobile = useIsMobile();
   // After Share fires, the tip copy softens from the long pitch to the short
   // post-share line (mirrors the export's data-tip-target / .tip-soft swap).
   const [shared, setShared] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 480px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
 
   const badges = comp.badges.slice(0, 3);
   const reportParagraphs = toParagraphs(comp.full_report);

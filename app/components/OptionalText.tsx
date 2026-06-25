@@ -3,26 +3,15 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties, ChangeEvent, MouseEvent } from "react";
 import type { OptionalTextProps } from "@/lib/types";
+import { useIsMobile } from "@/lib/useIsMobile";
 
 // =============================================================================
 // OptionalText — Screens 09 & 10 ("on the record" / "final entry")
 // One reusable component switched by `which` (9 | 10). Converted faithfully from
 // the design export (09/10 desktop artboards + 09M/10M mobile 390 artboards).
 // Presentational only: renders, calls onContinue / onSkip / onBack.
+// Desktop <-> mobile is decided by the shared useIsMobile hook (live at 768px).
 // =============================================================================
-
-/** Matches at <=480px (the mobile artboard); desktop layout above that. */
-function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 480px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return isMobile;
-}
 
 // One drifting scout mark in the background field.
 interface DriftMark {

@@ -19,7 +19,7 @@ const PHRASES = [
  *
  * Faithful to the export: same layout, same inline style values, same shared
  * classes (.paper-bg, .vhs/.reel, .tw-caret). Desktop matches the 1280-wide
- * artboard; <=480px matches the 390 mobile artboard.
+ * artboard; <=767px (the shared app breakpoint) matches the 390 mobile artboard.
  */
 export default function ScoutingRoom(_props: ScoutingRoomProps) {
   const [text, setText] = useState("");
@@ -89,7 +89,7 @@ export default function ScoutingRoom(_props: ScoutingRoomProps) {
         .cpc-scout-room .vhs { width: 132px; margin: 0 auto 44px; }
         .cpc-scout-room .sr-line { font: 500 16px var(--font-mono); letter-spacing: 0.03em; min-height: 22px; }
         .cpc-scout-room .sr-foot { margin-top: 40px; font: 400 11px var(--font-mono); letter-spacing: 0.22em; }
-        @media (max-width: 480px) {
+        @media (max-width: 767px) {
           .cpc-scout-room .sr-label { font: 500 10px var(--font-mono); letter-spacing: 0.3em; margin-bottom: 40px; }
           .cpc-scout-room .vhs { width: 96px; margin: 0 auto 34px; }
           .cpc-scout-room .sr-line { font: 500 14px var(--font-mono); letter-spacing: 0.02em; min-height: 20px; padding: 0 24px; }

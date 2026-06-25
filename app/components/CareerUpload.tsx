@@ -23,8 +23,8 @@ import type { CareerUploadProps } from "@/lib/types";
 import { extractPdfText } from "@/lib/pdf";
 
 // Shared inline values pulled verbatim from the export so desktop + mobile stay
-// in sync. Anything that differs between breakpoints is handled with the
-// `isMobile` flag below (single responsive component, mobile artboard <= 480px).
+// in sync. This screen is a single fluid layout (no separate mobile artboard),
+// so it has no JS breakpoint switch; it reflows responsively on its own.
 const GREEN = "#2f6043";
 const INK = "#211e17";
 const MUTED = "#6b655a";

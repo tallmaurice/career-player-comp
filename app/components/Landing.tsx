@@ -5,7 +5,8 @@
 // Faithful conversion of the design export's Screen 01 (desktop, export lines
 // ~117-272) and Screen 01M (mobile 390, export lines ~470-573).
 // One responsive component: desktop artboard at wide widths, the 390 mobile
-// artboard at <= 480px. Inline style values are preserved verbatim from the
+// artboard at <= 767px (the shared app-wide breakpoint, toggled here in CSS to
+// match the JS useIsMobile screens). Inline style values are preserved verbatim from the
 // export; shared classes (.scout-bg, .paper-card, .tilt-card, .stamp, .file-no,
 // .grade, .cta-green) come from app/globals.css. Presentational only — the CTA
 // calls LandingProps.onStart.
@@ -57,7 +58,7 @@ export default function Landing({ onStart, onHome }: LandingProps) {
       <style>{`
         .cpc-landing-desktop { display: flex; }
         .cpc-landing-mobile { display: none; }
-        @media (max-width: 480px) {
+        @media (max-width: 767px) {
           .cpc-landing-desktop { display: none; }
           .cpc-landing-mobile { display: block; }
         }

@@ -8,8 +8,8 @@
 // selected option, and calls onSelect. Auto-advance is handled by the parent.
 // =============================================================================
 
-import { useEffect, useState } from "react";
 import type { QuizQuestionProps } from "@/lib/types";
+import { useIsMobile } from "@/lib/useIsMobile";
 
 // Roman numerals for the vertical "INTAKE FORM · SECTION <n>" rule. The export
 // hardcodes "SECTION II"; here it tracks the live question index so the side
@@ -57,9 +57,10 @@ export default function QuizQuestion({
   onBack,
   onHome,
 }: QuizQuestionProps) {
-  // One responsive component: <=480px renders the 390 mobile artboard, wider
-  // renders the desktop artboard. Tracked here (not via CSS) because the export
-  // uses materially different markup/values per breakpoint.
+  // One responsive component: at or below the shared mobile breakpoint (767px)
+  // renders the 390 mobile artboard, wider renders the desktop artboard. Tracked
+  // in JS (not via CSS) because the export uses materially different markup and
+  // values per breakpoint. Live across resize via the shared useIsMobile hook.
   const isMobile = useIsMobile();
 
   const progress = Array.from({ length: total }, (_, i) => i);
@@ -246,20 +247,6 @@ function dot(i: number, current: number, size: number): React.CSSProperties {
       ? { animation: "pulseDot 1.6s ease-in-out infinite" }
       : {}),
   };
-}
-
-// SSR-safe mobile detection at the 480px breakpoint (the cutover the prompt
-// specifies). Defaults to desktop on the server, then corrects on mount.
-function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 480px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return isMobile;
 }
 
 // ---- style objects (values lifted verbatim from the export) ----------------
