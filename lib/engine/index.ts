@@ -61,7 +61,7 @@ export const SYSTEM_STRING: string = SYSTEM_PROMPT_V7.replace(
 
 /** A generation lens. Steers emphasis without changing the task or the schema.
  *  Lives in the user message so the cached system prefix never varies. */
-export type Lens = "sharp" | "roast" | "pattern";
+export type Lens = "sharp" | "roast" | "pattern" | "best";
 
 const LENS_NOTE: Record<Lens, string> = {
   sharp:
@@ -70,6 +70,8 @@ const LENS_NOTE: Record<Lens, string> = {
     "LENS FOR THIS PASS: the roast. Locate the self-image gap and the one thing they half-know and have never heard said this cleanly. Push the screenshot_line to its sharpest TRUE form. Stay accurate and never cross into cruelty or the uncontrollable.",
   pattern:
     "LENS FOR THIS PASS: the pattern. Read for the recurring behavior across the whole tape — the move they keep making — and build the comp and the tendency badge around that pattern, not a single moment.",
+  best:
+    "THIS IS THE ONLY PASS, so deliver the single best card on BOTH axes at once. Find the most precise, non-obvious player in the pool whose real arc rhymes with this career move-for-move, AND land the sharpest, truest, most screenshot-worthy line the tape earns. Maximum accuracy and maximum earned bite together, inside every gate, never crossing into cruelty or the uncontrollable.",
 };
 
 // ---- User message -----------------------------------------------------------

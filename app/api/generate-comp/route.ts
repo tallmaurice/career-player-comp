@@ -7,42 +7,39 @@
 //          429 { error } on per-IP or global daily-spend limit
 //          503 { error } on Anthropic / timeout failure
 //
-// Engine (v7): best-of-3 generation with 3 lens variations + a cold judge that
-// scores on accuracy AND fun. CONDITIONAL to save cost: generate candidate 1,
-// judge it solo; only fire candidates 2 and 3 if the first is weak, then judge
-// all three. NO banned-phrase pre-filter (v7 removed it). Accuracy gates and
-// safety guards live in the system prompt itself.
+// Engine (v7): a SINGLE balanced generation pass. The v7 spike that locked the
+// engine was single-generation (no best-of-3, no judge) and produced shippable,
+// biting cards on 6/6 profiles. Best-of-3 + a judge call added 3-4x the latency,
+// which blew the serverless function budget (the "scout took too long" error)
+// for no quality gain we'd validated. So v1 ships single-pass: fast, cheap, and
+// exactly what we tested. Best-of-3 can return later on a plan with more time.
 //
 // Caching: the system string (v7 prompt + injected pool) is byte-identical
 // across every request, so it is the prompt-cache prefix — marked with
-// cache_control: ephemeral. Per-request content (career, answers, lens) lives
-// in the user message after the breakpoint and is never cached.
+// cache_control: ephemeral. Per-request content lives after the breakpoint.
 //
-// Model: claude-sonnet-4-6 (chosen for cost per the engine spec). Sonnet 4.6
-// supports prompt caching with cache_control: { type: "ephemeral" }.
+// Model: claude-sonnet-4-6.
 // =============================================================================
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { Comp, QuizAnswers } from "@/lib/types";
-import {
-  SYSTEM_STRING,
-  buildUserMessage,
-  parseComp,
-  type Lens,
-} from "@/lib/engine";
+import { SYSTEM_STRING, buildUserMessage, parseComp } from "@/lib/engine";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Vercel function budget: the default (10s on Hobby) kills a single Sonnet
+// generation mid-flight. 60 is the Hobby ceiling and fits one pass with margin.
+export const maxDuration = 60;
 
 // ---- Tunables ---------------------------------------------------------------
 
 const MODEL = "claude-sonnet-4-6";
-// The Comp is 11 fields including a 2-4 paragraph full_report. 1200 (spec note)
-// truncates the report; 2000 gives headroom without much cost (output billed by
-// actual tokens). Judge is a tiny structured reply, so it gets a small cap.
+// The Comp is 11 fields including a 2-4 paragraph full_report. max_tokens is a
+// cap, not a target — the model stops when done (~900-1200 tokens typical), so
+// this only sets headroom, not latency.
 const GEN_MAX_TOKENS = 2000;
-const JUDGE_MAX_TOKENS = 400;
-const OVERALL_TIMEOUT_MS = 20_000;
+// Abort just under maxDuration so the user gets the friendly message, not a 504.
+const OVERALL_TIMEOUT_MS = 52_000;
 
 // Per-IP and global limits (only enforced when Upstash env is present).
 const PER_IP_LIMIT = 5; // requests
@@ -55,8 +52,6 @@ const apiKey = process.env.ANTHROPIC_API_KEY;
 const anthropic = apiKey ? new Anthropic({ apiKey }) : null;
 
 // The cached system block: stable prefix → cache_control ephemeral. Built once.
-// Passed as the `system` param (string | TextBlockParam[]); the cache breakpoint
-// on this block caches the whole v7 prompt + injected pool across every request.
 const SYSTEM_BLOCKS: Anthropic.TextBlockParam[] = [
   {
     type: "text",
@@ -77,8 +72,7 @@ async function checkLimits(ip: string): Promise<LimitState> {
     return { rateLimited: false, spendExhausted: false };
   }
 
-  // Lazy-import so the route still builds and runs when Upstash isn't installed
-  // or configured. Dynamic import keeps it out of the cold path when absent.
+  // Lazy-import so the route still builds and runs when Upstash isn't configured.
   try {
     const [{ Ratelimit }, { Redis }] = await Promise.all([
       import("@upstash/ratelimit"),
@@ -86,7 +80,6 @@ async function checkLimits(ip: string): Promise<LimitState> {
     ]);
     const redis = new Redis({ url, token });
 
-    // Per-IP sliding window.
     const ratelimit = new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(PER_IP_LIMIT, PER_IP_WINDOW),
@@ -99,16 +92,13 @@ async function checkLimits(ip: string): Promise<LimitState> {
     const spendKey = `cpc:spend:${day}`;
     const count = await redis.incr(spendKey);
     if (count === 1) {
-      // First write today — expire the counter ~2 days out.
       await redis.expire(spendKey, 60 * 60 * 48);
     }
     const spendExhausted = count > DAILY_SPEND_CAP;
 
     return { rateLimited: !success, spendExhausted };
   } catch {
-    // If Upstash is misbehaving, fail OPEN on the limiter (don't block users on
-    // an infra blip) but treat the request as allowed. The Anthropic-side
-    // failure path still protects us from runaway cost via the 503 wrap.
+    // Infra blip: fail OPEN on the limiter; the 503 wrap still bounds cost.
     return { rateLimited: false, spendExhausted: false };
   }
 }
@@ -119,7 +109,7 @@ function clientIp(req: Request): string {
   return req.headers.get("x-real-ip")?.trim() || "anon";
 }
 
-// ---- Anthropic calls --------------------------------------------------------
+// ---- Generation -------------------------------------------------------------
 
 function textFromMessage(msg: Anthropic.Message): string {
   return msg.content
@@ -128,8 +118,8 @@ function textFromMessage(msg: Anthropic.Message): string {
     .join("");
 }
 
-/** Generate one candidate for a given lens, with a single retry on invalid
- *  JSON or out-of-pool player. Returns null if both attempts fail. */
+/** One generation pass on a given lens, with a single retry on invalid JSON or
+ *  out-of-pool player. Returns null if both attempts fail. */
 async function generateCandidate(
   client: Anthropic,
   userMessage: string,
@@ -158,100 +148,6 @@ async function generateCandidate(
     if (parsed.ok) return parsed.comp;
   }
   return null;
-}
-
-const JUDGE_SYSTEM =
-  "You are a cold, fast editor for a self-aware career-roast product. You did not write these. Judge each candidate scouting report on TWO axes equally: ACCURACY (does it prove it read THIS specific career and assign a player whose real arc genuinely fits) and FUN (is the screenshot_line and card_summary genuinely sharp, true, and screenshot-worthy without crossing into cruelty or hitting anything uncontrollable). Penalize generic comps that could fit anyone, lazy famous-name picks, and soft/toothless writing. Reward precise non-obvious picks with a true, funny bite.";
-
-/** Judge: given candidates, return the index of the best, plus whether the best
- *  is strong enough to ship without generating more. Returns index 0 and weak
- *  on any failure (caller falls back to the first valid candidate). */
-async function judge(
-  client: Anthropic,
-  candidates: Comp[],
-  signal: AbortSignal,
-): Promise<{ winner: number; strong: boolean }> {
-  if (candidates.length === 1) {
-    // Solo gate: is candidate 0 strong enough to ship as-is?
-    const card = JSON.stringify({
-      player_name: candidates[0].player_name,
-      archetype_title: candidates[0].archetype_title,
-      card_summary: candidates[0].card_summary,
-      screenshot_line: candidates[0].screenshot_line,
-      why_this_player: candidates[0].why_this_player,
-    });
-    const msg = await client.messages.create(
-      {
-        model: MODEL,
-        max_tokens: JUDGE_MAX_TOKENS,
-        system: JUDGE_SYSTEM,
-        messages: [
-          {
-            role: "user",
-            content:
-              `Here is one candidate comp:\n${card}\n\n` +
-              `Is it strong on BOTH accuracy and fun — precise pick, true and genuinely sharp line, would a stranger screenshot it? ` +
-              `Reply with ONLY JSON: {"strong": true|false}. ` +
-              `Be strict: "strong" is false if the pick feels generic/lazy or the line is soft.`,
-          },
-        ],
-      },
-      { signal },
-    );
-    try {
-      const t = textFromMessage(msg);
-      const m = t.match(/\{[\s\S]*\}/);
-      const v = m ? (JSON.parse(m[0]) as { strong?: unknown }) : {};
-      return { winner: 0, strong: v.strong === true };
-    } catch {
-      return { winner: 0, strong: false };
-    }
-  }
-
-  // Pick-the-best across multiple candidates.
-  const summary = candidates
-    .map((c, i) =>
-      JSON.stringify({
-        index: i,
-        player_name: c.player_name,
-        archetype_title: c.archetype_title,
-        card_summary: c.card_summary,
-        screenshot_line: c.screenshot_line,
-        why_this_player: c.why_this_player,
-      }),
-    )
-    .join("\n");
-  const msg = await client.messages.create(
-    {
-      model: MODEL,
-      max_tokens: JUDGE_MAX_TOKENS,
-      system: JUDGE_SYSTEM,
-      messages: [
-        {
-          role: "user",
-          content:
-            `Here are ${candidates.length} candidate comps for the same person:\n${summary}\n\n` +
-            `Pick the single best on accuracy AND fun combined. ` +
-            `Reply with ONLY JSON: {"winner": <index>}.`,
-        },
-      ],
-    },
-    { signal },
-  );
-  try {
-    const t = textFromMessage(msg);
-    const m = t.match(/\{[\s\S]*\}/);
-    const v = m ? (JSON.parse(m[0]) as { winner?: unknown }) : {};
-    const w =
-      typeof v.winner === "number" &&
-      v.winner >= 0 &&
-      v.winner < candidates.length
-        ? v.winner
-        : 0;
-    return { winner: w, strong: true };
-  } catch {
-    return { winner: 0, strong: true };
-  }
 }
 
 // ---- Handler ----------------------------------------------------------------
@@ -300,8 +196,7 @@ export async function POST(req: Request): Promise<Response> {
       { status: 400 },
     );
   }
-  // With no resume AND no free-text signal, the quiz still carries it — the v7
-  // prompt handles a thin/empty tape. So we don't hard-require careerText.
+  // With no resume the quiz still carries it — the v7 prompt handles a thin tape.
 
   // ---- Limits ----
   const { rateLimited, spendExhausted } = await checkLimits(clientIp(req));
@@ -318,65 +213,33 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  // ---- Generate (best-of-3, conditional judge) ----
+  // ---- Generate (single balanced pass) ----
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), OVERALL_TIMEOUT_MS);
 
   try {
-    const lenses: Lens[] = ["sharp", "roast", "pattern"];
-
-    // Candidate 1 (sharp). Judge it solo; only generate 2 & 3 if it's weak.
-    const c1 = await generateCandidate(
+    // The balanced "best" lens: maximum accuracy AND maximum earned bite in one
+    // pass (the v7 spot-check config). The system prompt makes both co-primary.
+    let comp = await generateCandidate(
       anthropic,
-      buildUserMessage(careerText, answers, lenses[0]),
+      buildUserMessage(careerText, answers, "best"),
       controller.signal,
     );
-
-    if (!c1) {
-      // First lens failed twice — try the roast lens once as a fallback.
-      const fallback = await generateCandidate(
+    // If the first pass failed twice (rare), one fallback on the roast lens.
+    if (!comp) {
+      comp = await generateCandidate(
         anthropic,
-        buildUserMessage(careerText, answers, lenses[1]),
+        buildUserMessage(careerText, answers, "roast"),
         controller.signal,
       );
-      if (!fallback) {
-        return Response.json(
-          { error: "The scout couldn't get a clean read. Try again." },
-          { status: 503 },
-        );
-      }
-      return Response.json({ comp: fallback }, { status: 200 });
     }
-
-    const solo = await judge(anthropic, [c1], controller.signal);
-    if (solo.strong) {
-      return Response.json({ comp: c1 }, { status: 200 });
+    if (!comp) {
+      return Response.json(
+        { error: "The scout couldn't get a clean read. Try again." },
+        { status: 503 },
+      );
     }
-
-    // Weak — fire candidates 2 (roast) and 3 (pattern) in parallel.
-    const [c2, c3] = await Promise.all([
-      generateCandidate(
-        anthropic,
-        buildUserMessage(careerText, answers, lenses[1]),
-        controller.signal,
-      ),
-      generateCandidate(
-        anthropic,
-        buildUserMessage(careerText, answers, lenses[2]),
-        controller.signal,
-      ),
-    ]);
-
-    const candidates: Comp[] = [c1, c2, c3].filter(
-      (c): c is Comp => c !== null,
-    );
-    if (candidates.length === 1) {
-      return Response.json({ comp: candidates[0] }, { status: 200 });
-    }
-
-    const verdict = await judge(anthropic, candidates, controller.signal);
-    const winner = candidates[verdict.winner] ?? candidates[0];
-    return Response.json({ comp: winner }, { status: 200 });
+    return Response.json({ comp }, { status: 200 });
   } catch (err) {
     const aborted =
       controller.signal.aborted ||
@@ -387,7 +250,7 @@ export async function POST(req: Request): Promise<Response> {
         { status: 503 },
       );
     }
-    // Anthropic API errors (rate limit upstream, overload, auth) → friendly 503.
+    // Anthropic API errors (overload, auth, upstream limit) → friendly 503.
     return Response.json(
       { error: "The scout's having a moment. Try again in a few seconds." },
       { status: 503 },

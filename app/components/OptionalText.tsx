@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { CSSProperties, ChangeEvent, MouseEvent } from "react";
 import type { OptionalTextProps } from "@/lib/types";
 
@@ -116,11 +116,21 @@ export default function OptionalText({
 
   const [text, setText] = useState(value ?? "");
 
-  // Persistent muted example line beneath the textarea: pick one per mount.
-  const exampleLine = useMemo(() => {
-    if (!examples || examples.length === 0) return "";
-    return examples[Math.floor(Math.random() * examples.length)];
+  // Persistent muted example beneath the textarea, cycling through the rotation
+  // every 3.5s so users see the range, not just one frozen line.
+  const [exIdx, setExIdx] = useState(0);
+  useEffect(() => {
+    if (!examples || examples.length <= 1) return;
+    const id = setInterval(
+      () => setExIdx((i) => (i + 1) % examples.length),
+      3500,
+    );
+    return () => clearInterval(id);
   }, [examples]);
+  const exampleLine =
+    examples && examples.length > 0
+      ? `e.g. ${examples[exIdx % examples.length]}`
+      : "";
 
   // Step-progress dots (filled green, current pulses, trailing faint slot).
   const dots = [];
