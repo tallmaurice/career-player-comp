@@ -1,0 +1,10 @@
+- [Build state](build_state.md) — Career Player Comp: concept, locked decisions, adjustments, stack, immediate next steps
+- [Maurice's career background](user_career_background.md) — 15-year senior sports editor (ESPN, Complex, SNY, BR, BET, Barstool); building AI workflow tools; pursuing editorial-judgment + AI + product roles
+- [Professional positioning](professional_positioning.md) — Editorial+AI "translator" lane; role vs. independent-practice fork; real unsolicited workshop demand; a fleshed-out workshop concept
+- [Writing style rules](writing_style_rules.md) — Zero em dashes, max one tricolon, no "Not X. Y." fragments, banned LLM vocab when writing in Maurice's voice
+- [Design quality bar](design_quality_bar.md) — Beauty non-negotiable; Apple-level simplicity, no AI design tropes (purple, gradients, glassmorphism, etc.)
+- [Avoid generic product playbook](avoid_generic_product_playbook.md) — Don't reflexively reach for default AI-product moves; reason each step from the specific project; strip AI tropes in design and language
+- [Work smart, conserve tokens](work_smart_conserve_tokens.md) — Simplest approach that fully works; avoid redundant work/over-planning; keep real rigor where correctness needs it
+- [Exhaustive first pass](exhaustive_first_pass.md) — Thorough multi-pass thinking before the first response on critical asks; commit to conclusions; update when new info warrants
+- [Honest dialogue](honest_dialogue.md) — Push back when warranted, ask clarifying questions when they improve output, avoid yes-man patterns
+- [Doc editing cohesion](doc_editing_cohesion.md) — Integrate spec/doc edits cohesively as if written from scratch; never bolt updates onto the end

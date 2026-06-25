@@ -1,0 +1,274 @@
+// =============================================================================
+// Career Player Comp — LOCKED contract
+// Every phase (screens, engine, card image) codes against these types.
+// Do NOT change a field name or shape without updating all consumers.
+//
+// Sources of truth:
+//   - Engine output (Comp): system-prompt-v7.md JSON schema (ENGINE LOCKED 2026-06-24)
+//   - Quiz questions: docs/quiz-questions-v5.md (locked draft)
+// =============================================================================
+
+// ---- Engine output (the v7 scouting report) --------------------------------
+
+/** Badge category union. The 3 badges on a Comp MUST span 3 different
+ *  categories, and at least one MUST be "tendency" (the wry/roast badge). */
+export type BadgeCategory = "skill" | "temperament" | "intangible" | "tendency";
+
+export interface Badge {
+  /** Short display label, e.g. "Won't Call His Own Number". */
+  label: string;
+  category: BadgeCategory;
+  /** The specific real-career (or behavioral) detail that earns this badge. */
+  earned_by: string;
+}
+
+export interface StatLine {
+  /** Total years of work experience (estimate). Short value, e.g. "12". */
+  seasons: string;
+  /** Number of distinct employers, counted once. Short value, e.g. "03". */
+  teams: string;
+  /** Number of real career-direction / industry changes. e.g. "01". */
+  pivots: string;
+  /** Rookie Deal | Rising Contract | Mid-Level Exception | Max Contract |
+   *  Veteran Minimum (or a thesis-driven label). e.g. "UFA", "Max Contract". */
+  contract_status: string;
+}
+
+/** The full v7 engine output for one user. All string fields unless noted. */
+export interface Comp {
+  player_name: string;
+  /** e.g. "Small Forward · 2000s-2010s". */
+  position_era: string;
+  /** Coined fresh for this person, 3-5 words, never reused. */
+  archetype_title: string;
+  /** Exactly 3, spanning 3 categories, at least one "tendency". */
+  badges: Badge[];
+  /** 2-3 tight sentences; what prints ON the shareable card. */
+  card_summary: string;
+  /** The single sharpest, funniest, TRUE pull-quote (the standout line). */
+  screenshot_line: string;
+  /** 2-4 short paragraphs; the robust evaluation that lives OFF the card. */
+  full_report: string;
+  /** 1-2 sentences naming the explicit structural career-to-player parallel. */
+  why_this_player: string;
+  stat_line: StatLine;
+  front_office_fit: string;
+  /** Describes the reaction the card is built to produce. */
+  comp_tone: string;
+}
+
+// ---- Quiz answers -----------------------------------------------------------
+
+/** q1-q8 are the multiple-choice answers (the selected option text).
+ *  q9/q10 are the optional free-text fields (skippable). */
+export interface QuizAnswers {
+  q1: string;
+  q2: string;
+  q3: string;
+  q4: string;
+  q5: string;
+  q6: string;
+  q7: string;
+  q8: string;
+  q9?: string;
+  q10?: string;
+}
+
+// ---- App state machine ------------------------------------------------------
+
+export type Screen =
+  | "landing"
+  | "upload"
+  | "quiz"
+  | "optional9"
+  | "optional10"
+  | "loading"
+  | "results";
+
+export interface AppState {
+  screen: Screen;
+  /** Extracted PDF text OR pasted work history. */
+  careerText: string;
+  answers: Partial<QuizAnswers>;
+  result: Comp | null;
+}
+
+// ---- Screen component props (all presentational; navigation via callbacks) --
+
+export interface LandingProps {
+  onStart: () => void;
+}
+
+export interface CareerUploadProps {
+  onContinue: (careerText: string) => void;
+  onBack: () => void;
+}
+
+/** The shape of one multiple-choice quiz question. */
+export interface QuizQuestion {
+  /** The question text shown to the user. */
+  prompt: string;
+  /** The dimension this question measures (e.g. "ALTITUDE", "TEMPERAMENT"). */
+  section: string;
+  /** 4-5 answer option strings. */
+  options: string[];
+}
+
+export interface QuizQuestionProps {
+  /** 0-based index of this question (0..total-1). */
+  index: number;
+  /** Total number of multiple-choice questions (8). */
+  total: number;
+  question: QuizQuestion;
+  /** The currently selected option, if any. */
+  selected?: string;
+  onSelect: (option: string) => void;
+  onBack: () => void;
+}
+
+export interface OptionalTextProps {
+  /** Which optional field this is. */
+  which: 9 | 10;
+  prompt: string;
+  placeholder: string;
+  /** Rotating example placeholder lines for this field. */
+  examples: string[];
+  value?: string;
+  onContinue: (value: string) => void;
+  onSkip: () => void;
+  onBack: () => void;
+}
+
+// ScoutingRoom (loading) is self-contained theater; no props.
+export interface ScoutingRoomProps {}
+
+export interface ResultsProps {
+  comp: Comp;
+  onAppeal: () => void;
+  /** Stripe Payment Link (external URL) for the tip. */
+  tipUrl: string;
+  /** URL of the server-rendered card PNG for native share + download. */
+  cardImageUrl: string;
+}
+
+// =============================================================================
+// QUIZ CONTENT — locked from docs/quiz-questions-v5.md
+// 8 tap-to-advance multiple choice (one dimension each) + 2 optional text.
+// No em dashes in any option (per the v5 lock).
+// =============================================================================
+
+export const QUESTIONS: QuizQuestion[] = [
+  {
+    section: "ALTITUDE", // builder vs joiner; the #1 comp dimension. Feeds GATE 1.
+    prompt: "Think of the work you're proudest of. Which is closest?",
+    options: [
+      "I built it from nothing",
+      "I took something broken and fixed it",
+      "I ran something already working and kept it humming",
+      "I made a good team better from inside it",
+      "I got really good at one specific thing",
+    ],
+  },
+  {
+    section: "SCOPE",
+    prompt: "That thing you're known for, you pulled off:",
+    options: [
+      "Mostly solo",
+      "With a small crew I led",
+      "As one piece of a big team",
+      "By running a large operation",
+      "Quietly, while other people got the credit",
+    ],
+  },
+  {
+    section: "TEMPERAMENT", // closer/facilitator/anchor/grunt/planner. Feeds GATE 2.
+    prompt: "Crunch time, everyone's watching. You're the one who:",
+    options: [
+      "Takes the last shot",
+      "Sets up whoever takes it",
+      "Keeps everyone calm",
+      "Does the ugly work nobody will touch",
+      "Already saw it coming and planned for it",
+    ],
+  },
+  {
+    section: "ARC", // lifer/climber/reinventor/journeyman/slow-burn.
+    prompt: "Step back at your whole career. It looks like:",
+    options: [
+      "One lane, gone deep",
+      "A steady climb up one ladder",
+      "A couple of full reinventions",
+      "A lot of stops, but I always land on my feet",
+      "A slow burn that took a while to click",
+    ],
+  },
+  {
+    section: "CONFLICT",
+    prompt:
+      "Someone on your team isn't pulling their weight. The honest version of what you do:",
+    options: [
+      "Say it to their face, fast",
+      "Go over their head",
+      "Quietly cover it and resent it a little",
+      "Try to coach them up",
+      "Stay out of it, not my call",
+    ],
+  },
+  {
+    section: "SELF-IMAGE GAP", // prime roast fuel; feeds the bite.
+    prompt: "What do people get wrong about you at work?",
+    options: [
+      "They think I run more than I do",
+      "They think I'm chill, I'm keeping score",
+      "They underestimate me until they need me",
+      "They think I love this, I'm just good at it",
+      "They think I have a plan, I'm improvising",
+    ],
+  },
+  {
+    section: "ENDGAME", // ambition type.
+    prompt: "The version of you that 'made it' in ten years:",
+    options: [
+      "Running the whole thing",
+      "Best in the building at one craft",
+      "Out on my own, built something mine",
+      "Still here, still steady, that's the win",
+      "Honestly not sure, and fine with that",
+    ],
+  },
+  {
+    section: "MOTIVATION",
+    prompt: "What actually keeps you in it?",
+    options: [
+      "Winning",
+      "The craft itself",
+      "The people I'd let down if I left",
+      "The paycheck, no shame",
+      "Proving the doubters wrong",
+    ],
+  },
+];
+
+/** Optional free-text Q9 — the secret weapon (per v7, the strongest signal). */
+export const Q9_PROMPT =
+  "One thing about how you work that everyone around you knows but nobody says out loud.";
+
+/** Rotating placeholder examples for Q9 (cycle in the textarea). */
+export const Q9_EXAMPLES: string[] = [
+  "Be honest. This is between you and the scout.",
+  "Say the quiet part. We won't put your name on it.",
+  "The thing your last manager hinted at but never wrote down.",
+  "The habit that makes you great and a little hard to work with.",
+];
+
+/** Optional free-text Q10 — the resume safety-net. */
+export const Q10_PROMPT =
+  "Anything a resume would miss? How long you've been at this, a pivot that mattered, what you actually do all day, a win that doesn't fit on paper.";
+
+/** Rotating placeholder examples for Q10 (cycle in the textarea). */
+export const Q10_EXAMPLES: string[] = [
+  "The scout reads everything.",
+  "Paste a review note, a recent win, or just describe what you actually do.",
+  "The pivot that doesn't show up cleanly on the resume.",
+  "What you're the person for, even though it's not in your title.",
+];

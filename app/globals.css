@@ -1,0 +1,167 @@
+/* =============================================================================
+   Career Player Comp — design system
+   Extracted VERBATIM from the design export's <style> block
+   (aios/projects/career-player-comp/design-export/CPC-design/Career Player Comp.dc.html,
+   lines ~15-114). Do NOT re-express in Tailwind. The design is pixel-specific.
+   Palette is LIGHT cream paper + green accent (supersedes the old dark/gold spec).
+   ============================================================================= */
+
+:root {
+  /* palette */
+  --bg: #e9e3d5;
+  --card: #faf6ea;
+  --ink: #211e17;
+  --green: #2f6043;
+  --green-hi: #37714f;
+  --muted: #6b655a;
+  --muted2: #8a8680;
+  --faint: #a8a090;
+  --line: rgba(33, 30, 23, 0.12);
+
+  /* badge / grade category colors */
+  --scoring: #bd5024;   /* scoring (burnt orange) */
+  --defense: #356287;   /* defense (steel blue) */
+  --playmaking: #3a8054; /* playmaking (court green) */
+  --culture: #8f7220;   /* culture / intangible (ochre) */
+
+  /* fonts — bound to next/font CSS variables in app/layout.tsx.
+     Fallbacks keep the design intact if the variables are absent. */
+  --font-display: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  --font-body: var(--font-inter), "Inter", sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* reusable paper background — the warm cream + barely-there fractal-noise texture
+   lifted from every screen wrapper in the export. Apply to full-screen wrappers. */
+.paper-bg {
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='pa'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.10  0 0 0 0 0.07  0 0 0 0.045 0'/></filter><rect width='100%' height='100%' filter='url(%23pa)'/></svg>");
+  color: var(--ink);
+  isolation: isolate;
+}
+
+/* ---- keyframes (verbatim) ---------------------------------------------- */
+@keyframes pulseDot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(0.86); } }
+@keyframes scoutDrift { 0% { transform: translateY(0); } 100% { transform: translateY(-2900px); } }
+@keyframes scoutBreathe { 0%,100% { opacity:0.07; } 12%,88% { opacity:0.1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes ballPulse { 0%,100% { opacity:1; } 50% { opacity:0.42; } }
+
+/* ---- VHS loader (verbatim) --------------------------------------------- */
+.vhs .reel { transform-box: fill-box; transform-origin: center; animation: spin 2s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .vhs .reel { animation:none; } .vhs { animation: ballPulse 2.4s ease-in-out infinite; } }
+
+/* ---- typewriter caret (verbatim) --------------------------------------- */
+@keyframes caretBlink { 50% { opacity:0; } }
+.tw-caret { display:inline-block; width:9px; height:20px; background:#2f6043; vertical-align:-4px; margin-left:4px; animation: caretBlink 1s steps(1) infinite; }
+
+/* ---- upload drop zone / paste area (verbatim) -------------------------- */
+.drop-zone { transition: border-color 140ms ease, background 140ms ease; cursor:pointer; }
+.drop-zone:hover { border-color: rgba(47,96,67,0.75); background:#efe8d6; }
+.paste-area { transition: border-color 140ms ease; }
+.paste-area:focus-within { border-color: rgba(47,96,67,0.6); }
+
+/* ---- 3D tilt card (verbatim) ------------------------------------------- */
+.tilt-wrap { perspective: 1400px; }
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 400ms cubic-bezier(.2,.7,.2,1), box-shadow 400ms cubic-bezier(.2,.7,.2,1);
+  transform: rotateX(-5deg) rotateY(8deg);
+}
+.layer-z1 { transform: translateZ(26px); }
+.layer-z2 { transform: translateZ(44px); }
+.layer-z3 { transform: translateZ(62px); }
+
+/* drift field — ink on paper, barely-there texture (verbatim) */
+.scout-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+.scout-bg > span {
+  position:absolute; font-family:'JetBrains Mono', monospace; font-weight:500;
+  color:#131009; letter-spacing:0.08em; white-space:nowrap; will-change:transform,opacity;
+  animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite;
+  animation-name: scoutDrift, scoutBreathe;
+}
+.scout-bg .x-mark, .scout-bg .o-mark { font-family:'Barlow Condensed', sans-serif; font-weight:600; letter-spacing:0; }
+@media (prefers-reduced-motion: reduce) { .scout-bg > span { animation:none; opacity:0.04; } }
+
+/* paper card — lifted physical artifact on the desk (verbatim) */
+.paper-card {
+  position:relative; background:#faf6ea; border:1px solid rgba(33,30,23,0.24); border-radius:6px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 22px 46px -18px rgba(33,30,23,0.42), 0 5px 12px -5px rgba(33,30,23,0.22);
+  isolation:isolate; color:#211e17;
+}
+.paper-card::before {
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:-1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.13  0 0 0 0 0.11  0 0 0 0 0.08  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply; opacity:0.55;
+}
+.paper-card::after {
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:-1;
+  background:
+    radial-gradient(ellipse at 5% 4%, rgba(33,30,23,0.07), transparent 38%),
+    radial-gradient(ellipse at 97% 97%, rgba(33,30,23,0.09), transparent 40%);
+}
+
+/* worn filing markers (verbatim) */
+.stamp {
+  position:absolute; top:18px; right:18px; transform:rotate(-2.5deg);
+  padding:5px 9px 4px; border:1px solid rgba(47,96,67,0.55);
+  font:500 9px 'JetBrains Mono', monospace; letter-spacing:0.22em; color:#2f6043; opacity:0.82;
+  line-height:1.35; text-align:center; box-shadow: inset 0 0 8px rgba(47,96,67,0.07); z-index:2; border-radius:2px;
+}
+.stamp .dept { display:block; }
+.stamp .cls { display:block; font-size:8px; opacity:0.7; margin-top:1px; letter-spacing:0.28em; }
+.file-no {
+  display:inline-block; font:500 10px 'JetBrains Mono', monospace; letter-spacing:0.16em;
+  color:#5d584d; border:1px solid rgba(33,30,23,0.28); padding:3px 8px; border-radius:2px;
+  background:rgba(33,30,23,0.025); transform:rotate(-0.5deg);
+}
+
+/* scouting intake form (quiz) — one unified ruled block (verbatim) */
+.form-block {
+  background:#f4eede; border:1px solid rgba(33,30,23,0.22); border-radius:4px; overflow:hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 4px rgba(33,30,23,0.05);
+}
+.form-row {
+  display:flex; align-items:baseline; gap:20px; padding:20px 24px;
+  border-bottom:1px solid rgba(33,30,23,0.12);
+  transition: background 140ms ease; cursor:pointer;
+}
+.form-row:last-child { border-bottom:none; }
+.form-row:hover { background:rgba(47,96,67,0.05); }
+.form-row.selected { background:rgba(47,96,67,0.1); }
+.form-marker {
+  border:1px solid rgba(33,30,23,0.22); padding:3px 7px 2px; font:500 10px 'JetBrains Mono', monospace;
+  letter-spacing:0.2em; color:#6b655a; border-radius:1px; flex-shrink:0; background:rgba(255,255,255,0.5);
+}
+.form-row.selected .form-marker { background:#2f6043; border-color:#2f6043; color:#f4efe2; }
+
+/* grade — letter + fixed suffix slot so letters align with or without +/- (verbatim) */
+.grade { display:flex; justify-content:flex-end; align-items:baseline; }
+.grade .ltr { font-family:'Barlow Condensed'; font-weight:700; line-height:1; }
+.grade .suf { display:inline-block; text-align:left; font-family:'Barlow Condensed'; font-weight:700; opacity:0.62; }
+
+/* CTAs (verbatim) */
+.cta-green { transition: transform 120ms ease, background 120ms ease; cursor:pointer; }
+.cta-green:hover { background:#37714f; transform:translateY(-1px); }
+.ghost-ln { transition: background 120ms ease, border-color 120ms ease; cursor:pointer; }
+.ghost-ln:hover { background:rgba(33,30,23,0.04); border-color:rgba(47,96,67,0.45); }
+textarea[data-rotate]::placeholder { color:#a8a090; opacity:1; transition: opacity 480ms ease; }
+textarea[data-rotate].ph-fade::placeholder { opacity:0; }

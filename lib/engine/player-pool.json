@@ -1,0 +1,1622 @@
+[
+  {
+    "name": "Larry Bird",
+    "position_era": "Small Forward / 1980s",
+    "altitude": "founder",
+    "temperament": "closer",
+    "arc": "franchise-architect",
+    "distinctive_detail": "Took the same franchise he carried as a player and rebuilt it from the front office and bench, winning Coach of the Year, Executive of the Year, and MVP across three different jobs.",
+    "work_style": "Ran everything through his own brutal standard and trusted his read over consensus, on the floor and later in the chair.",
+    "career_traits": [
+      "multi-role institution-builder",
+      "ruthless competitor",
+      "stayed inside one organization in three capacities",
+      "set the standard others measured against"
+    ],
+    "2k_label": "The Architect Who Could Also Play",
+    "comp_tone": "Earned, dry, total respect. For the person who built the thing and then ran the thing.",
+    "league": "NBA"
+  },
+  {
+    "name": "Magic Johnson",
+    "position_era": "Point Guard / 1980s",
+    "altitude": "founder",
+    "temperament": "facilitator",
+    "arc": "reinventor",
+    "distinctive_detail": "Built a second identity entirely outside the game as an operator and investor after his career was cut short by a forced exit, becoming bigger off the floor than most are on it.",
+    "work_style": "Made everyone around him better by design, then took that same connective instinct into building businesses from scratch.",
+    "career_traits": [
+      "elite connector",
+      "second act eclipsed the first",
+      "turned a forced ending into a launch",
+      "operator at scale"
+    ],
+    "2k_label": "The One Who Got Bigger After",
+    "comp_tone": "Generous, expansive, builder energy. For the connector whose second act is the real story.",
+    "league": "NBA"
+  },
+  {
+    "name": "Isiah Thomas",
+    "position_era": "Point Guard / 1980s",
+    "altitude": "founder",
+    "temperament": "closer",
+    "arc": "political-exit",
+    "distinctive_detail": "Brilliant on-floor leader and franchise builder whose post-playing executive runs repeatedly ended in political flameouts that overshadowed real wins.",
+    "work_style": "Led with force and charisma, built and ran organizations, but burned as many bridges as he crossed.",
+    "career_traits": [
+      "undersized leader who willed wins",
+      "front-office ambition",
+      "talent shadowed by politics",
+      "polarizing operator"
+    ],
+    "2k_label": "The Leader The Politics Caught",
+    "comp_tone": "[QA] Honest about the political-exit shadow on his executive runs; verify the user wants the full arc and not just the playing legacy.",
+    "league": "NBA"
+  },
+  {
+    "name": "Jerry West",
+    "position_era": "Guard / 1960s-1970s",
+    "altitude": "founder",
+    "temperament": "closer",
+    "arc": "reinventor",
+    "distinctive_detail": "Became a far greater team architect than even his Hall of Fame playing career, building or shaping multiple title rosters as a GM and front-office consultant across four franchises.",
+    "work_style": "Obsessive talent evaluator who could not stand losing and translated a clutch player's edge into roster construction.",
+    "career_traits": [
+      "the logo who became the executive",
+      "built dynasties from the chair",
+      "perfectionist evaluator",
+      "second career outgrew the first"
+    ],
+    "2k_label": "The Builder Behind The Logo",
+    "comp_tone": "Reverent, sharp. For the person whose building work outran their already-great first act.",
+    "league": "NBA"
+  },
+  {
+    "name": "Pat Riley",
+    "position_era": "Guard-Coach-Exec / 1970s-2020s",
+    "altitude": "founder",
+    "temperament": "closer",
+    "arc": "reinventor",
+    "distinctive_detail": "Went from limited role player to defining coach to franchise-building executive, standing up a championship culture in Miami from essentially nothing and keeping it alive for decades.",
+    "work_style": "Imposed a non-negotiable standard and culture, reinvented his own role three times to stay load-bearing.",
+    "career_traits": [
+      "role player to institution",
+      "culture-from-scratch builder",
+      "serial reinventor",
+      "decades of relevance"
+    ],
+    "2k_label": "The Standard-Setter",
+    "comp_tone": "Commanding, earned. For the serial reinventor who builds the whole culture, not just the team.",
+    "league": "NBA"
+  },
+  {
+    "name": "Gregg Popovich",
+    "position_era": "Coach-Exec / 1990s-2020s",
+    "altitude": "founder",
+    "temperament": "anchor",
+    "arc": "franchise-architect",
+    "distinctive_detail": "Hired himself as coach after running basketball operations and built one of the most durable organizations in sports, stable enough that everyone wanted to work inside it.",
+    "work_style": "Built a system and a value set that outlasted any individual player and made the institution the star.",
+    "career_traits": [
+      "org-builder over star-chaser",
+      "system that survived turnover",
+      "long-haul stability",
+      "developed people not just players"
+    ],
+    "2k_label": "The Institution Builder",
+    "comp_tone": "Dry, deep respect. For the founder who built a place people want to belong to and never leave.",
+    "league": "NBA"
+  },
+  {
+    "name": "Steve Nash",
+    "position_era": "Point Guard / 2000s",
+    "altitude": "system-runner",
+    "temperament": "facilitator",
+    "arc": "late-bloomer",
+    "distinctive_detail": "An overlooked, traded-away prospect who became a two-time MVP in his thirties by running an offense that redefined how the game was played.",
+    "work_style": "Made an entire system work through vision and pace, peaking late once he finally got the keys.",
+    "career_traits": [
+      "overlooked early then elite late",
+      "redefined the system around him",
+      "peaked in his thirties",
+      "engine not the scorer"
+    ],
+    "2k_label": "The Late MVP",
+    "comp_tone": "Warm, smart. For the person who got the keys late and made everything around them run.",
+    "league": "NBA"
+  },
+  {
+    "name": "Chauncey Billups",
+    "position_era": "Point Guard / 2000s",
+    "altitude": "system-runner",
+    "temperament": "closer",
+    "arc": "journeyman",
+    "distinctive_detail": "Bounced through five teams in his first six seasons before landing in Detroit, where he became Mr. Big Shot and a Finals MVP running the offense and taking the last shot.",
+    "work_style": "A high-usage closer who controlled the game's final possessions, found his home only after years of being moved.",
+    "career_traits": [
+      "journeyman who found his fit",
+      "Finals MVP",
+      "wanted the last shot",
+      "leader who arrived after detours"
+    ],
+    "2k_label": "Mr. Big Shot",
+    "comp_tone": "Earned, clutch. For the closer who got passed around before becoming the one who takes the final shot.",
+    "league": "NBA"
+  },
+  {
+    "name": "Robert Horry",
+    "position_era": "Forward / 1990s-2000s",
+    "altitude": "role",
+    "temperament": "closer",
+    "arc": "steady-prime",
+    "distinctive_detail": "Modest regular-season role player who hit so many series-deciding shots across three franchises he earned the nickname Big Shot Rob and seven rings.",
+    "work_style": "Disappeared for stretches then took and made the single biggest shot of the night when it mattered.",
+    "career_traits": [
+      "low-usage most nights",
+      "elite in the deciding moment",
+      "winner across multiple homes",
+      "moment closer"
+    ],
+    "2k_label": "The Big-Moment Closer",
+    "comp_tone": "Sly, accurate. For the quiet operator who only shows up huge exactly when the stakes are highest.",
+    "league": "NBA"
+  },
+  {
+    "name": "Manu Ginobili",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "spark",
+    "arc": "slow-climb",
+    "distinctive_detail": "Drafted 57th, played years in Europe, then came over and accepted a sixth-man role for his whole prime despite being good enough to start, climbing into the Hall of Fame the unglamorous way.",
+    "work_style": "Brought instant chaos-creating offense off the bench and put ego aside for the role the team needed.",
+    "career_traits": [
+      "near-last pick",
+      "long developmental road before the NBA",
+      "chose bench role for the team",
+      "slow climb to the Hall"
+    ],
+    "2k_label": "The Sixth-Man Hall of Famer",
+    "comp_tone": "Beloved, dry. For the slow-burn riser who took the long way and put the team over the title.",
+    "league": "NBA"
+  },
+  {
+    "name": "John Stockton",
+    "position_era": "Point Guard / 1980s-2000s",
+    "altitude": "system-runner",
+    "temperament": "facilitator",
+    "arc": "lifer",
+    "distinctive_detail": "Played all 19 seasons for one franchise, never flashy, and quietly became the all-time leader in assists and steals through pure unglamorous consistency.",
+    "work_style": "Showed up, ran the offense the same exact way for two decades, and let the compounding numbers speak.",
+    "career_traits": [
+      "one team, 19 years",
+      "unglamorous compounding",
+      "low-flash all-time great",
+      "institutional memory"
+    ],
+    "2k_label": "The Compounding Lifer",
+    "comp_tone": "Quiet, exact. For the unflashy lifer whose numbers only make sense after twenty years of the same thing.",
+    "league": "NBA"
+  },
+  {
+    "name": "Tim Duncan",
+    "position_era": "Power Forward / 1990s-2010s",
+    "altitude": "star",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Played 19 seasons with one franchise as the quiet, fundamental anchor, never seeking spotlight, the steady foundation everything was built on.",
+    "work_style": "Did the same reliable, fundamentally perfect things every night for nearly two decades with zero ego or drama.",
+    "career_traits": [
+      "one team, 19 years",
+      "anchor of a dynasty",
+      "no-ego foundation",
+      "fundamentals over flash"
+    ],
+    "2k_label": "The Quiet Foundation",
+    "comp_tone": "Reserved, deep respect. For the no-drama anchor everything else gets built on top of.",
+    "league": "NBA"
+  },
+  {
+    "name": "Udonis Haslem",
+    "position_era": "Power Forward / 2000s-2020s",
+    "altitude": "glue",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Undrafted, played 20 seasons for his hometown team, spending his last years barely playing but holding the locker room together as the keeper of the culture.",
+    "work_style": "Did the dirty work early, then transitioned into the unofficial standard-keeper who mentored everyone who came through.",
+    "career_traits": [
+      "undrafted lifer",
+      "20 years one team",
+      "culture keeper",
+      "mentor to new arrivals"
+    ],
+    "2k_label": "The Culture Keeper",
+    "comp_tone": "Warm, dignified. For the undrafted lifer who became the institution's conscience.",
+    "league": "NBA"
+  },
+  {
+    "name": "Ben Wallace",
+    "position_era": "Center / 2000s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "late-bloomer",
+    "distinctive_detail": "Undrafted, told he was too short to play center, became a four-time Defensive Player of the Year and the anchor of a title team without ever needing the ball.",
+    "work_style": "Built an All-Star career entirely out of effort, defense, and rebounding, things that do not show in the box score.",
+    "career_traits": [
+      "undrafted, doubted",
+      "elite at the unglamorous job",
+      "value invisible on the stat sheet",
+      "blue-collar anchor"
+    ],
+    "2k_label": "The Undrafted Anchor",
+    "comp_tone": "Blue-collar pride. For the person whose whole value is the work nobody puts in the highlight reel.",
+    "league": "NBA"
+  },
+  {
+    "name": "Dennis Rodman",
+    "position_era": "Forward / 1990s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "late-bloomer",
+    "distinctive_detail": "Did not play organized ball until his twenties, then became the best rebounder of his era by mastering one elite skill while ignoring scoring entirely.",
+    "work_style": "Obsessively perfected a single high-value skill and accepted being a non-scorer to be irreplaceable at one thing.",
+    "career_traits": [
+      "late start",
+      "elite at exactly one thing",
+      "ignored the glamour stat",
+      "irreplaceable specialist"
+    ],
+    "2k_label": "The One-Skill Master",
+    "comp_tone": "[QA] Use for the off-floor antics only if the user fits; the career fact is the elite single-skill specialist who started late.",
+    "league": "NBA"
+  },
+  {
+    "name": "PJ Tucker",
+    "position_era": "Forward / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "journeyman",
+    "distinctive_detail": "Washed out of the NBA after one rookie year, spent five seasons grinding overseas in five countries, then came back and carved a long career as a defensive specialist who never needed plays run for him.",
+    "work_style": "Defends the toughest assignment, hits the corner three, complains about nothing, and survives by doing exactly one job extremely well.",
+    "career_traits": [
+      "washed out then clawed back",
+      "years grinding abroad",
+      "defensive specialist",
+      "needs zero touches"
+    ],
+    "2k_label": "The Specialist Who Clawed Back",
+    "comp_tone": "Gritty, respectful. For the person who got cut, went and proved it elsewhere, and came back to do one job perfectly.",
+    "league": "NBA"
+  },
+  {
+    "name": "Shane Battier",
+    "position_era": "Forward / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "steady-prime",
+    "distinctive_detail": "The no-stats All-Star: contributed almost entirely in ways the box score missed, doing the unselfish dirty work that made good teams great.",
+    "work_style": "Took the hard defensive assignment and made the smart play, valuable precisely because his impact was invisible.",
+    "career_traits": [
+      "high-IQ fitter",
+      "value off the box score",
+      "slots into built things",
+      "unselfish complement"
+    ],
+    "2k_label": "The No-Stats Glue Piece",
+    "comp_tone": "Cerebral. For the complementary piece who makes a built thing better, not the one who builds it.",
+    "league": "NBA"
+  },
+  {
+    "name": "Draymond Green",
+    "position_era": "Forward / 2010s-2020s",
+    "altitude": "system-runner",
+    "temperament": "anchor",
+    "arc": "late-bloomer",
+    "distinctive_detail": "A second-round pick who became the defensive and emotional engine of a dynasty by doing everything except score, the brain of the operation despite never being the talent.",
+    "work_style": "Quarterbacks the defense, makes the connective plays, and runs his mouth as the team's enforcer and conscience.",
+    "career_traits": [
+      "second-round overachiever",
+      "engine without the scoring",
+      "emotional and tactical core",
+      "irreplaceable connector"
+    ],
+    "2k_label": "The Engine That Doesn't Score",
+    "comp_tone": "Fiery, sharp. For the connective brain who runs the whole thing without ever being the headline.",
+    "league": "NBA"
+  },
+  {
+    "name": "Andre Iguodala",
+    "position_era": "Forward / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "facilitator",
+    "arc": "reinventor",
+    "distinctive_detail": "Gave up being a leading scorer and All-Star to become a bench role player and Finals MVP, reinventing himself for a winning team late in his career.",
+    "work_style": "Swallowed ego, took the defensive assignment and the bench role, and saved his best for the biggest games.",
+    "career_traits": [
+      "star turned role player",
+      "ego-free reinvention",
+      "Finals MVP off the bench",
+      "big-moment defender"
+    ],
+    "2k_label": "The Star Who Chose The Role",
+    "comp_tone": "Measured. For the person who stepped down in title to step up in value.",
+    "league": "NBA"
+  },
+  {
+    "name": "Marcus Smart",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "spark",
+    "arc": "steady-prime",
+    "distinctive_detail": "Won Defensive Player of the Year as a guard, valued for emotional fire and defense rather than scoring, the spark plug a team rallies around.",
+    "work_style": "Sets the emotional temperature, takes the charge, plays harder than everyone, and accepts the dirty-work identity.",
+    "career_traits": [
+      "energy and emotion",
+      "defensive identity",
+      "spark plug",
+      "value beyond scoring"
+    ],
+    "2k_label": "The Spark And The Pest",
+    "comp_tone": "Fiery. For the person whose value is the energy and edge they bring, not the numbers.",
+    "league": "NBA"
+  },
+  {
+    "name": "Jrue Holiday",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "facilitator",
+    "arc": "steady-prime",
+    "distinctive_detail": "A quiet two-way guard who repeatedly accepts a smaller role on better teams, doing the selfless winning work that earns universal respect from peers.",
+    "work_style": "Defends the other team's best, gives up shots, and does the unselfish thing that makes a contender complete.",
+    "career_traits": [
+      "selfless two-way guard",
+      "downsizes role to win",
+      "peer-respected",
+      "winning complement"
+    ],
+    "2k_label": "The Selfless Two-Way Guy",
+    "comp_tone": "Quiet respect. For the unselfish professional who keeps making winners out of better teams.",
+    "league": "NBA"
+  },
+  {
+    "name": "Patrick Beverley",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "spark",
+    "arc": "journeyman",
+    "distinctive_detail": "Went undrafted, spent years overseas, then built a career almost entirely on irritating defense and outsized energy on a string of different teams.",
+    "work_style": "Annoys the opposing star, talks nonstop, and survives by making himself impossible to ignore on defense.",
+    "career_traits": [
+      "undrafted, played abroad",
+      "career built on edge and energy",
+      "bounced around",
+      "pest specialist"
+    ],
+    "2k_label": "The Pest Who Made It",
+    "comp_tone": "Brash, fun. For the person who clawed in from nowhere on pure energy and stubbornness.",
+    "league": "NBA"
+  },
+  {
+    "name": "Tony Allen",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "steady-prime",
+    "distinctive_detail": "Built an entire respected career on lockdown perimeter defense alone, coining First Team All-Defense, First Team All-Offense not allowed about himself.",
+    "work_style": "Guarded the other team's best scorer every night and embraced being a defense-only specialist.",
+    "career_traits": [
+      "elite single-skill defender",
+      "self-aware specialist",
+      "no offensive game",
+      "defined by one job"
+    ],
+    "2k_label": "The Defense-Only Specialist",
+    "comp_tone": "Honest, sharp. For the person who is elite at exactly one hard thing and owns it.",
+    "league": "NBA"
+  },
+  {
+    "name": "Bruce Bowen",
+    "position_era": "Forward / 2000s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "late-bloomer",
+    "distinctive_detail": "Went undrafted and played years in France and the minor leagues before becoming an elite 3-and-D specialist on title teams in his late twenties.",
+    "work_style": "Hit the corner three and locked down the best wing, a specialist who arrived late after a long detour.",
+    "career_traits": [
+      "undrafted, long detour abroad",
+      "3-and-D specialist",
+      "arrived late",
+      "one-job excellence"
+    ],
+    "2k_label": "The Late-Arriving Specialist",
+    "comp_tone": "[QA] Solid on the undrafted/overseas and 3-and-D arc; verify exact years abroad if the detail is load-bearing.",
+    "league": "NBA"
+  },
+  {
+    "name": "Derrick White",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "facilitator",
+    "arc": "slow-climb",
+    "distinctive_detail": "Played Division II ball, was barely recruited, climbed through the developmental ranks, and became a quietly indispensable two-way guard and champion.",
+    "work_style": "Does every small thing right, never needs the spotlight, and got better at every single level he climbed.",
+    "career_traits": [
+      "Division II origin",
+      "climbed every rung",
+      "quietly indispensable",
+      "low-ego complement"
+    ],
+    "2k_label": "The Quiet Climber",
+    "comp_tone": "Understated. For the person who came from a small place and got better at every level.",
+    "league": "NBA"
+  },
+  {
+    "name": "Al Horford",
+    "position_era": "Center / 2000s-2020s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Spent a long, steady, unglamorous career as the reliable adult in the room before finally winning a title in his late thirties.",
+    "work_style": "Does the right thing every possession, mentors younger players, and provides drama-free reliability for over a decade.",
+    "career_traits": [
+      "steady unglamorous pro",
+      "the adult in the room",
+      "won very late",
+      "reliable anchor"
+    ],
+    "2k_label": "The Reliable Adult",
+    "comp_tone": "Calm, dignified. For the steady professional who finally got the payoff after a long, quiet career.",
+    "league": "NBA"
+  },
+  {
+    "name": "Danny Green",
+    "position_era": "Guard / 2010s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "journeyman",
+    "distinctive_detail": "Was cut early in his career, bounced through the G League, then became a 3-and-D specialist who won titles with three different franchises.",
+    "work_style": "Hits the open three, guards the wing, and travels well as a plug-and-play winning piece.",
+    "career_traits": [
+      "cut early then climbed back",
+      "3-and-D specialist",
+      "won with three teams",
+      "plug-and-play piece"
+    ],
+    "2k_label": "The Three-Ring Specialist",
+    "comp_tone": "Steady. For the person who got cut, ground back, and became a reliable winning piece anywhere.",
+    "league": "NBA"
+  },
+  {
+    "name": "Brian Scalabrine",
+    "position_era": "Forward / 2000s",
+    "altitude": "glue",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Barely played but stuck around for over a decade as a beloved end-of-bench locker-room presence who knew exactly what his job was.",
+    "work_style": "Practiced hard, mentored teammates, brought levity, and accepted a role with zero illusions about it.",
+    "career_traits": [
+      "end-of-bench survivor",
+      "locker-room glue",
+      "self-aware role",
+      "long tenure on minutes alone"
+    ],
+    "2k_label": "The Locker-Room Survivor",
+    "comp_tone": "Self-deprecating, warm. For the person who knows the job is presence and does it without ego.",
+    "league": "NBA"
+  },
+  {
+    "name": "Kendrick Perkins",
+    "position_era": "Center / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "steady-prime",
+    "distinctive_detail": "A scowling, low-scoring enforcer whose entire value was screen-setting, rim protection, and intimidation on a title team.",
+    "work_style": "Set hard screens, protected the rim, and brought a hard edge nobody wanted to test.",
+    "career_traits": [
+      "enforcer",
+      "low-scoring high-value",
+      "physical anchor",
+      "intimidation as a skill"
+    ],
+    "2k_label": "The Enforcer",
+    "comp_tone": "Hard-nosed. For the person whose value is toughness and protection, not the stat sheet.",
+    "league": "NBA"
+  },
+  {
+    "name": "DeAndre Jordan",
+    "position_era": "Center / 2010s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "steady-prime",
+    "distinctive_detail": "Built an All-NBA career on rebounding, lobs, and rim protection while being a famously poor free-throw shooter, elite at his lane and limited outside it.",
+    "work_style": "Catches lobs, rebounds, blocks shots, and stays entirely within a narrow but valuable role.",
+    "career_traits": [
+      "elite within a narrow role",
+      "lob and rim specialist",
+      "known limitation",
+      "high-value specialist"
+    ],
+    "2k_label": "The Lob-And-Rim Specialist",
+    "comp_tone": "Straight. For the person who is genuinely elite inside one lane and honest about its edges.",
+    "league": "NBA"
+  },
+  {
+    "name": "Chris Andersen",
+    "position_era": "Center / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "spark",
+    "arc": "journeyman",
+    "distinctive_detail": "Went undrafted, was banned from the league for two years, came back and built an energy-big career on hustle, shot-blocking, and lobs.",
+    "work_style": "Brought frenetic energy and rim protection off the bench and clawed back from a forced exile.",
+    "career_traits": [
+      "undrafted",
+      "banned then returned",
+      "energy specialist",
+      "comeback story"
+    ],
+    "2k_label": "The Comeback Energy Guy",
+    "comp_tone": "[QA] Confident on undrafted/energy-big and the two-year ban return; confirm if you want the ban referenced explicitly.",
+    "league": "NBA"
+  },
+  {
+    "name": "Scottie Pippen",
+    "position_era": "Forward / 1990s",
+    "altitude": "system-runner",
+    "temperament": "facilitator",
+    "arc": "slow-climb",
+    "distinctive_detail": "Came from a tiny college as an unknown, started as an equipment manager-turned-walk-on, and grew into the do-everything second star who made a dynasty function.",
+    "work_style": "Guarded everyone, ran the offense, and did all the connective work while playing alongside a bigger name.",
+    "career_traits": [
+      "from total obscurity to elite",
+      "do-everything second",
+      "made the system work",
+      "underappreciated next to the star"
+    ],
+    "2k_label": "The Indispensable Number Two",
+    "comp_tone": "Earned. For the person who came from nowhere and became the one who makes the whole thing run.",
+    "league": "NBA"
+  },
+  {
+    "name": "Kawhi Leonard",
+    "position_era": "Forward / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "slow-climb",
+    "distinctive_detail": "Entered as a quiet defensive role player, said almost nothing, and methodically built himself into a two-way superstar and Finals MVP through relentless private work.",
+    "work_style": "Lets the work talk, says nothing, and quietly becomes the most reliable closer in the building.",
+    "career_traits": [
+      "role player to superstar",
+      "silent operator",
+      "self-built through work",
+      "clutch closer"
+    ],
+    "2k_label": "The Quiet Riser",
+    "comp_tone": "Low-key, deadly. For the person who says little and just keeps getting better in silence.",
+    "league": "NBA"
+  },
+  {
+    "name": "Jimmy Butler",
+    "position_era": "Forward / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "slow-climb",
+    "distinctive_detail": "Was homeless as a teenager, came off the bench as a rookie, and climbed through sheer work into a max-level closer who repeatedly drags teams to the Finals.",
+    "work_style": "Outworks everyone, demands accountability, and saves his best for elimination games.",
+    "career_traits": [
+      "hard origin",
+      "bench to superstar climb",
+      "accountability culture",
+      "playoff riser"
+    ],
+    "2k_label": "The Climb-By-Force Closer",
+    "comp_tone": "Hard, earned. For the person who built everything from a brutal start through pure relentlessness.",
+    "league": "NBA"
+  },
+  {
+    "name": "Pau Gasol",
+    "position_era": "Center / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "facilitator",
+    "arc": "steady-prime",
+    "distinctive_detail": "A skilled, cerebral big man who thrived as a high-level complementary star, the smart selfless piece that turned a contender into a champion.",
+    "work_style": "Made the right read, passed, and elevated a star teammate without needing to be the alpha.",
+    "career_traits": [
+      "cerebral complement",
+      "skilled passing big",
+      "elevated the alpha",
+      "selfless second star"
+    ],
+    "2k_label": "The Smart Second Star",
+    "comp_tone": "Refined. For the high-skill professional who makes the top dog better by playing the right way.",
+    "league": "NBA"
+  },
+  {
+    "name": "Vince Carter",
+    "position_era": "Guard-Forward / 1990s-2020s",
+    "altitude": "star",
+    "temperament": "spark",
+    "arc": "reinventor",
+    "distinctive_detail": "Reinvented himself from a high-flying franchise scorer into a respected 22-season veteran bench shooter and mentor, the longest career in league history.",
+    "work_style": "Adapted his game completely as his body changed, shifting from headliner to elder role player gracefully.",
+    "career_traits": [
+      "star to role-player reinvention",
+      "22-season longevity",
+      "graceful identity shift",
+      "elder mentor"
+    ],
+    "2k_label": "The 22-Year Reinventor",
+    "comp_tone": "Graceful. For the person who completely changed their role to stay valuable for decades.",
+    "league": "NBA"
+  },
+  {
+    "name": "Grant Hill",
+    "position_era": "Forward / 1990s-2010s",
+    "altitude": "star",
+    "temperament": "facilitator",
+    "arc": "injury-arc",
+    "distinctive_detail": "Was on a Hall-of-Fame superstar track until devastating injuries cost him years, then rebuilt himself into a respected role player and lasted nearly two decades anyway.",
+    "work_style": "Was an elite all-around playmaker, then after injuries reinvented as a smart, durable veteran complement.",
+    "career_traits": [
+      "superstar track derailed",
+      "lost prime years to injury",
+      "rebuilt as a role player",
+      "second-act longevity"
+    ],
+    "2k_label": "The Derailed-Then-Rebuilt Star",
+    "comp_tone": "Bittersweet, respectful. For the person whose ceiling got taken by circumstance who rebuilt anyway.",
+    "league": "NBA"
+  },
+  {
+    "name": "Brandon Roy",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "injury-arc",
+    "distinctive_detail": "Was a clutch rising superstar whose knees forced him out of the game at his peak, a brilliant career cut short by his body.",
+    "work_style": "Was a fearless late-game closer whose career ended early through no fault of his game.",
+    "career_traits": [
+      "brilliant clutch peak",
+      "ended early by injury",
+      "ceiling never fully seen",
+      "what-could-have-been"
+    ],
+    "2k_label": "The Peak Cut Short",
+    "comp_tone": "[QA] Use carefully; the injury-arc is real but the comp can read as tragic, so confirm the person wants that framing.",
+    "league": "NBA"
+  },
+  {
+    "name": "Tracy McGrady",
+    "position_era": "Guard-Forward / 2000s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "injury-arc",
+    "distinctive_detail": "A transcendent scorer whose back and knee injuries eroded his prime and kept him from the deep playoff success his talent deserved.",
+    "work_style": "Could score effortlessly and create from anywhere, but his body kept undercutting the team success.",
+    "career_traits": [
+      "transcendent talent",
+      "prime eroded by injury",
+      "individual brilliance, team frustration",
+      "what-if arc"
+    ],
+    "2k_label": "The Talent The Body Betrayed",
+    "comp_tone": "[QA] Injury-arc is accurate; frame with dignity and confirm the user wants the unfulfilled-ceiling angle.",
+    "league": "NBA"
+  },
+  {
+    "name": "Penny Hardaway",
+    "position_era": "Guard / 1990s",
+    "altitude": "star",
+    "temperament": "facilitator",
+    "arc": "injury-arc",
+    "distinctive_detail": "A point-forward superstar whose injuries cut short a generational ceiling, who later reinvented himself entirely as a successful coach.",
+    "work_style": "Ran an offense with size and vision early, then rebuilt a whole second identity in coaching after the body gave out.",
+    "career_traits": [
+      "generational ceiling",
+      "injuries cut it short",
+      "reinvented as a coach",
+      "two distinct careers"
+    ],
+    "2k_label": "The Ceiling, Then The Reinvention",
+    "comp_tone": "[QA] Confident on the injury arc and coaching reinvention; verify which act the person identifies with.",
+    "league": "NBA"
+  },
+  {
+    "name": "Charles Oakley",
+    "position_era": "Power Forward / 1980s-2000s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Played 19 seasons as the bruising enforcer and protector, the guy who did the physical dirty work and guarded teammates' backs for two decades.",
+    "work_style": "Rebounded, set hard screens, fought everybody, and made himself the team's physical backbone.",
+    "career_traits": [
+      "19-season enforcer",
+      "physical backbone",
+      "protector of teammates",
+      "dirty-work lifer"
+    ],
+    "2k_label": "The Two-Decade Enforcer",
+    "comp_tone": "Hard-nosed, loyal. For the person who is the muscle and the protector everyone leans on.",
+    "league": "NBA"
+  },
+  {
+    "name": "Anthony Mason",
+    "position_era": "Forward / 1990s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "slow-climb",
+    "distinctive_detail": "A third-round pick who got cut, spent years grinding in Turkey, Venezuela, the CBA, and the USBL, then finally clawed into the NBA in his mid-twenties and grew into a rugged point-forward starter.",
+    "work_style": "Did the heavy physical labor, then grew an unexpected playmaking game, all after a long detour just to arrive.",
+    "career_traits": [
+      "third-round pick, cut, played abroad",
+      "years in the CBA and overseas leagues",
+      "physical worker who expanded his game",
+      "long slow climb to a real role"
+    ],
+    "2k_label": "The Grinder Who Earned It",
+    "comp_tone": "Gritty, earned. For the person who got cut, grinded everywhere nobody was watching, and climbed into a real role the hard way.",
+    "league": "NBA"
+  },
+  {
+    "name": "Bill Laimbeer",
+    "position_era": "Center / 1980s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "reinventor",
+    "distinctive_detail": "An unathletic big who built a career on toughness and physicality, then reinvented himself into one of the most successful coaches in WNBA history.",
+    "work_style": "Won with positioning, toughness, and unapologetic edge, then carried that into a long second career coaching champions.",
+    "career_traits": [
+      "limited athlete, max toughness",
+      "physical edge",
+      "reinvented as elite coach",
+      "second career success"
+    ],
+    "2k_label": "The Tough Guy Turned Coach",
+    "comp_tone": "[QA] Confident on the WNBA coaching success and physical-player identity; verify the user wants the villain edge.",
+    "league": "NBA"
+  },
+  {
+    "name": "Dennis Johnson",
+    "position_era": "Guard / 1970s-1980s",
+    "altitude": "role",
+    "temperament": "closer",
+    "arc": "journeyman",
+    "distinctive_detail": "Was a late-blooming prospect who barely played in high school and junior college, then became a Finals MVP and clutch two-way guard across three franchises.",
+    "work_style": "Defended the best guard, took big shots, and arrived as a star after an unlikely early path.",
+    "career_traits": [
+      "barely played young",
+      "late-blooming closer",
+      "Finals MVP",
+      "two-way across three teams"
+    ],
+    "2k_label": "The Unlikely Closer",
+    "comp_tone": "[QA] Confident on the late-blooming, defensive, Finals-MVP arc; verify the early high-school/JUCO detail if quoted.",
+    "league": "NBA"
+  },
+  {
+    "name": "Wes Unseld",
+    "position_era": "Center / 1960s-1970s",
+    "altitude": "star",
+    "temperament": "anchor",
+    "arc": "steady-prime",
+    "distinctive_detail": "Was an immediate franchise force, winning Rookie of the Year and MVP in the same first season and flipping a last-place team into a division winner, all without needing to score, then anchored that one franchise for 13 years.",
+    "work_style": "Made the impact felt from day one through dominant rebounding, the best outlet pass in the game, and brutal screens, all the high-value work that never required a single play run for him.",
+    "career_traits": [
+      "instant star, ROY and MVP as a rookie",
+      "elite impact without scoring",
+      "one-team anchor for 13 years",
+      "value from rebounding, outlets, and screens"
+    ],
+    "2k_label": "The Day-One Anchor",
+    "comp_tone": "Commanding, immediate. For the person who was load-bearing and elite from the very first day, not someone who climbed into it.",
+    "league": "NBA"
+  },
+  {
+    "name": "Michael Cooper",
+    "position_era": "Guard-Forward / 1980s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "reinventor",
+    "distinctive_detail": "A defense-first role player on a glamour dynasty who later reinvented himself into a championship-winning WNBA and NBA-development coach.",
+    "work_style": "Took the toughest perimeter assignment and did the dirty work, then built a long second identity as a coach.",
+    "career_traits": [
+      "defensive specialist on a star team",
+      "no-glamour role",
+      "reinvented as a winning coach",
+      "two careers"
+    ],
+    "2k_label": "The Stopper Turned Coach",
+    "comp_tone": "[QA] Confident on the defensive-specialist and coaching reinvention; verify which league/title if quoting specifics.",
+    "league": "NBA"
+  },
+  {
+    "name": "Horace Grant",
+    "position_era": "Power Forward / 1990s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "steady-prime",
+    "distinctive_detail": "The defense-and-rebounding third option on multiple title teams who did the unglamorous work next to bigger names and quietly won four rings.",
+    "work_style": "Rebounded, defended, and did the dirty work as the reliable third piece on championship rosters.",
+    "career_traits": [
+      "championship third option",
+      "defense and rebounding",
+      "unglamorous reliability",
+      "multiple rings"
+    ],
+    "2k_label": "The Reliable Third Option",
+    "comp_tone": "Steady. For the person who does the quiet essential work next to the headliners and wins.",
+    "league": "NBA"
+  },
+  {
+    "name": "Reggie Miller",
+    "position_era": "Guard / 1990s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "Played all 18 seasons for one franchise as the ultimate clutch shooter, building a Hall-of-Fame career on big shots and loyalty rather than championships.",
+    "work_style": "Lived for the biggest moment, talked trash, hit the dagger, and stayed loyal to one team his whole career.",
+    "career_traits": [
+      "one team, 18 years",
+      "clutch closer",
+      "loyalty over rings",
+      "big-moment specialist"
+    ],
+    "2k_label": "The One-Team Closer",
+    "comp_tone": "Confident, clutch. For the loyal lifer who lives for the biggest shot and never chased an easier path.",
+    "league": "NBA"
+  },
+  {
+    "name": "Dwyane Wade",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "A franchise cornerstone who took the final shot for fifteen years, briefly left, and came back to retire where he started, the face of one organization.",
+    "work_style": "Carried the offense, wanted the ball late, and built a franchise's identity around himself before passing the torch.",
+    "career_traits": [
+      "franchise face",
+      "elite closer",
+      "left and returned home",
+      "torch-bearer"
+    ],
+    "2k_label": "The Franchise Closer",
+    "comp_tone": "Confident. For the person who was the face of the place and wanted the ball when it mattered most.",
+    "league": "NBA"
+  },
+  {
+    "name": "Allen Iverson",
+    "position_era": "Guard / 2000s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "steady-prime",
+    "distinctive_detail": "An undersized scorer who carried mediocre rosters on sheer will and high usage, refusing to defer even when the math said he should.",
+    "work_style": "Took every hard shot, played through pain, and dominated the ball as the only option that mattered.",
+    "career_traits": [
+      "undersized high-usage scorer",
+      "carried weak rosters",
+      "refused to defer",
+      "all-or-nothing"
+    ],
+    "2k_label": "The Carry-Everything Scorer",
+    "comp_tone": "Defiant. For the high-usage talent who shoulders the whole load and will not be told to pass.",
+    "league": "NBA"
+  },
+  {
+    "name": "Kevin Garnett",
+    "position_era": "Power Forward / 2000s",
+    "altitude": "star",
+    "temperament": "anchor",
+    "arc": "political-exit",
+    "distinctive_detail": "Gave a franchise his entire prime, was never given enough help, and only won after being traded away from the team he carried for over a decade.",
+    "work_style": "Led with relentless intensity and defense, sacrificed everything for one team, and got his ring only after leaving.",
+    "career_traits": [
+      "loyal prime to one team",
+      "carried without help",
+      "won only after the trade",
+      "intensity-driven anchor"
+    ],
+    "2k_label": "The Loyal One Who Left To Win",
+    "comp_tone": "Intense, bittersweet. For the person who gave everything to one place and only got the payoff after leaving.",
+    "league": "NBA"
+  },
+  {
+    "name": "James Harden",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "reinventor",
+    "distinctive_detail": "Won Sixth Man of the Year as a complementary piece, then demanded a trade to reinvent himself into a high-usage franchise scorer who runs the whole offense.",
+    "work_style": "Controls the ball, creates everything, and rebuilt his identity from supporting role to system-defining engine.",
+    "career_traits": [
+      "role player to franchise engine",
+      "self-driven reinvention",
+      "high-usage creator",
+      "moved to get the keys"
+    ],
+    "2k_label": "The Sixth Man Who Took Over",
+    "comp_tone": "[QA] Confident on the Sixth-Man-to-franchise-engine arc; verify the user wants the franchise-mover angle.",
+    "league": "NBA"
+  },
+  {
+    "name": "Chris Paul",
+    "position_era": "Point Guard / 2000s-2020s",
+    "altitude": "system-runner",
+    "temperament": "facilitator",
+    "arc": "journeyman",
+    "distinctive_detail": "An elite floor general who ran multiple franchises' offenses at a high level for nearly two decades while moving from team to team chasing a ring he never got.",
+    "work_style": "Controls tempo, organizes everyone, demands precision, and makes every team he joins better immediately.",
+    "career_traits": [
+      "elite organizer",
+      "moved repeatedly",
+      "made every team better",
+      "the ring eluded him"
+    ],
+    "2k_label": "The Perfectionist Organizer",
+    "comp_tone": "Demanding, sharp. For the person who makes every operation run better and keeps moving in search of the title.",
+    "league": "NBA"
+  },
+  {
+    "name": "Damian Lillard",
+    "position_era": "Point Guard / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "Came from a small school as a mid-first-round pick, stayed loyal to one franchise for over a decade, and built a reputation as one of the great clutch shot-makers.",
+    "work_style": "Wants the last shot, stays loyal past the point of strategic sense, and lets big moments define him.",
+    "career_traits": [
+      "small-school origin",
+      "long loyalty to one team",
+      "elite closer",
+      "big-moment maker"
+    ],
+    "2k_label": "The Loyal Clutch Maker",
+    "comp_tone": "Confident, loyal. For the person who stayed put and lives for the moment everyone else avoids.",
+    "league": "NBA"
+  },
+  {
+    "name": "Mark Eaton",
+    "position_era": "Center / 1980s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "late-bloomer",
+    "distinctive_detail": "Was an auto mechanic discovered late, barely played in college, then became a two-time Defensive Player of the Year purely by being an enormous shot-blocking specialist.",
+    "work_style": "Stood in the paint, blocked everything, scored almost nothing, and built a career on one elite trait found late.",
+    "career_traits": [
+      "discovered late from another trade",
+      "barely played in college",
+      "elite single-skill specialist",
+      "defense-only"
+    ],
+    "2k_label": "The Mechanic Who Blocked Everything",
+    "comp_tone": "[QA] Confident on the auto-mechanic-to-shot-blocker story and DPOY; verify if quoting the mechanic detail directly.",
+    "league": "NBA"
+  },
+  {
+    "name": "John Starks",
+    "position_era": "Guard / 1990s",
+    "altitude": "role",
+    "temperament": "spark",
+    "arc": "slow-climb",
+    "distinctive_detail": "Bagged groceries and went undrafted, played in the CBA and overseas, then clawed into the NBA and became a fiery starting guard for a contender.",
+    "work_style": "Played with reckless emotion, took the big shot, and made it through pure refusal to quit after a long climb.",
+    "career_traits": [
+      "worked a grocery job",
+      "undrafted, CBA grind",
+      "emotional spark",
+      "slow climb to starter"
+    ],
+    "2k_label": "The Grocery-Bagger Who Made It",
+    "comp_tone": "Fiery, earned. For the person who came from nowhere, went undrafted, ground through the lower leagues, and refused to quit until they made it. Confirm the grocery-job detail before quoting it word for word.",
+    "league": "NBA"
+  },
+  {
+    "name": "Muggsy Bogues",
+    "position_era": "Point Guard / 1990s",
+    "altitude": "role",
+    "temperament": "facilitator",
+    "arc": "steady-prime",
+    "distinctive_detail": "At 5-foot-3, the shortest player in NBA history, built a 14-year career as a real starting point guard by being elite at the things size could not stop.",
+    "work_style": "Used speed, vision, and ball-handling to thrive where everyone said he could not, never needing to score.",
+    "career_traits": [
+      "defied a physical limit",
+      "14-year starter despite doubt",
+      "vision and quickness",
+      "made it on different terms"
+    ],
+    "2k_label": "The One Who Wasn't Supposed To Fit",
+    "comp_tone": "Earned, warm. For the person who was told the shape was wrong and built a long career anyway.",
+    "league": "NBA"
+  },
+  {
+    "name": "P.J. Brown",
+    "position_era": "Power Forward / 1990s-2000s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "A steady, dignified rebounding-and-defense big man who logged a long, drama-free career and won a ring in his final season as a veteran anchor.",
+    "work_style": "Defended, rebounded, set the tone with class, and provided exactly the same reliable thing for over a decade.",
+    "career_traits": [
+      "dignified blue-collar big",
+      "defense and rebounding",
+      "long steady career",
+      "ring in the final year"
+    ],
+    "2k_label": "The Dignified Anchor",
+    "comp_tone": "[QA] Confident on the steady blue-collar identity; verify the final-season ring detail if cited closely.",
+    "league": "NBA"
+  },
+  {
+    "name": "Brook Lopez",
+    "position_era": "Center / 2000s-2020s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "reinventor",
+    "distinctive_detail": "Spent his prime as a back-to-the-basket post scorer, then in his thirties completely reinvented his game into a floor-spacing three-point shooter and rim protector to stay relevant.",
+    "work_style": "Was a post-up center, then deliberately rebuilt his skill set around the modern game to extend his value.",
+    "career_traits": [
+      "post scorer first identity",
+      "reinvented as a stretch big",
+      "added a new core skill late",
+      "adapted to survive"
+    ],
+    "2k_label": "The Center Who Reinvented His Game",
+    "comp_tone": "Adaptive. For the person who saw the game change and rebuilt their core skill set to stay valuable.",
+    "league": "NBA"
+  },
+  {
+    "name": "Fred VanVleet",
+    "position_era": "Point Guard / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "closer",
+    "arc": "slow-climb",
+    "distinctive_detail": "Went undrafted, made the team on a two-way deal, climbed from the end of the bench to a starting champion and eventual max contract on the strength of bet on yourself.",
+    "work_style": "Earned everything from the bottom, took big shots, and turned an undrafted start into a max deal through steady climbing.",
+    "career_traits": [
+      "undrafted",
+      "bench to starter to max",
+      "bet on yourself",
+      "slow earned climb"
+    ],
+    "2k_label": "The Undrafted Climber",
+    "comp_tone": "Earned. For the person who started with nothing guaranteed and climbed every rung to the top.",
+    "league": "NBA"
+  },
+  {
+    "name": "Alex Caruso",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "slow-climb",
+    "distinctive_detail": "Went undrafted and grinded through two-way and G League deals before becoming one of the most respected defensive role players and a champion.",
+    "work_style": "Defends ferociously, makes the smart play, and turned a developmental-league grind into a valued rotation career.",
+    "career_traits": [
+      "undrafted, two-way grind",
+      "G League climb",
+      "defensive specialist",
+      "earned the rotation spot"
+    ],
+    "2k_label": "The Two-Way Deal Grinder",
+    "comp_tone": "Gritty. For the person who ground up through the developmental ranks to a real, respected role.",
+    "league": "NBA"
+  },
+  {
+    "name": "Gary Payton",
+    "position_era": "Point Guard / 1990s-2000s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "Spent his prime as the defensive identity and emotional engine of one franchise, the only point guard to win Defensive Player of the Year.",
+    "work_style": "Talked nonstop, locked up the other guard, and ran the team with relentless edge for over a decade in one place.",
+    "career_traits": [
+      "defensive identity",
+      "one-franchise prime",
+      "vocal leader",
+      "two-way engine"
+    ],
+    "2k_label": "The Two-Way Engine",
+    "comp_tone": "Brash. For the person who is both the defensive backbone and the loud emotional core of the operation.",
+    "league": "NBA"
+  },
+  {
+    "name": "Lou Williams",
+    "position_era": "Guard / 2000s-2020s",
+    "altitude": "role",
+    "temperament": "spark",
+    "arc": "steady-prime",
+    "distinctive_detail": "The all-time leading bench scorer and a three-time Sixth Man of the Year who built a long career entirely on being the best instant-offense reserve in the game.",
+    "work_style": "Came off the bench, scored in bunches, and accepted the reserve role as his identity for nearly two decades.",
+    "career_traits": [
+      "best bench scorer ever",
+      "three-time Sixth Man winner",
+      "accepted the reserve identity",
+      "long specialized career"
+    ],
+    "2k_label": "The Best Bench Scorer",
+    "comp_tone": "Confident. For the person who is undeniably elite at the role they chose to never leave.",
+    "league": "NBA"
+  },
+  {
+    "name": "Hakeem Olajuwon",
+    "position_era": "Center / 1980s-1990s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "late-bloomer",
+    "distinctive_detail": "Did not start playing basketball until age fifteen, having grown up a soccer goalkeeper, then became the most skilled center of his era and a two-time champion.",
+    "work_style": "Built an unmatched footwork-driven game from a late start and anchored both ends as the franchise centerpiece.",
+    "career_traits": [
+      "started the sport at 15",
+      "from another sport entirely",
+      "elite late-developed skill",
+      "two-way centerpiece"
+    ],
+    "2k_label": "The Late Start Who Mastered It",
+    "comp_tone": "Reverent. For the person who came to their craft late from somewhere else and became the best at it.",
+    "league": "NBA"
+  },
+  {
+    "name": "Dikembe Mutombo",
+    "position_era": "Center / 1990s-2000s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "reinventor",
+    "distinctive_detail": "Came to college to study medicine and barely played the sport, became a four-time Defensive Player of the Year on rim protection alone, then spent his life on humanitarian work.",
+    "work_style": "Protected the rim better than anyone, scored little, and built a second life of meaning entirely off the court.",
+    "career_traits": [
+      "arrived for a different purpose",
+      "elite single-skill defender",
+      "minimal offense",
+      "massive second-life impact"
+    ],
+    "2k_label": "The Protector With A Second Calling",
+    "comp_tone": "[QA] Confident on the rim-protector identity and humanitarian second act; verify the medicine-study detail if quoted.",
+    "league": "NBA"
+  },
+  {
+    "name": "Nick Collison",
+    "position_era": "Power Forward / 2000s-2010s",
+    "altitude": "glue",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Played his entire 15-year career with one franchise as a low-minutes screen-setting, charge-taking glue guy beloved internally far beyond his stats.",
+    "work_style": "Set bone-rattling screens, took charges, mentored stars, and accepted a tiny role for one organization his whole career.",
+    "career_traits": [
+      "one team, 15 years",
+      "screen-and-charge specialist",
+      "internally beloved glue",
+      "value beyond the box score"
+    ],
+    "2k_label": "The One-Team Glue Guy",
+    "comp_tone": "Quiet, warm. For the lifer whose value to one place far outran anything that showed up in numbers.",
+    "league": "NBA"
+  },
+  {
+    "name": "Steve Kerr",
+    "position_era": "Guard / 1990s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "reinventor",
+    "distinctive_detail": "A spot-up shooting specialist who hit big shots off the bench, then reinvented himself into a championship-winning general manager and then head coach.",
+    "work_style": "Did one thing on the floor extremely well, then built a far larger second career running and coaching teams.",
+    "career_traits": [
+      "shooting specialist",
+      "role-player rings",
+      "reinvented as GM and coach",
+      "second career eclipsed the first"
+    ],
+    "2k_label": "The Specialist Who Became The Boss",
+    "comp_tone": "Sharp. For the person whose narrow playing role became a launchpad for running the whole thing.",
+    "league": "NBA"
+  },
+  {
+    "name": "Derek Fisher",
+    "position_era": "Point Guard / 2000s",
+    "altitude": "role",
+    "temperament": "closer",
+    "arc": "steady-prime",
+    "distinctive_detail": "A limited starting guard who hit a string of famous clutch shots and led the players' union, valued for leadership and big moments over talent.",
+    "work_style": "Hit the big shot, organized the locker room, and led off the floor as much as on it despite modest physical gifts.",
+    "career_traits": [
+      "limited talent, big moments",
+      "clutch shot-maker",
+      "union leadership",
+      "leader over scorer"
+    ],
+    "2k_label": "The Leader Who Made Big Shots",
+    "comp_tone": "[QA] Confident on the clutch-role and union-leadership identity; verify specifics if quoting.",
+    "league": "NBA"
+  },
+  {
+    "name": "Diana Taurasi",
+    "position_era": "Guard / 2000s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "Played her entire two-decade career for one franchise as the ultimate clutch scorer, the player everyone wanted taking the last shot. Assignable to any user regardless of gender.",
+    "work_style": "Wanted the ball in the biggest moment, stayed loyal to one team for twenty years, and never shied from the pressure.",
+    "career_traits": [
+      "one franchise, two decades",
+      "ultimate closer",
+      "fearless under pressure",
+      "loyal lifer"
+    ],
+    "2k_label": "The Closer Who Stayed",
+    "comp_tone": "Confident, clutch. For the loyal lifer who lives for the last shot. Assign to anyone, any gender.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Sue Bird",
+    "position_era": "Point Guard / 2000s-2020s",
+    "altitude": "system-runner",
+    "temperament": "facilitator",
+    "arc": "lifer",
+    "distinctive_detail": "Played 20 seasons for one franchise as the steady, unselfish floor general who ran the offense and held the organization together across eras. Assignable to any user regardless of gender.",
+    "work_style": "Ran the team selflessly, controlled the game with vision, and provided drama-free continuity for two decades in one place.",
+    "career_traits": [
+      "one franchise, 20 years",
+      "unselfish floor general",
+      "institutional continuity",
+      "low-ego organizer"
+    ],
+    "2k_label": "The Steady Organizer",
+    "comp_tone": "Calm, dignified. For the unselfish lifer who runs the operation for decades. Assign to anyone, any gender.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Tamika Catchings",
+    "position_era": "Forward / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Played her entire career for one franchise as a two-way force who overcame a hearing impairment, then reinvented herself as a team executive and general manager. Assignable to any user regardless of gender.",
+    "work_style": "Did everything at both ends with relentless effort, stayed loyal to one team, and moved into running the franchise after.",
+    "career_traits": [
+      "one-franchise loyalty",
+      "overcame a real obstacle",
+      "two-way effort",
+      "reinvented as an executive"
+    ],
+    "2k_label": "The Loyal Force Who Built",
+    "comp_tone": "[QA] Confident on the one-team loyalty and exec second act; verify which detail the user identifies with. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Becky Hammon",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "founder",
+    "temperament": "facilitator",
+    "arc": "reinventor",
+    "distinctive_detail": "Went undrafted, built a long playing career on grit, then broke a barrier as a pioneering NBA assistant coach before becoming a championship WNBA head coach. Assignable to any user regardless of gender.",
+    "work_style": "Earned everything as an undrafted player, then built a trailblazing second career running teams and breaking ground.",
+    "career_traits": [
+      "undrafted player",
+      "grit-built playing career",
+      "barrier-breaking coach",
+      "championship builder"
+    ],
+    "2k_label": "The Undrafted Trailblazer",
+    "comp_tone": "Earned, pioneering. For the person who built from nothing and then broke ground running things. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Candace Parker",
+    "position_era": "Forward / 2000s-2020s",
+    "altitude": "star",
+    "temperament": "facilitator",
+    "arc": "reinventor",
+    "distinctive_detail": "A do-everything star who, while still playing, built a genuine parallel career as a national broadcaster and analyst, two real identities at once. Assignable to any user regardless of gender.",
+    "work_style": "Played a versatile point-forward game while simultaneously establishing herself as a sharp media voice, living two careers in parallel.",
+    "career_traits": [
+      "versatile two-way star",
+      "parallel media career",
+      "two identities at once",
+      "built the second act early"
+    ],
+    "2k_label": "The Player Who Was Also The Voice",
+    "comp_tone": "[QA] Use only for a genuine parallel-second-identity person, not as a lazy reinvention default. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Cynthia Cooper",
+    "position_era": "Guard / 1990s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "late-bloomer",
+    "distinctive_detail": "Played years overseas in relative obscurity and did not become a dominant star until her mid-thirties when a new league finally gave her a stage, then won four straight titles as the closer. Assignable to any user regardless of gender.",
+    "work_style": "Took the big shot and carried the team, finally getting the spotlight late after a long career in the shadows abroad.",
+    "career_traits": [
+      "long obscure years abroad",
+      "stardom in her mid-thirties",
+      "the closer",
+      "made the most of a late chance"
+    ],
+    "2k_label": "The Late Star Who Closed",
+    "comp_tone": "Earned. For the person who waited years for the right stage and dominated the second it arrived. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Lisa Leslie",
+    "position_era": "Center / 1990s-2000s",
+    "altitude": "founder",
+    "temperament": "anchor",
+    "arc": "lifer",
+    "distinctive_detail": "Was a face-of-the-league anchor who helped legitimize a brand-new league from its founding, then built a second career as a broadcaster and executive. Assignable to any user regardless of gender.",
+    "work_style": "Anchored both ends as a franchise centerpiece while serving as a public face who helped a new institution take root.",
+    "career_traits": [
+      "helped found a league's credibility",
+      "franchise anchor",
+      "public-facing builder",
+      "broadcasting second act"
+    ],
+    "2k_label": "The Face Of A New League",
+    "comp_tone": "[QA] Confident on the founding-era face and anchor identity; verify which second-act detail to use. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Sheryl Swoopes",
+    "position_era": "Forward / 1990s-2000s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "Was the first player signed to a brand-new league and became its first three-time MVP, a foundational star who built credibility for an institution from day one. Assignable to any user regardless of gender.",
+    "work_style": "Scored and defended at an elite two-way level as the cornerstone the whole new enterprise was built around.",
+    "career_traits": [
+      "first player signed to the league",
+      "foundational cornerstone",
+      "three-time MVP",
+      "built credibility from scratch"
+    ],
+    "2k_label": "The First Cornerstone",
+    "comp_tone": "[QA] Confident on the first-signing/foundational-MVP identity; verify exact firsts if quoted. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Sylvia Fowles",
+    "position_era": "Center / 2000s-2020s",
+    "altitude": "role",
+    "temperament": "anchor",
+    "arc": "reinventor",
+    "distinctive_detail": "A dominant, durable defensive-anchor center who quietly trained the entire time to become a mortician, building a literal second profession outside the game. Assignable to any user regardless of gender.",
+    "work_style": "Anchored the paint and rebounded relentlessly while preparing a genuine, unrelated second career off the court.",
+    "career_traits": [
+      "defensive anchor",
+      "elite durability",
+      "built an unrelated second profession",
+      "two real callings"
+    ],
+    "2k_label": "The Anchor With Another Life",
+    "comp_tone": "[QA] Confident on the defensive-anchor identity and the mortician second-career detail; verify if quoting directly. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "A'ja Wilson",
+    "position_era": "Forward / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "steady-prime",
+    "distinctive_detail": "A franchise cornerstone and multiple-time MVP who is the clear first option and closer, the player the entire operation runs through. Assignable to any user regardless of gender.",
+    "work_style": "Carries the scoring load, anchors the defense, and takes the big shot as the undisputed centerpiece. Assign to anyone.",
+    "career_traits": [
+      "franchise cornerstone",
+      "first option",
+      "multiple MVPs",
+      "the closer"
+    ],
+    "2k_label": "The Undisputed First Option",
+    "comp_tone": "Confident. For the person the whole operation is built around and runs through. Assign to anyone, any gender.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Lauren Jackson",
+    "position_era": "Forward-Center / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "injury-arc",
+    "distinctive_detail": "A dominant MVP-level scorer whose body and injuries cut her prime short, who later made an improbable comeback to play again years after retiring. Assignable to any user regardless of gender.",
+    "work_style": "Scored at an elite level as the centerpiece, fought through injuries that shortened her peak, and returned against the odds.",
+    "career_traits": [
+      "dominant MVP scorer",
+      "prime cut short by injury",
+      "improbable comeback",
+      "fought her body"
+    ],
+    "2k_label": "The Star Who Came Back",
+    "comp_tone": "[QA] Confident on the injury-shortened prime and comeback; verify which chapter the user identifies with. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Maya Moore",
+    "position_era": "Forward / 2010s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "reinventor",
+    "distinctive_detail": "Was a peak, championship-level superstar who walked away from the game at her prime to pursue criminal-justice reform, choosing an entirely different calling over basketball. Assignable to any user regardless of gender.",
+    "work_style": "Dominated as a two-way star, then deliberately left the thing she was best at to commit fully to a cause that mattered more.",
+    "career_traits": [
+      "peak superstar",
+      "walked away at her prime",
+      "chose a different calling",
+      "values over career"
+    ],
+    "2k_label": "The One Who Walked Away",
+    "comp_tone": "Reflective. For the person who left the thing they were best at for something they believed mattered more. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Breanna Stewart",
+    "position_era": "Forward / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "injury-arc",
+    "distinctive_detail": "A dominant two-way superstar who tore her Achilles at her peak, missed a full season, and rebuilt herself back to MVP level, then changed teams to win on her own terms. Assignable to any user regardless of gender.",
+    "work_style": "Did everything at an elite level, fought back from a devastating injury, and took control of her own career path.",
+    "career_traits": [
+      "dominant two-way star",
+      "devastating injury at peak",
+      "rebuilt to MVP level",
+      "took control of her path"
+    ],
+    "2k_label": "The One Who Rebuilt The Peak",
+    "comp_tone": "[QA] Confident on the Achilles injury and full return to MVP form; verify the team-change framing if quoted. Assign to anyone.",
+    "league": "WNBA"
+  },
+  {
+    "name": "Boris Diaw",
+    "position_era": "Forward / 2000s-2010s",
+    "altitude": "glue",
+    "temperament": "facilitator",
+    "arc": "journeyman",
+    "distinctive_detail": "A do-everything connective forward who was waived as out-of-shape, bounced teams, then became an indispensable passing glue piece on a champion by fitting into something already built.",
+    "work_style": "Made the extra pass, set screens, defended versatile, and made a built team flow without ever being the focus.",
+    "career_traits": [
+      "connective glue",
+      "waived then revived",
+      "fit into a built thing",
+      "championship complement"
+    ],
+    "2k_label": "The Connective Glue",
+    "comp_tone": "Easygoing. For the connector who slots into a built thing and makes it flow, not the one who builds it.",
+    "league": "NBA"
+  },
+  {
+    "name": "Kyle Korver",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "specialist",
+    "arc": "steady-prime",
+    "distinctive_detail": "A second-round pick who built a 17-year career on being one of the greatest pure shooters ever, elite at exactly one thing for nearly two decades.",
+    "work_style": "Ran off screens, hit the open three at a historic rate, and survived a long career by perfecting one elite skill.",
+    "career_traits": [
+      "one elite skill",
+      "17-year longevity",
+      "second-round origin",
+      "specialist mastery"
+    ],
+    "2k_label": "The Pure Shooter",
+    "comp_tone": "Clean. For the person who is genuinely one of the best ever at a single thing and built a career on it.",
+    "league": "NBA"
+  },
+  {
+    "name": "Zach Randolph",
+    "position_era": "Power Forward / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "anchor",
+    "arc": "reinventor",
+    "distinctive_detail": "Was a problem-child high-usage scorer early whose reputation cratered, then reinvented himself as the beloved blue-collar heart of a gritty contender.",
+    "work_style": "Bullied the post for buckets and boards, and turned a troubled early reputation into being the soul of a tough team.",
+    "career_traits": [
+      "troubled early reputation",
+      "high-usage post scorer",
+      "reinvented as a culture heart",
+      "redemption arc"
+    ],
+    "2k_label": "The Rebuilt Heart",
+    "comp_tone": "[QA] Confident on the troubled-early-then-beloved-veteran arc; handle the early-reputation framing with care.",
+    "league": "NBA"
+  },
+  {
+    "name": "Bam Adebayo",
+    "position_era": "Center / 2010s-2020s",
+    "altitude": "system-runner",
+    "temperament": "anchor",
+    "arc": "steady-prime",
+    "distinctive_detail": "An elite defensive anchor and connective passing big who does the unglamorous work that holds a team together rather than chasing his own scoring numbers.",
+    "work_style": "Guards all five positions, makes the connective pass, and accepts a foundational role over a flashy scoring one.",
+    "career_traits": [
+      "defensive anchor",
+      "connective passing big",
+      "foundation over flash",
+      "selfless centerpiece"
+    ],
+    "2k_label": "The Foundational Anchor",
+    "comp_tone": "Steady. For the person who holds the whole thing together by doing the work that does not get the headlines.",
+    "league": "NBA"
+  },
+  {
+    "name": "Tyrese Haliburton",
+    "position_era": "Point Guard / 2020s",
+    "altitude": "system-runner",
+    "temperament": "facilitator",
+    "arc": "slow-climb",
+    "distinctive_detail": "Slid in the draft over doubts, was traded away by the team that drafted him, then became an elite pass-first All-NBA floor general who makes everyone around him better.",
+    "work_style": "Runs the offense unselfishly, prioritizes the assist over his own shot, and elevates a whole roster.",
+    "career_traits": [
+      "draft-day doubts",
+      "traded by his first team",
+      "pass-first organizer",
+      "elevates everyone"
+    ],
+    "2k_label": "The Pass-First Riser",
+    "comp_tone": "[QA] Confident on the slid-in-draft, traded-away, pass-first arc; verify if leaning on the trade detail.",
+    "league": "NBA"
+  },
+  {
+    "name": "Shai Gilgeous-Alexander",
+    "position_era": "Guard / 2010s-2020s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "slow-climb",
+    "distinctive_detail": "Was traded as a young secondary piece, then quietly built himself season by season into an MVP-level first option and primary closer.",
+    "work_style": "Added control and craft every year, took on more load each season, and grew methodically into the centerpiece.",
+    "career_traits": [
+      "traded as a secondary piece",
+      "year-by-year growth",
+      "became the first option",
+      "methodical riser"
+    ],
+    "2k_label": "The Methodical Ascent",
+    "comp_tone": "[QA] Confident on the traded-secondary-piece-to-MVP-level arc; verify if leaning on a specific season.",
+    "league": "NBA"
+  },
+  {
+    "name": "Dirk Nowitzki",
+    "position_era": "Power Forward / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "Played all 21 seasons for one franchise, came from Germany as an unknown project, and stayed loyal through lean years until he finally closed out a title.",
+    "work_style": "Refined a singular signature skill, stayed loyal to one organization for two decades, and delivered the title himself.",
+    "career_traits": [
+      "one team, 21 years",
+      "international project",
+      "loyalty through lean years",
+      "delivered the title late"
+    ],
+    "2k_label": "The Loyal Franchise Closer",
+    "comp_tone": "Beloved, earned. For the person who stayed with one place through everything and finally delivered.",
+    "league": "NBA"
+  },
+  {
+    "name": "Shaun Livingston",
+    "position_era": "Guard / 2000s-2010s",
+    "altitude": "role",
+    "temperament": "facilitator",
+    "arc": "injury-arc",
+    "distinctive_detail": "Suffered one of the most gruesome knee injuries in sports history that nearly ended his career, then fought back over years to become a steady, valuable role guard and three-time champion.",
+    "work_style": "Rebuilt his entire game around a mid-range, ball-control style after the injury and became a dependable rotation piece.",
+    "career_traits": [
+      "catastrophic injury",
+      "long fight back",
+      "rebuilt his game",
+      "champion role piece"
+    ],
+    "2k_label": "The One Who Came All The Way Back",
+    "comp_tone": "Resilient. For the person whose career nearly ended and who rebuilt it into something steady and real.",
+    "league": "NBA"
+  },
+  {
+    "name": "Tony Parker",
+    "position_era": "Point Guard / 2000s-2010s",
+    "altitude": "star",
+    "temperament": "closer",
+    "arc": "lifer",
+    "distinctive_detail": "A late first-round international pick who spent nearly his entire career with one franchise, growing from a doubted rookie into a Finals MVP and the offensive engine.",
+    "work_style": "Attacked the paint relentlessly, took big shots, and grew within one organization from project to Finals MVP.",
+    "career_traits": [
+      "late-pick international",
+      "one-franchise career",
+      "grew into Finals MVP",
+      "offensive engine"
+    ],
+    "2k_label": "The Homegrown Engine",
+    "comp_tone": "Earned. For the person who grew up inside one place from doubted rookie to the engine that wins it all.",
+    "league": "NBA"
+  }
+]

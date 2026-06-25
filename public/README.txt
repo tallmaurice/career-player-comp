@@ -1,0 +1,1 @@
+OG default image goes here as og-default.png (1200x630). Referenced by app/layout.tsx metadata. v1 uses a STATIC generic card to keep the no-storage promise; the personalized card travels via the user-downloaded PNG from /api/card. Asset still to be added before launch.
