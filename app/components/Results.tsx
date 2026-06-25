@@ -374,11 +374,12 @@ ResultsProps) {
               }}
             />
             {/* headline: the why-this-player parallel, as the scout's verdict.
-                Dialed down ~16% (38 -> 32px) so the right column reads as
-                supporting detail under the hero card, not a second headline. */}
+                Dialed down again (32 -> 27px) and lightened (700 -> 600) so the
+                right column reads as supporting detail under the hero card and
+                the full report below, not a second headline. */}
             <h2
               style={{
-                font: "700 32px/1.05 'Barlow Condensed'",
+                font: "600 27px/1.08 'Barlow Condensed'",
                 color: "#211e17",
                 textTransform: "uppercase",
                 letterSpacing: "-0.005em",
@@ -388,10 +389,11 @@ ResultsProps) {
               {comp.why_this_player}
             </h2>
             {/* prose para 1 = card_summary (the on-card summary, echoed here).
-                Annotation prose dropped a step (14.5 -> 13px). */}
+                Annotation prose dropped another step (13 -> 12px) so the column
+                sits below the full report in the reading hierarchy. */}
             <p
               style={{
-                font: "400 13px/1.65 'Inter'",
+                font: "400 12px/1.65 'Inter'",
                 color: "#4a463d",
                 margin: "0 0 16px",
               }}
@@ -401,10 +403,10 @@ ResultsProps) {
               </span>
               {comp.card_summary}
             </p>
-            {/* prose para 2 = front_office_fit (12.5px, a notch under para 1) */}
+            {/* prose para 2 = front_office_fit (11.5px, a notch under para 1) */}
             <p
               style={{
-                font: "400 12.5px/1.6 'Inter'",
+                font: "400 11.5px/1.6 'Inter'",
                 color: "#6b655a",
                 margin: "0 0 34px",
               }}
@@ -667,9 +669,9 @@ ResultsProps) {
             <p
               key={i}
               style={{
-                // Full-report body dropped a step (15 -> 13px) so it reads as
-                // supporting detail beside the hero card.
-                font: "400 13px/1.72 'Inter'",
+                // Full-report body scaled UP (13 -> 16px) — this is the meat of
+                // the report and should be the most readable block on the page.
+                font: "400 16px/1.72 'Inter'",
                 color: "#4a463d",
                 margin: "0 0 22px",
               }}
@@ -742,40 +744,7 @@ ResultsProps) {
           </div>
         </div>
 
-        {/* scout's note header (above card on mobile) */}
-        <div style={{ padding: "26px 22px 10px" }}>
-          <div
-            style={{
-              font: "400 10px 'JetBrains Mono', monospace",
-              color: "#2f6043",
-              letterSpacing: "0.28em",
-              marginBottom: 10,
-            }}
-          >
-            [ SCOUT'S NOTE · FINAL ]
-          </div>
-          <h2
-            style={{
-              font: "700 30px/1.0 'Barlow Condensed'",
-              textTransform: "uppercase",
-              letterSpacing: "-0.005em",
-              margin: "0 0 8px",
-            }}
-          >
-            {comp.why_this_player}
-          </h2>
-          <div
-            style={{
-              font: "400 11px 'Inter'",
-              color: "#6b655a",
-              fontStyle: "italic",
-            }}
-          >
-            Drag the card. Tilt your phone. It responds.
-          </div>
-        </div>
-
-        {/* hero tilt card */}
+        {/* hero tilt card — FIRST on mobile (card before the scout's words) */}
         <CardTilt mobile />
 
         {/* standout line / pull quote = screenshot_line */}
@@ -800,6 +769,44 @@ ResultsProps) {
           >
             [ STANDOUT LINE ]
           </div>
+        </div>
+
+        {/* scout's note — BELOW the card on mobile (card-first order).
+            Headline scaled DOWN (30 -> 25px) and lightened (700 -> 600) to
+            mirror desktop; the on-card summary echoes here as the verdict prose. */}
+        <div style={{ padding: "26px 22px 4px" }}>
+          <div
+            style={{
+              font: "400 10px 'JetBrains Mono', monospace",
+              color: "#2f6043",
+              letterSpacing: "0.28em",
+              marginBottom: 10,
+            }}
+          >
+            [ SCOUT'S NOTE · FINAL ]
+          </div>
+          <h2
+            style={{
+              font: "600 25px/1.06 'Barlow Condensed'",
+              textTransform: "uppercase",
+              letterSpacing: "-0.005em",
+              margin: "0 0 12px",
+            }}
+          >
+            {comp.why_this_player}
+          </h2>
+          <p
+            style={{
+              font: "400 12px/1.6 'Inter'",
+              color: "#4a463d",
+              margin: 0,
+            }}
+          >
+            <span style={{ fontStyle: "italic", color: "#6b655a" }}>
+              In summary,{" "}
+            </span>
+            {comp.card_summary}
+          </p>
         </div>
 
         {/* grade bars (display-derived) */}
@@ -978,7 +985,9 @@ ResultsProps) {
             <p
               key={i}
               style={{
-                font: "400 13.5px/1.7 'Inter'",
+                // Full-report body scaled UP (13.5 -> 16px) — the meat of the
+                // report, the most readable block on the page.
+                font: "400 16px/1.72 'Inter'",
                 color: "#4a463d",
                 margin: "0 0 18px",
               }}
