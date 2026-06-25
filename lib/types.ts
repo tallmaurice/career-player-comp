@@ -97,11 +97,17 @@ export interface AppState {
 
 export interface LandingProps {
   onStart: () => void;
+  /** Click the top-left wordmark to reset the flow to landing. On landing
+   *  itself this is effectively a no-op reset; included for consistency. */
+  onHome: () => void;
 }
 
 export interface CareerUploadProps {
   onContinue: (careerText: string) => void;
-  onBack: () => void;
+  /** Click the top-left wordmark to abandon and reset to landing. On this
+   *  screen the wordmark doubles as back (its only nav was a return to
+   *  landing), so a dedicated onBack is no longer needed. */
+  onHome: () => void;
 }
 
 /** The shape of one multiple-choice quiz question. */
@@ -124,6 +130,8 @@ export interface QuizQuestionProps {
   selected?: string;
   onSelect: (option: string) => void;
   onBack: () => void;
+  /** Click the top-left wordmark to abandon the quiz and reset to landing. */
+  onHome: () => void;
 }
 
 export interface OptionalTextProps {
@@ -137,14 +145,19 @@ export interface OptionalTextProps {
   onContinue: (value: string) => void;
   onSkip: () => void;
   onBack: () => void;
+  /** Click the top-left wordmark to abandon and reset to landing. */
+  onHome: () => void;
 }
 
-// ScoutingRoom (loading) is self-contained theater; no props.
+// ScoutingRoom (loading) is self-contained theater; no header wordmark, so no
+// onHome — the parent owns abandoning a mid-generation loader.
 export interface ScoutingRoomProps {}
 
 export interface ResultsProps {
   comp: Comp;
   onAppeal: () => void;
+  /** Click the top-left wordmark to reset the flow to landing. */
+  onHome: () => void;
   /** Stripe Payment Link (external URL) for the tip. */
   tipUrl: string;
   /** URL of the server-rendered card PNG for native share + download. */

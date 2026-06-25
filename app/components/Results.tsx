@@ -18,8 +18,47 @@
 // .cta-green, .ghost-ln) come from app/globals.css and are NOT re-expressed.
 // =============================================================================
 
-import type { ResultsProps, Badge, BadgeCategory } from "@/lib/types";
-import { useEffect, useRef, useState } from "react";
+import type { ResultsProps, Badge, BadgeCategory, Comp } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { useTilt } from "@/lib/useTilt";
+
+// ---- creator / B2B links (muted, scouting-doc style) ------------------------
+// TODO(maurice): confirm the real creator URL before launch. Defaults to the
+// LinkedIn profile; override per-deploy with NEXT_PUBLIC_CREATOR_URL.
+const CREATOR_URL =
+  process.env.NEXT_PUBLIC_CREATOR_URL ??
+  "https://www.linkedin.com/in/maurice-peebles";
+// TODO(maurice): set NEXT_PUBLIC_CONTACT_URL to the real intake (a form or a
+// real inbox). Falls back to a mailto placeholder for now.
+const CONTACT_URL =
+  process.env.NEXT_PUBLIC_CONTACT_URL ?? "mailto:hello@careerplayercomp.com";
+
+// ---- card-image payload (414-safe) ------------------------------------------
+// The /api/card route only RENDERS: player_name, position_era, archetype_title,
+// badges, card_summary, stat_line (see app/api/card/route.tsx · buildCard). The
+// full comp also carries full_report (2-4 paragraphs) + other prose that the
+// card never draws. Passing the whole comp via a GET ?data= param risks a 414
+// URI-Too-Long on a long full_report. So we build the card URL from ONLY the
+// fields the image uses — full_report and the other unrendered prose are
+// dropped from the payload, which keeps the URL short and well under any limit.
+// (base64url encoder mirrors encodeComp() in app/page.tsx.)
+function encodeCardComp(comp: Comp): string {
+  const slim = {
+    player_name: comp.player_name,
+    position_era: comp.position_era,
+    archetype_title: comp.archetype_title,
+    badges: comp.badges,
+    card_summary: comp.card_summary,
+    stat_line: comp.stat_line,
+  };
+  const json = JSON.stringify(slim);
+  const b64 = btoa(
+    encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (_, h) =>
+      String.fromCharCode(parseInt(h, 16)),
+    ),
+  );
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
 
 // ---- Category color system --------------------------------------------------
 // The Comp contract gives each badge a `category` (skill | temperament |
@@ -90,9 +129,12 @@ function toParagraphs(text: string): string[] {
 export default function Results({
   comp,
   onAppeal,
+  onHome,
   tipUrl,
-  cardImageUrl,
-}: ResultsProps) {
+}: // cardImageUrl is still part of ResultsProps (and passed by page.tsx), but we
+// no longer read it here: the card URL is now derived from a slim, 414-safe
+// payload below (see cardUrl / encodeCardComp).
+ResultsProps) {
   // Match the desktop (>=) vs 390px mobile artboard with one component.
   const [isMobile, setIsMobile] = useState(false);
   // After Share fires, the tip copy softens from the long pitch to the short
@@ -116,37 +158,100 @@ export default function Results({
     status: tightenStatus(comp.stat_line.contract_status),
   };
 
-  // Native share with download fallback. Presentational-only: shares/downloads
-  // the server-rendered card PNG (cardImageUrl); no user data is persisted.
+  // Build the card-image URL from the SLIM payload (see encodeCardComp), not the
+  // full-comp `cardImageUrl` prop, so a long full_report can't 414 the GET.
+  const cardUrl = `/api/card?format=feed&data=${encodeCardComp(comp)}`;
+  const fileName = `scouting-report-${comp.player_name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")}.png`;
+
+  // Fetch the rendered PNG as a blob and trigger a real browser download.
+  const downloadCardPng = async () => {
+    const res = await fetch(cardUrl);
+    if (!res.ok) throw new Error(`card fetch failed: ${res.status}`);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = fileName;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Revoke on the next tick so the click has a chance to start the download.
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  };
+
+  // Native share with graceful fallback. Prefer sharing the PNG file itself
+  // (Web Share Level 2); fall back to sharing the card URL; then to copying the
+  // link; then to a direct download. The soft post-share tip shows either way.
   const handleShare = async () => {
     setShared(true);
     const navAny = navigator as Navigator & {
       share?: (data: ShareData) => Promise<void>;
+      canShare?: (data: ShareData) => boolean;
     };
+    const shareText = comp.screenshot_line;
+    const shareTitle = `Career Player Comp — ${comp.player_name}`;
+
+    // 1) Try sharing the actual PNG file (best result on mobile).
     if (navAny.share) {
       try {
+        const res = await fetch(cardUrl);
+        if (res.ok) {
+          const blob = await res.blob();
+          const file = new File([blob], fileName, { type: "image/png" });
+          if (!navAny.canShare || navAny.canShare({ files: [file] })) {
+            await navAny.share({ title: shareTitle, text: shareText, files: [file] });
+            return;
+          }
+        }
+      } catch {
+        // file share unsupported or cancelled — try URL share next
+      }
+      // 2) Share the absolute card URL as a link.
+      try {
         await navAny.share({
-          title: `Career Player Comp — ${comp.player_name}`,
-          text: comp.screenshot_line,
-          url: cardImageUrl,
+          title: shareTitle,
+          text: shareText,
+          url: new URL(cardUrl, window.location.origin).toString(),
         });
         return;
       } catch {
-        // user cancelled or share failed — fall through to opening the image
+        // cancelled or failed — fall through to copy/download
       }
     }
-    window.open(cardImageUrl, "_blank", "noopener");
+
+    // 3) No Web Share API: copy the link, else download the PNG.
+    const absolute = new URL(cardUrl, window.location.origin).toString();
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(absolute);
+        return;
+      }
+    } catch {
+      // clipboard blocked — fall through to download
+    }
+    try {
+      await downloadCardPng();
+    } catch {
+      window.open(absolute, "_blank", "noopener");
+    }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     setShared(true);
-    const a = document.createElement("a");
-    a.href = cardImageUrl;
-    a.download = `career-player-comp-${comp.player_name
-      .toLowerCase()
-      .replace(/\s+/g, "-")}.png`;
-    a.rel = "noopener";
-    a.click();
+    try {
+      await downloadCardPng();
+    } catch {
+      // If the blob fetch fails, open the card URL directly as a last resort.
+      window.open(
+        new URL(cardUrl, window.location.origin).toString(),
+        "_blank",
+        "noopener",
+      );
+    }
   };
 
   const onAppealClick = (e: React.MouseEvent) => {
@@ -171,10 +276,22 @@ export default function Results({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "28px 56px",
-            borderBottom: "1px solid rgba(33,30,23,0.12)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button
+            type="button"
+            onClick={onHome}
+            aria-label="Career Player Comp — home"
+            className="cpc-home"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              background: "transparent",
+              border: "none",
+              padding: 0,
+            }}
+          >
             <div style={{ width: 8, height: 8, background: "#2f6043" }} />
             <div
               style={{
@@ -185,7 +302,7 @@ export default function Results({
             >
               CAREER PLAYER COMP
             </div>
-          </div>
+          </button>
           <div
             style={{
               font: "400 11px 'JetBrains Mono', monospace",
@@ -262,22 +379,25 @@ export default function Results({
                 marginBottom: 24,
               }}
             />
-            {/* headline: the why-this-player parallel, as the scout's verdict */}
+            {/* headline: the why-this-player parallel, as the scout's verdict.
+                Dialed down ~16% (38 -> 32px) so the right column reads as
+                supporting detail under the hero card, not a second headline. */}
             <h2
               style={{
-                font: "700 38px/1.02 'Barlow Condensed'",
+                font: "700 32px/1.05 'Barlow Condensed'",
                 color: "#211e17",
                 textTransform: "uppercase",
                 letterSpacing: "-0.005em",
-                margin: "0 0 22px",
+                margin: "0 0 20px",
               }}
             >
               {comp.why_this_player}
             </h2>
-            {/* prose para 1 = card_summary (the on-card summary, echoed here) */}
+            {/* prose para 1 = card_summary (the on-card summary, echoed here).
+                Annotation prose dropped a step (14.5 -> 13px). */}
             <p
               style={{
-                font: "400 14.5px/1.65 'Inter'",
+                font: "400 13px/1.65 'Inter'",
                 color: "#4a463d",
                 margin: "0 0 16px",
               }}
@@ -287,10 +407,10 @@ export default function Results({
               </span>
               {comp.card_summary}
             </p>
-            {/* prose para 2 = front_office_fit */}
+            {/* prose para 2 = front_office_fit (12.5px, a notch under para 1) */}
             <p
               style={{
-                font: "400 13.5px/1.6 'Inter'",
+                font: "400 12.5px/1.6 'Inter'",
                 color: "#6b655a",
                 margin: "0 0 34px",
               }}
@@ -524,6 +644,9 @@ export default function Results({
                 FILE No. 2026-4471
               </div>
             </div>
+
+            {/* creator credit + quiet B2B line (muted, scouting-doc style) */}
+            <CreatorCredit />
           </div>
         </div>
 
@@ -550,7 +673,9 @@ export default function Results({
             <p
               key={i}
               style={{
-                font: "400 15px/1.72 'Inter'",
+                // Full-report body dropped a step (15 -> 13px) so it reads as
+                // supporting detail beside the hero card.
+                font: "400 13px/1.72 'Inter'",
                 color: "#4a463d",
                 margin: "0 0 22px",
               }}
@@ -586,10 +711,22 @@ export default function Results({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "18px 22px",
-            borderBottom: "1px solid rgba(33,30,23,0.12)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            type="button"
+            onClick={onHome}
+            aria-label="Career Player Comp — home"
+            className="cpc-home"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              background: "transparent",
+              border: "none",
+              padding: 0,
+            }}
+          >
             <div style={{ width: 6, height: 6, background: "#2f6043" }} />
             <div
               style={{
@@ -599,7 +736,7 @@ export default function Results({
             >
               CAREER PLAYER COMP
             </div>
-          </div>
+          </button>
           <div
             style={{
               font: "400 9px 'JetBrains Mono', monospace",
@@ -901,36 +1038,29 @@ export default function Results({
             FILE No. 2026-4471
           </div>
         </div>
+
+        {/* creator credit + quiet B2B line (muted, scouting-doc style) */}
+        <div style={{ margin: "0 22px 28px" }}>
+          <CreatorCredit />
+        </div>
       </div>
     );
   }
 
   // ---------------------------------------------------------------------------
-  // The hero tilt paper-card. Pointer-driven 3D tilt on desktop; the on-screen
-  // card keeps the grain/tilt/noise the satori card route can't render.
-  // `mobile` toggles the smaller artboard's font sizes/padding.
+  // The hero tilt paper-card. Pointer- and touch-driven 3D tilt via useTilt;
+  // the on-screen card keeps the grain/tilt/noise the satori card route can't
+  // render. `mobile` toggles the smaller artboard's font sizes/padding.
   // ---------------------------------------------------------------------------
   function CardTilt({ mobile = false }: { mobile?: boolean }) {
-    const cardRef = useRef<HTMLDivElement>(null);
-
-    // Pointer tilt: lerp toward cursor offset, snap back on leave. The base
-    // resting transform (rotateX(-5deg) rotateY(8deg)) lives in .tilt-card.
-    const onMove = (e: React.PointerEvent) => {
-      const el = cardRef.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5; // -0.5..0.5
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      el.style.transform = `rotateX(${-py * 10 - 2}deg) rotateY(${px * 14 + 6}deg)`;
-    };
-    const onLeave = () => {
-      const el = cardRef.current;
-      if (el) el.style.transform = "";
-    };
+    // Pointer + touch tilt, reduced-motion-aware. The resting lean
+    // (rotateX(-5deg) rotateY(8deg)) and the eased snap-back live in .tilt-card.
+    const { wrapRef, cardRef } = useTilt();
 
     return (
       <div
         className="tilt-wrap"
+        ref={wrapRef}
         style={
           mobile
             ? { padding: "16px 22px 22px" }
@@ -940,8 +1070,6 @@ export default function Results({
         <div
           ref={cardRef}
           className="tilt-card paper-card"
-          onPointerMove={mobile ? undefined : onMove}
-          onPointerLeave={mobile ? undefined : onLeave}
           style={mobile ? { padding: "26px 22px" } : { width: 580, padding: "44px 42px" }}
         >
           <div className="stamp" style={mobile ? { top: 12, right: 12 } : undefined}>
@@ -1125,6 +1253,63 @@ export default function Results({
 }
 
 // ---- small presentational helpers -------------------------------------------
+
+// Muted creator credit + a quiet B2B line, styled to read like the bottom of a
+// scouting document, not a marketing CTA. Used on both desktop and mobile.
+function CreatorCredit() {
+  const linkBase: React.CSSProperties = {
+    color: "#6b655a",
+    textDecoration: "none",
+    borderBottom: "1px solid rgba(33,30,23,0.18)",
+    paddingBottom: 1,
+  };
+  return (
+    <div
+      style={{
+        marginTop: 18,
+        paddingTop: 14,
+        borderTop: "1px solid rgba(33,30,23,0.08)",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+      }}
+    >
+      <div
+        style={{
+          font: "400 10px 'JetBrains Mono', monospace",
+          color: "#a8a090",
+          letterSpacing: "0.16em",
+        }}
+      >
+        BUILT BY{" "}
+        <a
+          href={CREATOR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={linkBase}
+        >
+          MAURICE PEEBLES
+        </a>
+      </div>
+      <div
+        style={{
+          font: "400 11px/1.5 'Inter'",
+          color: "#a8a090",
+        }}
+      >
+        Want this for your team or brand?{" "}
+        <a
+          href={CONTACT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={linkBase}
+        >
+          Get in touch.
+        </a>
+      </div>
+    </div>
+  );
+}
 
 function StatCell({
   label,

@@ -110,6 +110,7 @@ export default function OptionalText({
   onContinue,
   onSkip,
   onBack,
+  onHome,
 }: OptionalTextProps) {
   const isMobile = useIsMobile();
   const cfg = CONFIG[which];
@@ -419,9 +420,22 @@ export default function OptionalText({
         <div style={{ font: `500 11px ${MONO}`, color: "#6b655a", letterSpacing: "0.22em" }}>
           {cfg.counter}
         </div>
-        <div style={{ font: `500 11px ${MONO}`, color: "#a8a090", letterSpacing: "0.18em" }}>
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="Career Player Comp — home"
+          className="cpc-home"
+          style={{
+            font: `500 11px ${MONO}`,
+            color: "#a8a090",
+            letterSpacing: "0.18em",
+            background: "transparent",
+            border: "none",
+            padding: 0,
+          }}
+        >
           [ CAREER PLAYER COMP ]
-        </div>
+        </button>
       </div>
 
       {/* progress dots */}

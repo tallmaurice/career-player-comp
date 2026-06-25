@@ -55,6 +55,7 @@ export default function QuizQuestion({
   selected,
   onSelect,
   onBack,
+  onHome,
 }: QuizQuestionProps) {
   // One responsive component: <=480px renders the 390 mobile artboard, wider
   // renders the desktop artboard. Tracked here (not via CSS) because the export
@@ -169,7 +170,15 @@ export default function QuizQuestion({
         <div style={desktopFileNo}>
           [ FILE {fileNo(index + 1)} / {fileNo(total)} ]
         </div>
-        <div style={desktopBrand}>[ CAREER PLAYER COMP ]</div>
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="Career Player Comp — home"
+          className="cpc-home"
+          style={desktopBrand}
+        >
+          [ CAREER PLAYER COMP ]
+        </button>
       </div>
 
       <div style={desktopDots}>
@@ -329,6 +338,11 @@ const desktopBrand: React.CSSProperties = {
   font: `500 11px ${MONO}`,
   color: "var(--faint)",
   letterSpacing: "0.18em",
+  // reset button chrome so the clickable wordmark looks identical to the
+  // plain label it replaced (hover affordance comes from .cpc-home)
+  background: "transparent",
+  border: "none",
+  padding: 0,
 };
 
 const desktopDots: React.CSSProperties = {
@@ -380,7 +394,6 @@ const desktopFooter: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  borderTop: "1px solid rgba(33,30,23,0.12)",
   paddingTop: 20,
   position: "relative",
   zIndex: 1,
@@ -447,7 +460,6 @@ const mobileFooter: React.CSSProperties = {
   right: 22,
   bottom: 22,
   textAlign: "center",
-  borderTop: "1px solid rgba(33,30,23,0.12)",
   paddingTop: 16,
 };
 const mobileFooterTxt: React.CSSProperties = {

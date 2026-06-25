@@ -38,12 +38,29 @@ const BODY = "'Inter'";
 // File-extraction status, shown on the "ADDED" chip.
 type FileStatus = "reading" | "ok" | "thin" | "error";
 
-export default function CareerUpload({ onContinue, onBack }: CareerUploadProps) {
+export default function CareerUpload({
+  onContinue,
+  onHome,
+}: CareerUploadProps) {
   const [pasteText, setPasteText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileText, setFileText] = useState("");
   const [fileStatus, setFileStatus] = useState<FileStatus | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function openPicker() {
+    fileInputRef.current?.click();
+  }
+
+  // Clear the attached file and return the zone to its empty state. Reset the
+  // input's value too, so re-selecting the *same* file still fires onChange.
+  function clearFile() {
+    setFileName(null);
+    setFileText("");
+    setFileStatus(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
 
   // The CTA appears once there's *some* usable input. A thin/failed PDF alone
   // does NOT enable it — the user must paste; a paste alone always works.
@@ -104,15 +121,14 @@ export default function CareerUpload({ onContinue, onBack }: CareerUploadProps) 
           alignItems: "center",
           justifyContent: "space-between",
           padding: "clamp(18px, 3vw, 28px) clamp(22px, 5vw, 56px)",
-          borderBottom: "1px solid rgba(33,30,23,0.12)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button
             type="button"
-            onClick={onBack}
-            aria-label="Back"
-            className="ghost-ln"
+            onClick={onHome}
+            aria-label="Career Player Comp — home"
+            className="cpc-home"
             style={{
               display: "flex",
               alignItems: "center",
@@ -214,20 +230,30 @@ export default function CareerUpload({ onContinue, onBack }: CareerUploadProps) 
               [ OPTION A ]
             </div>
             <div
-              className="drop-zone"
+              className={`drop-zone${isDragging ? " is-dragging" : ""}`}
               role="button"
               tabIndex={0}
               aria-label="Upload résumé or LinkedIn PDF"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={openPicker}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
-                  fileInputRef.current?.click();
+                  openPicker();
                 }
               }}
-              onDragOver={(e) => e.preventDefault()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (!isDragging) setIsDragging(true);
+              }}
+              onDragLeave={(e) => {
+                // ignore drags that just move between children of the zone
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setIsDragging(false);
+                }
+              }}
               onDrop={(e) => {
                 e.preventDefault();
+                setIsDragging(false);
                 handleFiles(e.dataTransfer.files);
               }}
               style={{
@@ -258,20 +284,62 @@ export default function CareerUpload({ onContinue, onBack }: CareerUploadProps) 
                   marginBottom: "clamp(16px, 2vw, 22px)",
                 }}
               >
-                Drop a PDF here, or click to browse. PDF only.
+                Drop a PDF here, or use the button below. PDF only.
               </div>
+
+              {/* explicit, obvious upload button — so the zone isn't an invisible
+                  target. Stops propagation so it doesn't double-fire the zone's
+                  own onClick. Relabels once a file is successfully attached. */}
+              <button
+                type="button"
+                className="upload-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openPicker();
+                }}
+                style={{
+                  alignSelf: "flex-start",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: hasUsableFile ? "transparent" : GREEN,
+                  color: hasUsableFile ? GREEN : "#f1ece0",
+                  border: `1.5px solid ${GREEN}`,
+                  padding: "11px 18px",
+                  font: `600 12px ${BODY}`,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  borderRadius: 4,
+                  marginBottom: "clamp(16px, 2vw, 20px)",
+                }}
+              >
+                <span aria-hidden style={{ font: `600 14px ${BODY}`, lineHeight: 1 }}>
+                  {hasUsableFile ? "↻" : "↑"}
+                </span>
+                {hasUsableFile ? "Choose a different file" : "Choose PDF file"}
+              </button>
 
               {/* file chip — only after a PDF is attached */}
               {fileName && (
                 <>
                   <div
+                    className={`file-chip${fileStatus === "ok" ? " is-ok" : ""}`}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: 10,
                       padding: "12px 14px",
-                      background: PAPER_HI,
-                      border: "1px solid rgba(33,30,23,0.16)",
+                      background: fileStatus === "ok" ? "rgba(47,96,67,0.07)" : PAPER_HI,
+                      border:
+                        fileStatus === "ok"
+                          ? "1px solid rgba(47,96,67,0.45)"
+                          : "1px solid rgba(33,30,23,0.16)",
+                      borderLeft:
+                        fileStatus === "ok"
+                          ? `3px solid ${GREEN}`
+                          : fileStatus === "thin" || fileStatus === "error"
+                            ? "3px solid #bd5024"
+                            : "1px solid rgba(33,30,23,0.16)",
                       borderRadius: 4,
                     }}
                   >
@@ -320,6 +388,35 @@ export default function CareerUpload({ onContinue, onBack }: CareerUploadProps) 
                           ? "ADDED ✓"
                           : "CAN'T READ"}
                     </div>
+                    {/* remove / clear — returns the zone to its empty state.
+                        Stops propagation so it doesn't reopen the file picker. */}
+                    <button
+                      type="button"
+                      className="chip-remove"
+                      aria-label={`Remove ${fileName}`}
+                      title="Remove file"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearFile();
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 24,
+                        height: 24,
+                        flexShrink: 0,
+                        background: "transparent",
+                        border: "none",
+                        borderRadius: 3,
+                        color: MUTED,
+                        font: `400 15px ${BODY}`,
+                        lineHeight: 1,
+                        padding: 0,
+                      }}
+                    >
+                      ✕
+                    </button>
                   </div>
 
                   {/* thin / failed extraction: steer to the paste box (Option B) */}
@@ -483,7 +580,6 @@ export default function CareerUpload({ onContinue, onBack }: CareerUploadProps) 
           alignItems: "center",
           flexWrap: "wrap",
           gap: 12,
-          borderTop: "1px solid rgba(33,30,23,0.12)",
           paddingTop: 20,
         }}
       >

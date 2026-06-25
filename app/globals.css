@@ -76,8 +76,22 @@ body {
 /* ---- upload drop zone / paste area (verbatim) -------------------------- */
 .drop-zone { transition: border-color 140ms ease, background 140ms ease; cursor:pointer; }
 .drop-zone:hover { border-color: rgba(47,96,67,0.75); background:#efe8d6; }
+.drop-zone.is-dragging { border-color: rgba(47,96,67,0.9); border-style:solid; background:#eae3d0; }
 .paste-area { transition: border-color 140ms ease; }
 .paste-area:focus-within { border-color: rgba(47,96,67,0.6); }
+
+/* explicit "browse" button inside the drop zone — same family as .cta-green */
+.upload-btn { transition: background 120ms ease, border-color 120ms ease, transform 120ms ease; cursor:pointer; }
+.upload-btn:hover { background:#37714f; border-color:#37714f; transform:translateY(-1px); }
+
+/* file chip — fades + lifts in on attach; subtle settle on success */
+@keyframes chipIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes chipOk { 0% { box-shadow:0 0 0 0 rgba(47,96,67,0); } 40% { box-shadow:0 0 0 3px rgba(47,96,67,0.16); } 100% { box-shadow:0 0 0 0 rgba(47,96,67,0); } }
+.file-chip { animation: chipIn 220ms cubic-bezier(.2,.7,.2,1); }
+.file-chip.is-ok { animation: chipIn 220ms cubic-bezier(.2,.7,.2,1), chipOk 700ms ease 180ms; }
+.chip-remove { transition: background 120ms ease, color 120ms ease; cursor:pointer; }
+.chip-remove:hover { background:rgba(33,30,23,0.08); color:#211e17; }
+@media (prefers-reduced-motion: reduce) { .file-chip, .file-chip.is-ok { animation:none; } }
 
 /* ---- 3D tilt card (verbatim) ------------------------------------------- */
 .tilt-wrap { perspective: 1400px; }
@@ -163,5 +177,10 @@ body {
 .cta-green:hover { background:#37714f; transform:translateY(-1px); }
 .ghost-ln { transition: background 120ms ease, border-color 120ms ease; cursor:pointer; }
 .ghost-ln:hover { background:rgba(33,30,23,0.04); border-color:rgba(47,96,67,0.45); }
+
+/* clickable "home" wordmark in each screen header — subtle hover, points back
+   to the landing screen and resets the flow (onHome). */
+.cpc-home { transition: opacity 120ms ease; cursor:pointer; }
+.cpc-home:hover { opacity:0.6; }
 textarea[data-rotate]::placeholder { color:#a8a090; opacity:1; transition: opacity 480ms ease; }
 textarea[data-rotate].ph-fade::placeholder { opacity:0; }

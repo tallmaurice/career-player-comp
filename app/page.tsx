@@ -70,6 +70,9 @@ export default function Page() {
 
   // Guard so React 18 StrictMode double-invoke doesn't fire two generations.
   const generatingRef = useRef(false);
+  // Bumped on every reset/home so an in-flight generation that resolves AFTER
+  // the user has gone home can't slam the screen back to results.
+  const genTokenRef = useRef(0);
 
   const patch = useCallback(
     (p: Partial<AppState>) => setState((s) => ({ ...s, ...p })),
@@ -78,16 +81,26 @@ export default function Page() {
 
   const reset = useCallback(() => {
     generatingRef.current = false;
+    genTokenRef.current += 1; // invalidate any in-flight generation
     setError(null);
     setQIndex(0);
     setState(INITIAL);
   }, []);
+
+  // Top-left wordmark on every screen: abandon whatever's in flight and go home
+  // with a clean slate (careerText, answers, result all cleared via INITIAL).
+  const onHome = reset;
 
   // ---- the generation call, fired when we enter `loading` -------------------
   const runGeneration = useCallback(async () => {
     if (generatingRef.current) return;
     generatingRef.current = true;
     setError(null);
+
+    // Snapshot the token; if onHome/reset fires while we're awaiting, this
+    // generation is stale and must not write any state when it resolves.
+    const token = genTokenRef.current;
+    const stale = () => genTokenRef.current !== token;
 
     const startedAt = Date.now();
     const holdMin = () => {
@@ -111,8 +124,11 @@ export default function Page() {
         | { comp?: Comp; error?: string }
         | null;
 
+      if (stale()) return; // user went home mid-flight; drop the result silently
+
       if (!res.ok || !data?.comp) {
         await holdMin();
+        if (stale()) return;
         setError(
           data?.error ??
             "The scout couldn't finish the report. Take another shot.",
@@ -122,10 +138,12 @@ export default function Page() {
       }
 
       await holdMin(); // keep the scouting room up for the full beat
+      if (stale()) return;
       generatingRef.current = false;
       setState((s) => ({ ...s, result: data.comp!, screen: "results" }));
     } catch {
       await holdMin();
+      if (stale()) return;
       setError("Something dropped on the way to the front office. Try again.");
       generatingRef.current = false;
     }
@@ -197,7 +215,7 @@ export default function Page() {
     case "landing":
       return (
         <>
-          <Landing onStart={onStart} />
+          <Landing onStart={onStart} onHome={onHome} />
           <Disclaimer />
         </>
       );
@@ -206,7 +224,7 @@ export default function Page() {
       return (
         <CareerUpload
           onContinue={onUploadContinue}
-          onBack={() => patch({ screen: "landing" })}
+          onHome={onHome}
         />
       );
 
@@ -220,6 +238,7 @@ export default function Page() {
           selected={state.answers[key]}
           onSelect={onSelectAnswer}
           onBack={onQuizBack}
+          onHome={onHome}
         />
       );
     }
@@ -244,6 +263,7 @@ export default function Page() {
             setQIndex(TOTAL_QUESTIONS - 1);
             patch({ screen: "quiz" });
           }}
+          onHome={onHome}
         />
       );
 
@@ -264,6 +284,7 @@ export default function Page() {
             patch({ screen: "loading" });
           }}
           onBack={() => patch({ screen: "optional9" })}
+          onHome={onHome}
         />
       );
 
@@ -293,6 +314,7 @@ export default function Page() {
           <Results
             comp={state.result}
             onAppeal={reset}
+            onHome={onHome}
             tipUrl={TIP_URL}
             cardImageUrl={`/api/card?format=feed&data=${encodeComp(state.result)}`}
           />

@@ -13,6 +13,20 @@
 
 import type { CSSProperties } from "react";
 import type { LandingProps } from "@/lib/types";
+import { useTilt } from "@/lib/useTilt";
+
+// Shared "clickable home wordmark" affordance: strips button chrome, adds a
+// pointer cursor + a subtle hover so the top-left wordmark reads as a link back
+// to the landing screen. Used by every screen's header (see globals usage).
+const homeBtnStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  background: "transparent",
+  border: "none",
+  padding: 0,
+  cursor: "pointer",
+};
 
 // The grade rows in the sample card (Manu Ginóbili). Drives both artboards so
 // the four scouting categories stay in sync.
@@ -34,7 +48,7 @@ const SAMPLE_SUMMARY_DESKTOP =
 const SAMPLE_SUMMARY_MOBILE =
   "Comes off the bench because that is where the team needs him. Builds compounding value through repeat motions inside a system he didn't design.";
 
-export default function Landing({ onStart }: LandingProps) {
+export default function Landing({ onStart, onHome }: LandingProps) {
   return (
     <>
       {/* Responsive switch + drift-field animation tokens. The export ships two
@@ -49,15 +63,15 @@ export default function Landing({ onStart }: LandingProps) {
         }
       `}</style>
 
-      <LandingDesktop onStart={onStart} />
-      <LandingMobile onStart={onStart} />
+      <LandingDesktop onStart={onStart} onHome={onHome} />
+      <LandingMobile onStart={onStart} onHome={onHome} />
     </>
   );
 }
 
 // ---- DESKTOP (export Screen 01) --------------------------------------------
 
-function LandingDesktop({ onStart }: LandingProps) {
+function LandingDesktop({ onStart, onHome }: LandingProps) {
   return (
     <div
       className="cpc-landing-desktop paper-bg"
@@ -81,12 +95,17 @@ function LandingDesktop({ onStart }: LandingProps) {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "28px 56px",
-          borderBottom: "1px solid rgba(33,30,23,0.12)",
           position: "relative",
           zIndex: 1,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="Career Player Comp — home"
+          className="cpc-home"
+          style={homeBtnStyle}
+        >
           <div style={{ width: "8px", height: "8px", background: "#2f6043" }} />
           <div
             style={{
@@ -97,7 +116,7 @@ function LandingDesktop({ onStart }: LandingProps) {
           >
             CAREER PLAYER COMP
           </div>
-        </div>
+        </button>
         <div
           style={{
             font: "400 11px var(--font-mono)",
@@ -234,9 +253,9 @@ function LandingDesktop({ onStart }: LandingProps) {
           </div>
         </div>
 
-        {/* right column — tilted sample card */}
+        {/* right column — tilted sample card (the card owns its own
+            .tilt-wrap / .tilt-card so the pointer tilt stays self-contained) */}
         <div
-          className="tilt-wrap"
           style={{
             display: "flex",
             alignItems: "flex-start",
@@ -254,7 +273,6 @@ function LandingDesktop({ onStart }: LandingProps) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderTop: "1px solid rgba(33,30,23,0.12)",
           paddingTop: "20px",
           zIndex: 1,
           position: "relative",
@@ -310,11 +328,14 @@ function HonestStat({ label, value }: { label: string; value: string }) {
 }
 
 function SampleCardDesktop() {
+  const { wrapRef, cardRef } = useTilt();
   return (
-    <div
-      className="paper-card tilt-card"
-      style={{ width: "430px", padding: "30px 28px" }}
-    >
+    <div className="tilt-wrap" ref={wrapRef}>
+      <div
+        ref={cardRef}
+        className="paper-card tilt-card"
+        style={{ width: "430px", padding: "30px 28px" }}
+      >
       <div className="stamp">
         <span className="dept">SCOUTING DEPT.</span>
         <span className="cls">CLASS B · SAMPLE</span>
@@ -467,6 +488,7 @@ function SampleCardDesktop() {
         <CardStat label="PIVOTS" value="01" />
         <CardStat label="STATUS" value="RFA" valueColor="#2f6043" />
       </div>
+      </div>
     </div>
   );
 }
@@ -526,7 +548,7 @@ function CardStat({
 
 // ---- MOBILE (export Screen 01M, 390) ---------------------------------------
 
-function LandingMobile({ onStart }: LandingProps) {
+function LandingMobile({ onStart, onHome }: LandingProps) {
   return (
     <div
       className="cpc-landing-mobile paper-bg"
@@ -549,12 +571,17 @@ function LandingMobile({ onStart }: LandingProps) {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "18px 22px",
-          borderBottom: "1px solid rgba(33,30,23,0.12)",
           position: "relative",
           zIndex: 1,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="Career Player Comp — home"
+          className="cpc-home"
+          style={{ ...homeBtnStyle, gap: "8px", color: "#211e17" }}
+        >
           <div style={{ width: "6px", height: "6px", background: "#2f6043" }} />
           <div
             style={{
@@ -564,7 +591,7 @@ function LandingMobile({ onStart }: LandingProps) {
           >
             CAREER PLAYER COMP
           </div>
-        </div>
+        </button>
         <div
           style={{
             font: "400 9px var(--font-mono)",
@@ -632,9 +659,8 @@ function LandingMobile({ onStart }: LandingProps) {
         </div>
       </div>
 
-      {/* sample card */}
+      {/* sample card (owns its own .tilt-wrap / .tilt-card for the tilt) */}
       <div
-        className="tilt-wrap"
         style={{ padding: "0 22px 22px", position: "relative", zIndex: 1 }}
       >
         <SampleCardMobile />
@@ -677,8 +703,14 @@ function LandingMobile({ onStart }: LandingProps) {
 }
 
 function SampleCardMobile() {
+  const { wrapRef, cardRef } = useTilt();
   return (
-    <div className="paper-card tilt-card" style={{ padding: "22px 20px" }}>
+    <div className="tilt-wrap" ref={wrapRef}>
+      <div
+        ref={cardRef}
+        className="paper-card tilt-card"
+        style={{ padding: "22px 20px" }}
+      >
       <div className="stamp" style={{ top: "12px", right: "12px" }}>
         <span className="dept">SCOUTING DEPT.</span>
         <span className="cls">SAMPLE</span>
@@ -832,6 +864,7 @@ function SampleCardMobile() {
         <CardStatMobile label="TEAMS" value="02" />
         <CardStatMobile label="PIVOTS" value="01" />
         <CardStatMobile label="STATUS" value="RFA" valueColor="#2f6043" />
+      </div>
       </div>
     </div>
   );
