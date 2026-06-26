@@ -117,13 +117,16 @@ type El = {
   type: string;
   props: { style?: Record<string, unknown>; children?: unknown };
 };
+// satori only does flexbox, and every node needs an explicit display:flex or it
+// gets a zero/wrong measured height and siblings overlap. Default it on for every
+// element here (callers can still override by passing their own `display`).
 function el(type: string, style: Record<string, unknown>, children?: unknown): El {
-  return { type, props: { style, children } };
+  return { type, props: { style: { display: "flex", ...style }, children } };
 }
 
 function buildCard(comp: Comp, w: number, h: number): El {
   const story = h > w;
-  const pad = story ? 88 : 64;
+  const pad = story ? 88 : 44;
   const badges = (comp.badges ?? []).slice(0, 3);
   const stat = {
     seasons: tightNumber(comp.stat_line?.seasons ?? ""),
@@ -132,16 +135,25 @@ function buildCard(comp: Comp, w: number, h: number): El {
     status: tightStatus(comp.stat_line?.contract_status ?? ""),
   };
 
-  const nameSize = story ? 132 : 92;
-  const archSize = story ? 40 : 30;
-  const summarySize = story ? 30 : 23;
+  // feed (1200x630) is a short, wide banner: far less vertical room than story
+  // (1080x1920), so it runs tighter type and spacing or the content overruns the
+  // frame. story can breathe.
+  const nameSize = story ? 132 : 64;
+  const archSize = story ? 40 : 24;
+  const summarySize = story ? 30 : 19;
 
   const mono = "JetBrains Mono";
   const display = "Barlow Condensed";
   const body = "Inter";
 
   const divider = (color: string, mb: number) =>
-    el("div", { display: "flex", height: 1, background: color, marginBottom: mb });
+    el("div", {
+      height: 1,
+      width: "100%",
+      flexShrink: 0,
+      background: color,
+      marginBottom: mb,
+    });
 
   const statCell = (label: string, value: string, accent = false) =>
     el(
@@ -202,10 +214,11 @@ function buildCard(comp: Comp, w: number, h: number): El {
           el(
             "div",
             {
-              display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: story ? 40 : 26,
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: story ? 40 : 20,
             },
             [
               el(
@@ -245,7 +258,9 @@ function buildCard(comp: Comp, w: number, h: number): El {
               color: C.ink,
               textTransform: "uppercase",
               letterSpacing: "-0.01em",
-              marginBottom: 14,
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: story ? 14 : 10,
             },
             comp.player_name,
           ),
@@ -258,7 +273,9 @@ function buildCard(comp: Comp, w: number, h: number): El {
               fontSize: story ? 24 : 18,
               color: C.muted,
               letterSpacing: "0.14em",
-              marginBottom: story ? 28 : 18,
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: story ? 28 : 14,
             },
             comp.position_era,
           ),
@@ -272,25 +289,27 @@ function buildCard(comp: Comp, w: number, h: number): El {
               color: C.green,
               textTransform: "uppercase",
               letterSpacing: "0.04em",
-              marginBottom: story ? 28 : 18,
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: story ? 28 : 14,
             },
             comp.archetype_title,
           ),
-          divider("rgba(47,96,67,0.3)", story ? 28 : 18),
+          divider("rgba(47,96,67,0.3)", story ? 28 : 12),
           // badges
           el(
             "div",
             {
-              display: "flex",
               flexWrap: "wrap",
-              marginBottom: story ? 32 : 22,
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: story ? 32 : 14,
             },
             badges.map((b: Badge) => {
               const color = BADGE_COLOR[b.category] ?? C.green;
               return el(
                 "div",
                 {
-                  display: "flex",
                   fontFamily: mono,
                   fontWeight: 500,
                   fontSize: story ? 22 : 17,
@@ -302,6 +321,7 @@ function buildCard(comp: Comp, w: number, h: number): El {
                   padding: story ? "8px 14px" : "6px 11px",
                   marginRight: 10,
                   marginBottom: 10,
+                  flexShrink: 0,
                 },
                 b.label,
               );
@@ -311,23 +331,26 @@ function buildCard(comp: Comp, w: number, h: number): El {
           el(
             "div",
             {
-              display: "flex",
               fontFamily: body,
               fontWeight: 400,
               fontSize: summarySize,
-              lineHeight: 1.5,
+              lineHeight: story ? 1.5 : 1.4,
               color: C.body,
-              marginBottom: story ? 40 : 28,
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: story ? 40 : 14,
             },
             comp.card_summary,
           ),
-          // spacer pushes the stat line + watermark to the bottom
-          el("div", { display: "flex", flex: 1 }),
-          divider("rgba(33,30,23,0.14)", story ? 24 : 16),
+          // spacer pushes the stat line + watermark to the bottom.
+          // minHeight:0 lets this be the only thing that shrinks when the frame
+          // is short (the feed size), so the fixed rows above keep their height.
+          el("div", { flex: 1, minHeight: 0 }),
+          divider("rgba(33,30,23,0.14)", story ? 24 : 10),
           // stat line
           el(
             "div",
-            { display: "flex", marginBottom: story ? 28 : 18 },
+            { width: "100%", flexShrink: 0, marginBottom: story ? 28 : 10 },
             [
               statCell("SEASONS", stat.seasons),
               statCell("TEAMS", stat.teams),
@@ -339,9 +362,10 @@ function buildCard(comp: Comp, w: number, h: number): El {
           el(
             "div",
             {
-              display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              width: "100%",
+              flexShrink: 0,
             },
             [
               el(
