@@ -52,34 +52,30 @@ const BADGE_COLOR: Record<BadgeCategory, string> = {
 interface FontSpec {
   name: string;
   weight: 400 | 500 | 600 | 700;
-  family: string; // Google Fonts family query
+  url: string; // direct TrueType (.ttf) url — satori cannot read WOFF2
 }
 
+// Direct TTF files from jsdelivr's fontsource mirror. The old Google Fonts css2
+// + spoofed-old-UA trick stopped serving TTF (it returns WOFF2 now, which satori
+// can't parse) — that was the "card render failed" bug. These URLs serve raw
+// .ttf (sig 0x00010000), verified end-to-end through satori + resvg.
 const FONTS: FontSpec[] = [
-  { name: "Barlow Condensed", weight: 600, family: "Barlow+Condensed:wght@600" },
-  { name: "Barlow Condensed", weight: 700, family: "Barlow+Condensed:wght@700" },
-  { name: "Inter", weight: 400, family: "Inter:wght@400" },
-  { name: "Inter", weight: 500, family: "Inter:wght@500" },
-  { name: "JetBrains Mono", weight: 400, family: "JetBrains+Mono:wght@400" },
-  { name: "JetBrains Mono", weight: 500, family: "JetBrains+Mono:wght@500" },
+  { name: "Barlow Condensed", weight: 600, url: "https://cdn.jsdelivr.net/fontsource/fonts/barlow-condensed@latest/latin-600-normal.ttf" },
+  { name: "Barlow Condensed", weight: 700, url: "https://cdn.jsdelivr.net/fontsource/fonts/barlow-condensed@latest/latin-700-normal.ttf" },
+  { name: "Inter", weight: 400, url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf" },
+  { name: "Inter", weight: 500, url: "https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.ttf" },
+  { name: "JetBrains Mono", weight: 400, url: "https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.ttf" },
+  { name: "JetBrains Mono", weight: 500, url: "https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-500-normal.ttf" },
 ];
 
 type LoadedFont = { name: string; data: ArrayBuffer; weight: number; style: "normal" };
 let _fontCache: LoadedFont[] | null = null;
 
-// UA string old enough that Google serves TTF (satori can't read WOFF2).
-const TTF_UA =
-  "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50";
-
 async function loadOneFont(spec: FontSpec): Promise<LoadedFont> {
-  const cssUrl = `https://fonts.googleapis.com/css2?family=${spec.family}&display=swap`;
-  const css = await fetch(cssUrl, { headers: { "User-Agent": TTF_UA } }).then((r) =>
-    r.text(),
-  );
-  const m = css.match(/src:\s*url\(([^)]+)\)\s*format\(['"]?truetype['"]?\)/);
-  const url = m?.[1] ?? css.match(/url\((https:[^)]+\.ttf)\)/)?.[1];
-  if (!url) throw new Error(`no TTF url for ${spec.name} ${spec.weight}`);
-  const data = await fetch(url).then((r) => r.arrayBuffer());
+  const res = await fetch(spec.url);
+  if (!res.ok)
+    throw new Error(`font fetch ${res.status} for ${spec.name} ${spec.weight}`);
+  const data = await res.arrayBuffer();
   return { name: spec.name, data, weight: spec.weight, style: "normal" };
 }
 
