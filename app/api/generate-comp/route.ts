@@ -45,6 +45,13 @@ const OVERALL_TIMEOUT_MS = 52_000;
 const PER_IP_LIMIT = 5; // requests
 const PER_IP_WINDOW = "1 h" as const;
 const DAILY_SPEND_CAP = 1500; // max generations per UTC day (global kill-switch)
+// IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
+const BYPASS_IPS = new Set(
+  (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
+);
 
 // ---- Anthropic client -------------------------------------------------------
 
@@ -65,6 +72,10 @@ const SYSTEM_BLOCKS: Anthropic.TextBlockParam[] = [
 type LimitState = { rateLimited: boolean; spendExhausted: boolean };
 
 async function checkLimits(ip: string): Promise<LimitState> {
+  if (BYPASS_IPS.has(ip)) {
+    // Allowlisted (you): no per-IP limit, and don't count toward the daily cap.
+    return { rateLimited: false, spendExhausted: false };
+  }
   // Accept either the native Upstash names OR the Vercel-Upstash marketplace
   // names (KV_REST_API_*), so the limiter works however Upstash was provisioned.
   const url =
