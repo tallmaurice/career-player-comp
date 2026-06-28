@@ -28,7 +28,7 @@ import { useIsMobile } from "@/lib/useIsMobile";
 // LinkedIn profile; override per-deploy with NEXT_PUBLIC_CREATOR_URL.
 const CREATOR_URL =
   process.env.NEXT_PUBLIC_CREATOR_URL ??
-  "https://www.linkedin.com/in/maurice-peebles";
+  "https://www.linkedin.com/in/mauricepeebles";
 // TODO(maurice): set NEXT_PUBLIC_CONTACT_URL to the real intake (a form or a
 // real inbox). Falls back to a mailto placeholder for now.
 const CONTACT_URL =
