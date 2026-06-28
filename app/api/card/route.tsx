@@ -247,22 +247,76 @@ function buildCard(comp: Comp, w: number, h: number): El {
               ),
             ],
           ),
-          // player name
+          // player name + OVR/POT hero badge (2K-style overall rating)
           el(
             "div",
             {
-              fontFamily: display,
-              fontWeight: 700,
-              fontSize: nameSize,
-              lineHeight: 0.92,
-              color: C.ink,
-              textTransform: "uppercase",
-              letterSpacing: "-0.01em",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
               width: "100%",
               flexShrink: 0,
               marginBottom: story ? 14 : 10,
             },
-            comp.player_name,
+            [
+              el(
+                "div",
+                {
+                  fontFamily: display,
+                  fontWeight: 700,
+                  fontSize: nameSize,
+                  lineHeight: 0.92,
+                  color: C.ink,
+                  textTransform: "uppercase",
+                  letterSpacing: "-0.01em",
+                  flex: 1,
+                  minWidth: 0,
+                  marginRight: story ? 24 : 16,
+                },
+                comp.player_name,
+              ),
+              el(
+                "div",
+                { flexDirection: "column", alignItems: "flex-end", flexShrink: 0 },
+                [
+                  el(
+                    "div",
+                    {
+                      fontFamily: display,
+                      fontWeight: 700,
+                      fontSize: story ? 116 : 58,
+                      lineHeight: 0.84,
+                      color: C.green,
+                      letterSpacing: "-0.01em",
+                    },
+                    String(comp.ovr ?? ""),
+                  ),
+                  el(
+                    "div",
+                    {
+                      fontFamily: mono,
+                      fontWeight: 500,
+                      fontSize: story ? 22 : 13,
+                      color: C.muted,
+                      letterSpacing: "0.24em",
+                      marginTop: story ? 4 : 2,
+                    },
+                    "OVR",
+                  ),
+                  el(
+                    "div",
+                    {
+                      fontFamily: mono,
+                      fontWeight: 500,
+                      fontSize: story ? 18 : 11,
+                      color: C.faint,
+                      letterSpacing: "0.14em",
+                      marginTop: story ? 8 : 4,
+                    },
+                    `POT ${comp.pot ?? ""}`,
+                  ),
+                ],
+              ),
+            ],
           ),
           // position / era
           el(

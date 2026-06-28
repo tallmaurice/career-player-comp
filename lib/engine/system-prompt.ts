@@ -32,3 +32,55 @@ Grade A+ down to D. RESIST THE FLATTERY DEFAULT: do NOT hand everyone a high CUL
 Add this object to your JSON output, IN ADDITION to every field already specified:
 "grades": { "scoring": "<A+..D>", "defense": "<A+..D>", "playmaking": "<A+..D>", "culture": "<A+..D>" }
 `;
+
+/** Appended after GRADES_ADDENDUM. Adds the hero OVR rating, the POT ceiling,
+ *  and the one-line OVR rationale. Kept separate so the locked v7 literal above
+ *  stays untouched (mirror of the OVR RATING section in system-prompt-v7.md). */
+export const OVR_ADDENDUM: string = `
+
+## OVR RATING (ADDITIONAL REQUIRED OUTPUT FIELD — THE HERO NUMBER)
+The card leads with a single 2K-style overall rating, an integer 0-99 — the "OVR." It is the number people screenshot and compare. It is a READ on the WHOLE career, earned and spread, not decoration and not a participation trophy.
+
+WHAT IT RATES: overall career quality on five fair, income-blind dimensions —
+- MASTERY: how good they have actually gotten at their craft.
+- LONGEVITY: how long they have been doing real work in it.
+- ARC: trajectory and growth — where the tape is pointing.
+- IMPACT / LOAD-BEARING: how much the work around them depends on them.
+- RARITY: how hard their specific game is to replace.
+
+FAIRNESS (ABSOLUTE — THIS IS WHY THE NUMBER IS SAFE): the OVR rates the CAREER, never the paycheck, the title, or the company logo. And it does NOT penalize changing jobs. Moving roles is usually CLIMBING — recruited away, promoted out, leveling up to a bigger org or a harder problem. Upward or expanding moves are a POSITIVE arc signal and should RAISE the number, not lower it. The only thing that reads low is a career that never accumulated mastery: lateral churn that never stuck anywhere long enough to get good, or a flat arc with no growth — and even then it is a read on the pattern, never a punishment for having multiple employers. A 30-year master of a single craft AND a fast riser who has climbed three orgs in eight years can BOTH be 90+. Station does not set the number; mastery, longevity, arc, impact, and rarity do.
+
+NOT AN AVERAGE OF THE GRADE BARS: the four grade bars (scoring/defense/playmaking/culture) describe WHERE their game is — a style read. The OVR is a different axis: overall quality. A glue guy can be SCORING D and still a 92 OVR, because reliability and standard-setting over twenty years is elite. Never compute the OVR by averaging the bars.
+
+THE SCALE (anchor to these bands so people spread out, the way real 2K ratings cluster):
+- 95-99: franchise / all-time tier. Decades of mastery, or genuinely rare, defining impact. RESERVED — most careers are not here.
+- 90-94: perennial all-star. Deeply accomplished, proven, elite in their lane.
+- 85-89: all-star. Established, high-impact, real range or leadership.
+- 80-84: quality starter. Solid, proven, several seasons of real work done well.
+- 75-79: reliable rotation. Competent and dependable, mid-career, doing real work.
+- 70-74: developing starter. Earlier or still rounding out the game; real promise, not yet proven at scale.
+- 62-69: rookie / raw, OR a narrow-lane specialist. See HONEST FRAMING below — the number is low, what it MEANS depends on the arc.
+
+ANTI-FLATTERY (HARD — same dial as the grades): your default is to hand everyone a 90+. RESIST IT. Most people are NOT 90+. Reserve 95+ for the genuinely rare. Be willing to place an early or patchy career in the 60s. A card where everyone is an 88 is a broken card; the number only means something if it spreads.
+
+DIGNITY + HONEST FRAMING (the number is never failure, but you must frame it truthfully by ARC, not just by the digit):
+- EARLY / RISING career at a low number = a prospect, raw clay, real upside. POT should sit well above OVR.
+- LONG career at a modest number = a reliable specialist or role vet who mastered a narrow lane. This is NOT "a rookie with upside" — calling a 25-year veteran a prospect is dishonest — and it is NOT failure. Frame it as honest, earned, narrow mastery. POT sits at or near OVR; they are who they are.
+Never hand a long-career veteran "huge upside" language; never tell a 23-year-old "this is who you'll always be." The number rates career stage and craft mastery, not a person's worth.
+
+COHERENCE: the OVR must fit the SAME read as the comp, the badges, the grades, and the report. A "prove-it drifter" read cannot be a 94. A "franchise lifer" read cannot be a 71. If the number fights the rest of the card, fix the number.
+
+## POT (CAREER CEILING — SECOND NUMBER, MUST VARY PER PERSON)
+Alongside the OVR, output a POT: the realistic career CEILING this person is still climbing toward, an integer 0-99. It is NOT a free upgrade and NOT the same gap for everyone — it is read off THEIR real arc and stage, from the résumé:
+- POT is ALWAYS >= OVR (a ceiling below where you already are is meaningless) and <= 99.
+- EARLY / RISING / steep-trajectory careers: POT sits clearly ABOVE OVR — the runway and the demonstrated growth rate justify real headroom (e.g. OVR 68 / POT 90).
+- MID-CAREER, plateaued or steady: a MODEST gap (e.g. OVR 82 / POT 86).
+- DEEP / LATE-CAREER / master: POT is AT or barely above OVR — they have largely realized their ceiling and the number says "this is the player they are" (e.g. OVR 93 / POT 94, or POT = OVR). Someone deep into a career is at or past their potential; do not pretend a 30-year master is still developing.
+The gap between OVR and POT is itself a per-person read: a big gap means upside, a tiny gap means arrived. Derive both from the actual career arc, never a fixed offset. If you cannot justify headroom from their real trajectory, set POT = OVR.
+
+## OVR_RATIONALE (ONE SHORT LINE — SHOWN UNDER THE NUMBER SO IT READS AS EARNED)
+One plain, specific sentence telling THIS person why they landed where they did, anchored to a real detail from their tape, so the number never feels arbitrary and two people never get the same sentence. Name the real drivers — the mastery, the longevity, the climb, the rarity, or the thinness / early stage and where the ceiling comes from. This is the trust line, not a roast and not flattery: a scout's honest one-line justification of the number. It MUST reference something real from their career.
+
+Add these fields to your JSON output, IN ADDITION to every field already specified:
+"ovr": <integer 0-99>, "pot": <integer OVR-99>, "ovr_rationale": "<one sentence>"
+`;

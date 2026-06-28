@@ -48,6 +48,8 @@ function encodeCardComp(comp: Comp): string {
     player_name: comp.player_name,
     position_era: comp.position_era,
     archetype_title: comp.archetype_title,
+    ovr: comp.ovr,
+    pot: comp.pot,
     badges: comp.badges,
     card_summary: comp.card_summary,
     stat_line: comp.stat_line,
@@ -488,6 +490,9 @@ ResultsProps) {
               ))}
             </div>
 
+            {/* OVR/POT rationale + how-scored note (the trust block) */}
+            <RatingNote comp={comp} />
+
             {/* scout signature */}
             <div
               style={{
@@ -885,6 +890,11 @@ ResultsProps) {
           </div>
         </div>
 
+        {/* OVR/POT rationale + how-scored note (the trust block) */}
+        <div style={{ padding: "0 22px" }}>
+          <RatingNote comp={comp} mobile />
+        </div>
+
         {/* Share + Download (stacked on mobile) */}
         <div
           style={{
@@ -1122,20 +1132,76 @@ ResultsProps) {
             FILE No. 2026-4471
           </div>
 
-          {/* player_name */}
+          {/* player_name + OVR/POT hero badge (2K-style overall rating) */}
           <div
-            className="layer-z3"
             style={{
-              font: mobile
-                ? "700 44px/0.92 'Barlow Condensed'"
-                : "700 76px/0.92 'Barlow Condensed'",
-              color: "#211e17",
-              textTransform: "uppercase",
-              letterSpacing: "-0.008em",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              gap: mobile ? 12 : 20,
               marginBottom: mobile ? 8 : 10,
             }}
           >
-            {comp.player_name}
+            <div
+              className="layer-z3"
+              style={{
+                font: mobile
+                  ? "700 44px/0.92 'Barlow Condensed'"
+                  : "700 76px/0.92 'Barlow Condensed'",
+                color: "#211e17",
+                textTransform: "uppercase",
+                letterSpacing: "-0.008em",
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              {comp.player_name}
+            </div>
+            <div
+              className="layer-z3"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  font: mobile
+                    ? "700 42px/0.86 'Barlow Condensed'"
+                    : "700 68px/0.86 'Barlow Condensed'",
+                  color: "#2f6043",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {comp.ovr}
+              </div>
+              <div
+                style={{
+                  font: mobile
+                    ? "500 9px 'JetBrains Mono', monospace"
+                    : "500 11px 'JetBrains Mono', monospace",
+                  color: "#6b655a",
+                  letterSpacing: "0.24em",
+                  marginTop: mobile ? 1 : 2,
+                }}
+              >
+                OVR
+              </div>
+              <div
+                style={{
+                  font: mobile
+                    ? "500 8px 'JetBrains Mono', monospace"
+                    : "500 10px 'JetBrains Mono', monospace",
+                  color: "#a8a090",
+                  letterSpacing: "0.14em",
+                  marginTop: mobile ? 3 : 5,
+                }}
+              >
+                POT {comp.pot}
+              </div>
+            </div>
           </div>
 
           {/* position_era */}
@@ -1331,6 +1397,103 @@ function CreatorCredit() {
           Get in touch.
         </a>
       </div>
+    </div>
+  );
+}
+
+// The rating trust block: the OVR/POT readout, the per-user rationale (so the
+// number reads as earned, not arbitrary), and a static one-line note on what
+// the rating weighs (so nobody feels cheated by a low number). Results page
+// only — the card itself carries the big OVR; this is the on-screen depth.
+function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) {
+  return (
+    <div
+      style={{
+        marginTop: mobile ? 22 : 30,
+        paddingTop: mobile ? 16 : 18,
+        borderTop: "1px solid rgba(33,30,23,0.14)",
+      }}
+    >
+      <div
+        style={{
+          font: "500 10px 'JetBrains Mono', monospace",
+          color: "#2f6043",
+          letterSpacing: "0.24em",
+          marginBottom: 12,
+        }}
+      >
+        [ THE RATING ]
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: 16,
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+          <span
+            style={{
+              font: mobile
+                ? "700 30px 'Barlow Condensed'"
+                : "700 34px 'Barlow Condensed'",
+              color: "#2f6043",
+            }}
+          >
+            {comp.ovr}
+          </span>
+          <span
+            style={{
+              font: "500 10px 'JetBrains Mono', monospace",
+              color: "#6b655a",
+              letterSpacing: "0.18em",
+            }}
+          >
+            OVR
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+          <span
+            style={{
+              font: mobile
+                ? "700 22px 'Barlow Condensed'"
+                : "700 24px 'Barlow Condensed'",
+              color: "#211e17",
+            }}
+          >
+            {comp.pot}
+          </span>
+          <span
+            style={{
+              font: "500 10px 'JetBrains Mono', monospace",
+              color: "#a8a090",
+              letterSpacing: "0.18em",
+            }}
+          >
+            POT
+          </span>
+        </div>
+      </div>
+      <p
+        style={{
+          font: mobile ? "400 12.5px/1.6 'Inter'" : "400 13px/1.65 'Inter'",
+          color: "#4a463d",
+          margin: "0 0 10px",
+        }}
+      >
+        {comp.ovr_rationale}
+      </p>
+      <p
+        style={{
+          font: "400 11px/1.55 'Inter'",
+          color: "#a8a090",
+          margin: 0,
+        }}
+      >
+        OVR weighs career mastery, longevity, trajectory, impact, and how hard
+        your game is to replace, not pay or title. POT is your ceiling.
+      </p>
     </div>
   );
 }

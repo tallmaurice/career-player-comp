@@ -10,7 +10,7 @@
 // =============================================================================
 
 import type { Comp, QuizAnswers } from "@/lib/types";
-import { SYSTEM_PROMPT_V7, PLAYER_POOL_SLOT, GRADES_ADDENDUM } from "./system-prompt";
+import { SYSTEM_PROMPT_V7, PLAYER_POOL_SLOT, GRADES_ADDENDUM, OVR_ADDENDUM } from "./system-prompt";
 import poolJson from "./player-pool.json";
 
 // ---- Player pool ------------------------------------------------------------
@@ -54,7 +54,8 @@ export function isPlayerInPool(name: string): boolean {
  */
 export const SYSTEM_STRING: string =
   SYSTEM_PROMPT_V7.replace(PLAYER_POOL_SLOT, JSON.stringify(PLAYER_POOL)) +
-  GRADES_ADDENDUM;
+  GRADES_ADDENDUM +
+  OVR_ADDENDUM;
 
 // ---- Lens variations for best-of-3 ------------------------------------------
 
@@ -165,6 +166,20 @@ function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
 }
 
+/** Coerce a model OVR/POT to a clean integer in [min, max], else fall back.
+ *  Accepts a number or a numeric string ("84", "OVR 84"). Like grades, a
+ *  garbled rating never rejects a comp — it falls back. */
+function coerceRating(v: unknown, fallback: number, min: number, max: number): number {
+  let n: number | null = null;
+  if (typeof v === "number" && Number.isFinite(v)) n = v;
+  else if (typeof v === "string") {
+    const m = v.match(/\d{1,3}/); // first 1-3 digit run, tolerates "OVR 84"
+    if (m) n = parseInt(m[0], 10);
+  }
+  if (n === null || !Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.round(n)));
+}
+
 const VALID_GRADE = /^[A-DF][+-]?$/;
 /** Coerce a model grade to a clean ASCII letter grade (e.g. "A-"), else fall
  *  back. Grades are optional: a missing/garbled grade never rejects a comp. */
@@ -268,6 +283,15 @@ export function parseComp(raw: string): ParseResult {
   if (!cats.has("tendency"))
     return { ok: false, reason: "shape", detail: "badges need >=1 tendency" };
 
+  // ovr / pot / ovr_rationale: optional, coerced, never reject for them.
+  // ovr clamped to a sane band; pot clamped to >= ovr (a ceiling below current
+  // is meaningless); rationale falls back to a generic trust line if missing.
+  const ovr = coerceRating(o["ovr"], 78, 40, 99);
+  const pot = coerceRating(o["pot"], ovr, ovr, 99);
+  const ovr_rationale = isNonEmptyString(o["ovr_rationale"])
+    ? (o["ovr_rationale"] as string).trim()
+    : "Rated on career mastery, longevity, trajectory, impact, and how hard the game is to replace.";
+
   const playerName = (o["player_name"] as string).trim();
   if (!isPlayerInPool(playerName))
     return { ok: false, reason: "out_of_pool", detail: `not in pool: ${playerName}` };
@@ -281,6 +305,9 @@ export function parseComp(raw: string): ParseResult {
     player_name: canonical,
     position_era: (o["position_era"] as string).trim(),
     archetype_title: (o["archetype_title"] as string).trim(),
+    ovr,
+    pot,
+    ovr_rationale,
     badges: (badges as Comp["badges"]).map((b) => ({
       label: b.label.trim(),
       category: b.category,

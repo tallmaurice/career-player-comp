@@ -78,8 +78,38 @@ export function useTilt(): TiltRefs {
       card.style.transform = "";
     };
 
-    const onPointerMove = (e: PointerEvent) => applyTilt(e.clientX, e.clientY);
+    // Intro "it moves" hint. On mobile there is no hovering cursor and touchmove
+    // only fires while a finger is dragging ON the card, so a user landing on
+    // results sees a static card and never learns it tilts. So on load the card
+    // plays a short two-beat lean (a bit bigger than the interactive clamp so it
+    // clearly reads as motion), then settles to the resting lean. It cancels the
+    // instant the user takes over, and reduced-motion users never reach here.
+    const timers: number[] = [];
+    let introDone = false;
+    const cancelIntro = () => {
+      if (introDone) return;
+      introDone = true;
+      timers.forEach((t) => clearTimeout(t));
+      timers.length = 0;
+    };
+    const introTilt = (rotX: number, rotY: number) => {
+      if (introDone) return;
+      card.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    };
+    timers.push(window.setTimeout(() => introTilt(-8, 13), 650));
+    timers.push(window.setTimeout(() => introTilt(-3, -10), 1200));
+    timers.push(
+      window.setTimeout(() => {
+        if (!introDone) reset();
+      }, 1750),
+    );
+
+    const onPointerMove = (e: PointerEvent) => {
+      cancelIntro();
+      applyTilt(e.clientX, e.clientY);
+    };
     const onTouchMove = (e: TouchEvent) => {
+      cancelIntro();
       const t = e.touches[0];
       if (t) applyTilt(t.clientX, t.clientY);
     };
@@ -91,6 +121,7 @@ export function useTilt(): TiltRefs {
     wrap.addEventListener("touchcancel", reset);
 
     return () => {
+      cancelIntro();
       wrap.removeEventListener("pointermove", onPointerMove);
       wrap.removeEventListener("pointerleave", reset);
       wrap.removeEventListener("touchmove", onTouchMove);

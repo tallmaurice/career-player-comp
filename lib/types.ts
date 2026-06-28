@@ -50,6 +50,16 @@ export interface Comp {
   position_era: string;
   /** Coined fresh for this person, 3-5 words, never reused. */
   archetype_title: string;
+  /** 2K-style overall career rating, integer 0-99 (the hero number). Rates
+   *  career QUALITY (mastery/longevity/arc/impact/rarity), income-blind — NOT
+   *  an average of the four grade bars. Earned and spread, never clustered. */
+  ovr: number;
+  /** 2K-style career ceiling, integer 0-99, always >= ovr. The OVR->POT gap is
+   *  a per-person read: big gap = early/rising upside, tiny gap = arrived/vet. */
+  pot: number;
+  /** One short résumé-anchored sentence justifying the OVR so the number reads
+   *  as earned, not arbitrary. Shown under the number on the results page. */
+  ovr_rationale: string;
   /** Exactly 3, spanning 3 categories, at least one "tendency". */
   badges: Badge[];
   /** 2-3 tight sentences; what prints ON the shareable card. */
