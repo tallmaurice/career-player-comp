@@ -248,7 +248,8 @@ function LandingDesktop({ onStart, onHome }: LandingProps) {
               maxWidth: "560px",
             }}
           >
-            <HonestStat label="ARCHETYPES" value="63" />
+            {/* keep in sync with the player pool count (lib/engine/player-pool.json) */}
+            <HonestStat label="ARCHETYPES" value="204" />
             <HonestStat label="ACCOUNT" value="NONE NEEDED" />
             <HonestStat label="DATA STORED" value="NONE" />
           </div>
