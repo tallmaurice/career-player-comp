@@ -65,8 +65,12 @@ const SYSTEM_BLOCKS: Anthropic.TextBlockParam[] = [
 type LimitState = { rateLimited: boolean; spendExhausted: boolean };
 
 async function checkLimits(ip: string): Promise<LimitState> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  // Accept either the native Upstash names OR the Vercel-Upstash marketplace
+  // names (KV_REST_API_*), so the limiter works however Upstash was provisioned.
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
   if (!url || !token) {
     // Dev / unconfigured: no limits.
     return { rateLimited: false, spendExhausted: false };
