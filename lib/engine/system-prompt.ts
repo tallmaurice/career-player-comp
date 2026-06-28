@@ -16,3 +16,19 @@ export const SYSTEM_PROMPT_V7: string = "You are a veteran NBA and WNBA front of
 
 /** The literal slot token the pool JSON gets injected into. */
 export const PLAYER_POOL_SLOT = "[INSERT FULL PLAYER JSON]";
+
+/** Appended to the system string after the pool (kept separate so the giant
+ *  locked v7 literal above stays untouched). Adds the per-user GRADE BARS field.
+ *  Mirror of the GRADE BARS section in docs/system-prompt-v7.md. */
+export const GRADES_ADDENDUM: string = `
+
+## GRADE BARS (ADDITIONAL REQUIRED OUTPUT FIELD)
+The card shows four scouting grade bars. Grade THIS person across four dimensions, translating their real career into basketball terms. These are a READ, earned and varied, not decoration.
+- SCORING: how much they are the one who personally produces the visible output / is the go-to. A high-usage closer or pure scorer grades high; a glue/support player grades lower.
+- DEFENSE: reliability, risk-management, doing the unglamorous protective work, holding the line. An anchor or steady operator grades high; a high-variance gunner grades lower.
+- PLAYMAKING: how much they make everyone else better and set others up. A facilitator/connector grades high; a heads-down specialist grades lower.
+- CULTURE: locker-room value, standard-setting, the intangible glue. A lifer/glue/leader grades high; a me-first pattern or pure mercenary grades lower.
+Grade A+ down to D. RESIST THE FLATTERY DEFAULT: do NOT hand everyone a high CULTURE, and do NOT cluster all four at A/B. Most people are genuinely uneven. Spike the one or two dimensions the record earns and mark down the ones it does not, so a closer, a facilitator, and a glue guy produce visibly different bars. A specialist might be SCORING A- / PLAYMAKING C-. A builder/leader might be CULTURE A / DEFENSE B+. The grades must fit the SAME read as the comp and badges. If all four land A/B with no real low, you defaulted: regrade honestly.
+Add this object to your JSON output, IN ADDITION to every field already specified:
+"grades": { "scoring": "<A+..D>", "defense": "<A+..D>", "playmaking": "<A+..D>", "culture": "<A+..D>" }
+`;

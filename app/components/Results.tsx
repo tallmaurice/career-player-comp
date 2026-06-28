@@ -18,7 +18,7 @@
 // .cta-green, .ghost-ln) come from app/globals.css and are NOT re-expressed.
 // =============================================================================
 
-import type { ResultsProps, Badge, BadgeCategory, Comp } from "@/lib/types";
+import type { ResultsProps, Badge, BadgeCategory, Comp, Grades } from "@/lib/types";
 import { useState } from "react";
 import { useTilt } from "@/lib/useTilt";
 import { useIsMobile } from "@/lib/useIsMobile";
@@ -79,25 +79,46 @@ const BADGE_COLOR: Record<BadgeCategory, string> = {
   tendency: "#3a8054",
 };
 
-// ---- Grade bars are DISPLAY-DERIVED -----------------------------------------
-// The Comp contract has no scoring/defense/playmaking/culture grades. The
-// export shows four graded bars purely as scouting-report set dressing. Rather
-// than fabricate per-user numbers we don't have, we render the export's exact
-// tasteful default set (C / A- / B / A+). If a future engine version emits real
-// grades, swap GRADE_BARS for a mapping off `comp`. The label/letter/suffix and
-// bar width are all visual constants here, intentionally not tied to the user.
-const GRADE_BARS: Array<{
-  label: string;
-  color: string;
-  width: string; // bar fill width
-  letter: string; // grade letter
-  suffix: string; // + / - / "" — sits in the fixed-width .suf slot so letters align
-}> = [
-  { label: "SCORING", color: "#bd5024", width: "42%", letter: "C", suffix: "" },
-  { label: "DEFENSE", color: "#356287", width: "88%", letter: "A", suffix: "−" },
-  { label: "PLAYMAKING", color: "#3a8054", width: "71%", letter: "B", suffix: "" },
-  { label: "CULTURE", color: "#8f7220", width: "94%", letter: "A", suffix: "+" },
+// ---- Grade bars are PER-USER (engine-derived) -------------------------------
+// The engine now emits comp.grades (scoring/defense/playmaking/culture, A+..D),
+// graded to THIS person. We keep the label + color constant (the card's fixed
+// palette) and derive the letter, the +/- suffix, and the bar width from the
+// grade. (Was previously a hardcoded constant identical for every user.)
+const GRADE_META: Array<{ label: string; key: keyof Grades; color: string }> = [
+  { label: "SCORING", key: "scoring", color: "#bd5024" },
+  { label: "DEFENSE", key: "defense", color: "#356287" },
+  { label: "PLAYMAKING", key: "playmaking", color: "#3a8054" },
+  { label: "CULTURE", key: "culture", color: "#8f7220" },
 ];
+
+// Letter grade -> bar fill width (visual only; monotonic, A+ high to F low).
+const GRADE_WIDTH: Record<string, string> = {
+  "A+": "96%", A: "91%", "A-": "86%", "B+": "80%", B: "74%", "B-": "68%",
+  "C+": "61%", C: "54%", "C-": "48%", "D+": "41%", D: "35%", "D-": "30%", F: "24%",
+};
+
+// Split "A-" into base letter + display suffix (figure-minus for the .suf slot).
+function splitGrade(raw: string): { letter: string; suffix: string } {
+  const g = (raw || "B").trim().toUpperCase();
+  const m = g.match(/^([A-DF])([+-])?$/);
+  if (!m) return { letter: "B", suffix: "" };
+  return { letter: m[1], suffix: m[2] === "-" ? "−" : m[2] ?? "" };
+}
+
+// Build the four render-ready bars from the per-user grades.
+function buildGradeBars(grades: Grades | undefined) {
+  return GRADE_META.map((m) => {
+    const raw = grades?.[m.key] ?? "B";
+    const { letter, suffix } = splitGrade(raw);
+    return {
+      label: m.label,
+      color: m.color,
+      width: GRADE_WIDTH[raw.trim().toUpperCase()] ?? "70%",
+      letter,
+      suffix,
+    };
+  });
+}
 
 // ---- stat_line display hardening --------------------------------------------
 // Known engine drift (per the foundation manifest): stat_line fields can come
@@ -414,9 +435,9 @@ ResultsProps) {
               {comp.front_office_fit}
             </p>
 
-            {/* grade bars (display-derived; see GRADE_BARS comment) */}
+            {/* grade bars (per-user; see buildGradeBars) */}
             <div style={{ borderTop: "1px solid rgba(33,30,23,0.14)" }}>
-              {GRADE_BARS.map((g, i) => (
+              {buildGradeBars(comp.grades).map((g, i, arr) => (
                 <div
                   key={g.label}
                   style={{
@@ -425,7 +446,7 @@ ResultsProps) {
                     gap: 18,
                     padding: "16px 0",
                     borderBottom:
-                      i < GRADE_BARS.length - 1
+                      i < arr.length - 1
                         ? "1px solid rgba(33,30,23,0.08)"
                         : "none",
                     alignItems: "center",
@@ -809,10 +830,10 @@ ResultsProps) {
           </p>
         </div>
 
-        {/* grade bars (display-derived) */}
+        {/* grade bars (per-user; see buildGradeBars) */}
         <div style={{ padding: "14px 22px 0" }}>
           <div style={{ borderTop: "1px solid rgba(33,30,23,0.14)" }}>
-            {GRADE_BARS.map((g, i) => (
+            {buildGradeBars(comp.grades).map((g, i, arr) => (
               <div
                 key={g.label}
                 style={{
@@ -821,7 +842,7 @@ ResultsProps) {
                   gap: 12,
                   padding: "11px 0",
                   borderBottom:
-                    i < GRADE_BARS.length - 1
+                    i < arr.length - 1
                       ? "1px solid rgba(33,30,23,0.08)"
                       : "none",
                   alignItems: "center",

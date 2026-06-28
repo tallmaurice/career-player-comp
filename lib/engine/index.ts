@@ -10,7 +10,7 @@
 // =============================================================================
 
 import type { Comp, QuizAnswers } from "@/lib/types";
-import { SYSTEM_PROMPT_V7, PLAYER_POOL_SLOT } from "./system-prompt";
+import { SYSTEM_PROMPT_V7, PLAYER_POOL_SLOT, GRADES_ADDENDUM } from "./system-prompt";
 import poolJson from "./player-pool.json";
 
 // ---- Player pool ------------------------------------------------------------
@@ -52,10 +52,9 @@ export function isPlayerInPool(name: string): boolean {
  *
  * Computed once at module load.
  */
-export const SYSTEM_STRING: string = SYSTEM_PROMPT_V7.replace(
-  PLAYER_POOL_SLOT,
-  JSON.stringify(PLAYER_POOL),
-);
+export const SYSTEM_STRING: string =
+  SYSTEM_PROMPT_V7.replace(PLAYER_POOL_SLOT, JSON.stringify(PLAYER_POOL)) +
+  GRADES_ADDENDUM;
 
 // ---- Lens variations for best-of-3 ------------------------------------------
 
@@ -166,6 +165,17 @@ function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
 }
 
+const VALID_GRADE = /^[A-DF][+-]?$/;
+/** Coerce a model grade to a clean ASCII letter grade (e.g. "A-"), else fall
+ *  back. Grades are optional: a missing/garbled grade never rejects a comp. */
+function coerceGrade(v: unknown, fallback: string): string {
+  if (typeof v === "string") {
+    const g = v.trim().toUpperCase().replace("−", "-"); // figure-minus -> hyphen
+    if (VALID_GRADE.test(g)) return g;
+  }
+  return fallback;
+}
+
 /**
  * Parse a raw model response into a validated Comp.
  * Validates: JSON parses, all 11 fields present with the right shape, exactly
@@ -219,6 +229,18 @@ export function parseComp(raw: string): ParseResult {
     if (!isNonEmptyString(slo[f]))
       return { ok: false, reason: "shape", detail: `missing stat_line.${f}` };
   }
+
+  // grades: optional 4 letter grades; coerce with fallback, never reject for them
+  const grObj =
+    typeof o["grades"] === "object" && o["grades"] !== null
+      ? (o["grades"] as Record<string, unknown>)
+      : {};
+  const grades = {
+    scoring: coerceGrade(grObj["scoring"], "B"),
+    defense: coerceGrade(grObj["defense"], "B"),
+    playmaking: coerceGrade(grObj["playmaking"], "B"),
+    culture: coerceGrade(grObj["culture"], "B"),
+  };
 
   // badges: exactly 3, 3 categories, >=1 tendency
   const badges = o["badges"];
@@ -274,6 +296,7 @@ export function parseComp(raw: string): ParseResult {
       pivots: String(slo["pivots"]).trim(),
       contract_status: String(slo["contract_status"]).trim(),
     },
+    grades,
     front_office_fit: (o["front_office_fit"] as string).trim(),
     comp_tone: (o["comp_tone"] as string).trim(),
   };
