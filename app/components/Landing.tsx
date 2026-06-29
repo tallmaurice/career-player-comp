@@ -12,7 +12,7 @@
 // calls LandingProps.onStart.
 // =============================================================================
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import type { LandingProps } from "@/lib/types";
 import { useTilt } from "@/lib/useTilt";
 
@@ -50,6 +50,25 @@ const SAMPLE_SUMMARY_MOBILE =
   "Comes off the bench because that is where the team needs him. Builds compounding value through repeat motions inside a system he didn't design.";
 
 export default function Landing({ onStart, onHome }: LandingProps) {
+  // Live "N careers scouted" social proof. Fetched client-side from /api/scouted
+  // (the global Redis counter /api/generate-comp increments). Stays null until a
+  // positive total comes back, so the line is hidden at 0 or on any fetch failure
+  // — the hero never shows a placeholder or a zero.
+  const [scouted, setScouted] = useState<number | null>(null);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/scouted")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const total = Number(d?.total);
+        if (live && Number.isFinite(total) && total > 0) setScouted(total);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+
   return (
     <>
       {/* Responsive switch + drift-field animation tokens. The export ships two
@@ -64,15 +83,19 @@ export default function Landing({ onStart, onHome }: LandingProps) {
         }
       `}</style>
 
-      <LandingDesktop onStart={onStart} onHome={onHome} />
-      <LandingMobile onStart={onStart} onHome={onHome} />
+      <LandingDesktop onStart={onStart} onHome={onHome} scouted={scouted} />
+      <LandingMobile onStart={onStart} onHome={onHome} scouted={scouted} />
     </>
   );
 }
 
 // ---- DESKTOP (export Screen 01) --------------------------------------------
 
-function LandingDesktop({ onStart, onHome }: LandingProps) {
+function LandingDesktop({
+  onStart,
+  onHome,
+  scouted,
+}: LandingProps & { scouted: number | null }) {
   return (
     <div
       className="cpc-landing-desktop paper-bg"
@@ -208,7 +231,7 @@ function LandingDesktop({ onStart, onHome }: LandingProps) {
               display: "flex",
               alignItems: "center",
               gap: "20px",
-              marginBottom: "60px",
+              marginBottom: scouted ? "26px" : "60px",
             }}
           >
             <button
@@ -238,6 +261,36 @@ function LandingDesktop({ onStart, onHome }: LandingProps) {
               ~ 90 SECONDS
             </div>
           </div>
+          {scouted ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "9px",
+                marginBottom: "34px",
+              }}
+            >
+              <div
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  background: "#2f6043",
+                  borderRadius: "50%",
+                  boxShadow: "0 0 0 3px rgba(47,96,67,0.15)",
+                  flexShrink: 0,
+                }}
+              />
+              <div
+                style={{
+                  font: "400 11px var(--font-mono)",
+                  color: "#2f6043",
+                  letterSpacing: "0.18em",
+                }}
+              >
+                {scouted.toLocaleString()} CAREERS SCOUTED
+              </div>
+            </div>
+          ) : null}
           <div
             style={{
               borderTop: "1px solid rgba(33,30,23,0.14)",
@@ -550,7 +603,11 @@ function CardStat({
 
 // ---- MOBILE (export Screen 01M, 390) ---------------------------------------
 
-function LandingMobile({ onStart, onHome }: LandingProps) {
+function LandingMobile({
+  onStart,
+  onHome,
+  scouted,
+}: LandingProps & { scouted: number | null }) {
   return (
     <div
       className="cpc-landing-mobile paper-bg"
@@ -699,6 +756,19 @@ function LandingMobile({ onStart, onHome }: LandingProps) {
         >
           [ ~ 90 SECONDS · NO DATA STORED ]
         </div>
+        {scouted ? (
+          <div
+            style={{
+              font: "400 10px var(--font-mono)",
+              color: "#2f6043",
+              letterSpacing: "0.18em",
+              textAlign: "center",
+              marginTop: "10px",
+            }}
+          >
+            [ {scouted.toLocaleString()} CAREERS SCOUTED ]
+          </div>
+        ) : null}
       </div>
     </div>
   );
