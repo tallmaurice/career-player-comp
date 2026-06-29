@@ -40,7 +40,7 @@ const AUTO_ADVANCE_MS = 320; // brief pause so the "[ SELECTED ]" state register
 const MIN_LOADING_MS = 3000; // hold the scouting-room theater at least this long
 const TIP_URL =
   process.env.NEXT_PUBLIC_STRIPE_TIP_URL ??
-  "https://buy.stripe.com/5kQ8wQbWO1FV1ydfzOcfK00";
+  "https://buy.stripe.com/3cIeVe09Ddt1dBadl70Jq00";
 
 const INITIAL: AppState = {
   screen: "landing",
