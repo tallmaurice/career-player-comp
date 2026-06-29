@@ -27,9 +27,12 @@ import { SYSTEM_STRING, buildUserMessage, parseComp } from "@/lib/engine";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Vercel function budget: the default (10s on Hobby) kills a single Sonnet
-// generation mid-flight. 60 is the Hobby ceiling and fits one pass with margin.
-export const maxDuration = 60;
+// Vercel function budget. On the Pro plan the ceiling is 300s; we set 120 so a
+// COLD-cache run (the ~204-player pool makes the system prompt ~60k input
+// tokens, and a cold ephemeral cache must prefill all of it before generating —
+// the real cause of the "scout took too long" timeouts) has ample headroom.
+// Warm-cache runs (steady traffic) finish far faster; this is just the ceiling.
+export const maxDuration = 120;
 
 // ---- Tunables ---------------------------------------------------------------
 
@@ -40,9 +43,10 @@ const MODEL = "claude-sonnet-4-6";
 // when done (~1200-1600 tokens typical now), so this only sets headroom (enough
 // that a long résumé's season table can't truncate the JSON), not latency.
 const GEN_MAX_TOKENS = 2400;
-// Abort just under maxDuration so the user gets the friendly message, not a 504.
-// Streaming keeps the call robust near the budget, so we use more of the 60s.
-const OVERALL_TIMEOUT_MS = 57_000;
+// Abort comfortably under maxDuration so the user gets the friendly message, not
+// a 504. Streaming keeps the call robust across the full budget. 105s leaves
+// room even for a cold prefill + the full generation, with margin to respond.
+const OVERALL_TIMEOUT_MS = 105_000;
 
 // Per-IP and global limits (only enforced when Upstash env is present).
 const PER_IP_LIMIT = 5; // requests
