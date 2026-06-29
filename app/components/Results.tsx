@@ -618,7 +618,7 @@ ResultsProps) {
               style={{
                 font: "400 12px/1.65 'Inter'",
                 color: "#4a463d",
-                margin: "0 0 16px",
+                margin: "0 0 30px",
               }}
             >
               <span style={{ fontStyle: "italic", color: "#6b655a" }}>
@@ -626,27 +626,7 @@ ResultsProps) {
               </span>
               {comp.card_summary}
             </p>
-            {/* Front office fit — its OWN labeled section (matches the PDF),
-                not a bare second paragraph tacked under the summary. */}
-            <div
-              style={{
-                font: "500 10px 'JetBrains Mono', monospace",
-                color: "#2f6043",
-                letterSpacing: "0.24em",
-                margin: "0 0 10px",
-              }}
-            >
-              [ FRONT OFFICE FIT ]
-            </div>
-            <p
-              style={{
-                font: "400 12px/1.65 'Inter'",
-                color: "#4a463d",
-                margin: "0 0 34px",
-              }}
-            >
-              {comp.front_office_fit}
-            </p>
+            {/* Best Team Fit moved to its own wide section below (DepthSection). */}
 
             {/* grade bars (per-user; see buildGradeBars) */}
             <div style={{ borderTop: "1px solid rgba(33,30,23,0.14)" }}>
@@ -1057,27 +1037,6 @@ ResultsProps) {
               In summary,{" "}
             </span>
             {comp.card_summary}
-          </p>
-          {/* Front office fit — its own labeled section (parity with desktop +
-              PDF; was previously omitted on mobile entirely). */}
-          <div
-            style={{
-              font: "500 10px 'JetBrains Mono', monospace",
-              color: "#2f6043",
-              letterSpacing: "0.24em",
-              margin: "18px 0 8px",
-            }}
-          >
-            [ FRONT OFFICE FIT ]
-          </div>
-          <p
-            style={{
-              font: "400 12px/1.6 'Inter'",
-              color: "#4a463d",
-              margin: 0,
-            }}
-          >
-            {comp.front_office_fit}
           </p>
         </div>
 
@@ -1897,8 +1856,9 @@ function DepthSection({
   const weaknesses = comp.weaknesses ?? [];
   const seasons = comp.season_stats ?? [];
   const secondary = comp.secondary_comp?.trim() ?? "";
+  const fit = comp.front_office_fit?.trim() ?? "";
   const hasPC = strengths.length > 0 || weaknesses.length > 0;
-  if (!hasPC && seasons.length === 0 && !secondary && scoutedNumber == null)
+  if (!hasPC && seasons.length === 0 && !secondary && !fit && scoutedNumber == null)
     return null;
 
   const sectionLabel = (text: string) => (
@@ -1962,6 +1922,14 @@ function DepthSection({
         padding: mobile ? "24px 22px 0" : "8px 56px 0",
       }}
     >
+      {fit && (
+        <div style={{ marginBottom: mobile ? 28 : 40 }}>
+          {sectionLabel("BEST TEAM FIT")}
+          <div style={{ font: "400 14px/1.6 'Inter'", color: "#4a463d" }}>
+            {fit}
+          </div>
+        </div>
+      )}
       {secondary && (
         <div style={{ marginBottom: mobile ? 22 : 30 }}>
           <div
