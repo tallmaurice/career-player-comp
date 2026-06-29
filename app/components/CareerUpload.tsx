@@ -285,8 +285,8 @@ export default function CareerUpload({
                 }}
               >
                 Drop a PDF here, or use the button below. PDF only. Need your
-                LinkedIn PDF? On your profile, click the More (or Resources)
-                button → Save to PDF.
+                LinkedIn PDF? On your profile, click More (the three-dot button)
+                → Save to PDF. On a paid plan, look under Resources instead.
               </div>
 
               {/* explicit, obvious upload button — so the zone isn't an invisible
