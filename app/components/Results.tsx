@@ -169,11 +169,21 @@ function toParagraphs(text: string): string[] {
   return parts.length ? parts : [text.trim()];
 }
 
-// Format the entire scouting report as a plain-text file for the "full report"
-// download option. Captures every section the results page shows. (v1 text; a
-// designed PDF/long-image export can replace this later.)
-function buildReportText(comp: Comp): string {
-  const rule = "=".repeat(52);
+// Escape user/model text for safe HTML interpolation in the printable report.
+function esc(s: string): string {
+  return (s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Build a print-optimized HTML document for the "full report" download. The user
+// prints it to PDF via the browser dialog (no extra dependency). Styled to read
+// like the on-screen scouting case file: cream paper, green accents, hairline
+// rules. Avoids background fills (browsers strip them in print) — accents are
+// text color + borders, which print reliably.
+function buildReportHTML(comp: Comp): string {
   const c = comp.contract;
   const yrs = c?.years
     ? /^\d+$/.test(c.years.trim())
@@ -182,77 +192,103 @@ function buildReportText(comp: Comp): string {
     : "";
   const contractLine =
     [c?.value, yrs].filter(Boolean).join(" / ") +
-    (c?.descriptor ? ` (${c.descriptor})` : "");
+    (c?.descriptor ? ` · ${c.descriptor}` : "");
+  const draftLine =
+    (comp.draft?.pick ?? "") + (comp.draft?.note ? ` · ${comp.draft.note}` : "");
   const badges = comp.badges
-    .map((b) => `  - ${b.label} [${b.tier}]: ${b.earned_by}`)
-    .join("\n");
-  const grades = `  SCORING ${comp.grades.scoring} | DEFENSE ${comp.grades.defense} | PLAYMAKING ${comp.grades.playmaking} | CULTURE ${comp.grades.culture}`;
+    .map(
+      (b) =>
+        `<li><strong>${esc(b.label)}</strong> <span class="tier">[${esc(
+          b.tier,
+        )}]</span><br><span class="muted">${esc(b.earned_by)}</span></li>`,
+    )
+    .join("");
   const strengths = comp.strengths?.length
-    ? comp.strengths.map((s) => `  + ${s}`).join("\n")
-    : "  (none listed)";
+    ? comp.strengths.map((s) => `<li>${esc(s)}</li>`).join("")
+    : "<li class='muted'>(none listed)</li>";
   const weaknesses = comp.weaknesses?.length
-    ? comp.weaknesses.map((s) => `  - ${s}`).join("\n")
-    : "  (none listed)";
+    ? comp.weaknesses.map((s) => `<li>${esc(s)}</li>`).join("")
+    : "<li class='muted'>(none listed)</li>";
   const seasons = comp.season_stats?.length
-    ? comp.season_stats.map((s) => `  ${s.year}  ${s.team}\n      ${s.line}`).join("\n")
-    : "  (not available)";
-  return [
-    "CAREER PLAYER COMP - SCOUTING REPORT",
-    rule,
-    `PLAYER COMP:  ${comp.player_name}`,
-    `              ${comp.position_era}`,
-    `ARCHETYPE:    ${comp.archetype_title}`,
-    "",
-    `OVR ${comp.ovr}   POT ${comp.pot}`,
-    `  ${comp.ovr_rationale}`,
-    "",
-    `CONTRACT:     ${contractLine}`,
-    `DRAFT:        ${comp.draft?.pick ?? ""}${comp.draft?.note ? ` - ${comp.draft.note}` : ""}`,
-    "",
-    "WHY THIS PLAYER",
-    rule,
-    comp.why_this_player,
-    "",
-    "SCOUT'S SUMMARY",
-    rule,
-    comp.card_summary,
-    "",
-    "STANDOUT LINE",
-    rule,
-    `  "${comp.screenshot_line}"`,
-    "",
-    "GRADES",
-    rule,
-    grades,
-    "",
-    "BADGES",
-    rule,
-    badges,
-    "",
-    "STRENGTHS",
-    rule,
-    strengths,
-    "",
-    "WEAKNESSES",
-    rule,
-    weaknesses,
-    "",
-    "CAREER STATS BY SEASON",
-    rule,
-    seasons,
-    "",
-    "FULL SCOUTING REPORT",
-    rule,
-    comp.full_report,
-    "",
-    "FRONT OFFICE FIT",
-    rule,
-    comp.front_office_fit,
-    "",
-    rule,
-    "Career Player Comp - careerplayercomp.com - scouted by Claude S. (AI)",
-    "For entertainment. Not affiliated with the NBA, WNBA, or any player.",
-  ].join("\n");
+    ? comp.season_stats
+        .map(
+          (s) =>
+            `<tr><td class="yr">${esc(s.year)}</td><td class="tm">${esc(
+              s.team,
+            )}</td><td class="ln">${esc(s.line)}</td></tr>`,
+        )
+        .join("")
+    : "";
+  const reportParas = toParagraphs(comp.full_report)
+    .map((p) => `<p>${esc(p)}</p>`)
+    .join("");
+  const seasonBlock = seasons
+    ? `<h2>Career Stats by Season</h2><table class="seasons">${seasons}</table>`
+    : "";
+
+  return `<!doctype html><html><head><meta charset="utf-8">
+<title>Scouting Report — ${esc(comp.player_name)}</title>
+<style>
+  @page { margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #2b2820; line-height: 1.55; margin: 0; }
+  .doc { max-width: 720px; margin: 0 auto; padding: 8px 0 32px; }
+  .top { display: flex; justify-content: space-between; align-items: center; font: 600 11px/1 'JetBrains Mono', monospace; letter-spacing: .22em; color: #2f6043; text-transform: uppercase; border-bottom: 2px solid #2f6043; padding-bottom: 10px; }
+  .top .file { color: #a8a090; font-weight: 400; letter-spacing: .16em; }
+  h1 { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 52px; line-height: .95; text-transform: uppercase; letter-spacing: -.01em; margin: 22px 0 4px; }
+  .pos { font: 500 12px 'JetBrains Mono', monospace; letter-spacing: .14em; color: #6b655a; text-transform: uppercase; }
+  .arch { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 24px; text-transform: uppercase; letter-spacing: .03em; color: #2f6043; margin: 6px 0 18px; }
+  .ratings { display: flex; gap: 26px; align-items: baseline; border-top: 1px solid #d8d2c2; border-bottom: 1px solid #d8d2c2; padding: 12px 0; margin-bottom: 6px; }
+  .ratings .n { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 700; }
+  .ratings .ovr .n { font-size: 40px; color: #2f6043; }
+  .ratings .pot .n { font-size: 30px; color: #2b2820; }
+  .ratings .lab { font: 500 10px 'JetBrains Mono', monospace; letter-spacing: .18em; color: #6b655a; margin-left: 6px; }
+  .rat-why { font-size: 12.5px; color: #4a463d; margin: 6px 0 18px; }
+  .deal { display: flex; gap: 40px; font: 500 13px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
+  .deal .k { color: #a8a090; font-size: 10px; letter-spacing: .16em; display: block; margin-bottom: 3px; }
+  h2 { font: 600 10px 'JetBrains Mono', monospace; letter-spacing: .24em; color: #2f6043; text-transform: uppercase; border-bottom: 1px solid #d8d2c2; padding-bottom: 6px; margin: 26px 0 12px; }
+  p { margin: 0 0 12px; font-size: 14px; }
+  .quote { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 22px; color: #2f6043; text-transform: uppercase; line-height: 1.25; }
+  .grades { font: 500 13px 'JetBrains Mono', monospace; letter-spacing: .04em; }
+  ul { margin: 0; padding-left: 18px; } li { margin-bottom: 7px; font-size: 13.5px; }
+  .cols { display: flex; gap: 40px; } .cols > div { flex: 1; }
+  .tier { font: 500 11px 'JetBrains Mono', monospace; color: #bd5024; letter-spacing: .06em; }
+  .muted { color: #6b655a; } .colhead { color: #2f6043; }
+  table.seasons { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.seasons td { padding: 8px 8px 8px 0; border-bottom: 1px solid #ece6d6; vertical-align: top; }
+  table.seasons .yr { font: 500 11px 'JetBrains Mono', monospace; color: #2f6043; white-space: nowrap; width: 92px; }
+  table.seasons .tm { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; text-transform: uppercase; font-size: 14px; width: 160px; }
+  .foot { margin-top: 30px; padding-top: 12px; border-top: 1px solid #d8d2c2; font: 400 10px 'JetBrains Mono', monospace; letter-spacing: .12em; color: #a8a090; text-transform: uppercase; }
+</style></head>
+<body><div class="doc">
+  <div class="top"><span>Career Player Comp · Scouting Report</span><span class="file">File No. 2026-4471</span></div>
+  <h1>${esc(comp.player_name)}</h1>
+  <div class="pos">${esc(comp.position_era)}</div>
+  <div class="arch">${esc(comp.archetype_title)}</div>
+  <div class="ratings">
+    <span class="ovr"><span class="n">${comp.ovr}</span><span class="lab">OVR</span></span>
+    <span class="pot"><span class="n">${comp.pot}</span><span class="lab">POT</span></span>
+  </div>
+  <div class="rat-why">${esc(comp.ovr_rationale)}</div>
+  <div class="deal">
+    <span><span class="k">Contract</span>${esc(contractLine)}</span>
+    <span><span class="k">Draft</span>${esc(draftLine)}</span>
+  </div>
+  <h2>Why This Player</h2><p>${esc(comp.why_this_player)}</p>
+  <h2>Standout Line</h2><p class="quote">“${esc(comp.screenshot_line)}”</p>
+  <h2>Scout's Summary</h2><p>${esc(comp.card_summary)}</p>
+  <h2>Grades</h2><p class="grades">SCORING ${esc(comp.grades.scoring)} &nbsp; DEFENSE ${esc(comp.grades.defense)} &nbsp; PLAYMAKING ${esc(comp.grades.playmaking)} &nbsp; CULTURE ${esc(comp.grades.culture)}</p>
+  <h2>Badges</h2><ul>${badges}</ul>
+  <h2>Strengths &amp; Weaknesses</h2>
+  <div class="cols">
+    <div><p class="grades colhead">STRENGTHS</p><ul>${strengths}</ul></div>
+    <div><p class="grades colhead">WEAKNESSES</p><ul>${weaknesses}</ul></div>
+  </div>
+  ${seasonBlock}
+  <h2>Full Scouting Report</h2>${reportParas}
+  <h2>Front Office Fit</h2><p>${esc(comp.front_office_fit)}</p>
+  <div class="foot">careerplayercomp.com · scouted by Claude S. (AI) · For entertainment. Not affiliated with the NBA, WNBA, or any player.</div>
+</div></body></html>`;
 }
 
 export default function Results({
@@ -311,30 +347,55 @@ ResultsProps) {
     setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   };
 
-  // The full scouting report as a formatted text file (card-only vs full-report
-  // download choice). Captures every section the results page shows.
-  const downloadReportTxt = () => {
-    const text = buildReportText(comp);
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = `scouting-report-${slugBase}.txt`;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  // The full scouting report as a PDF: render a print-optimized HTML doc into a
+  // hidden iframe and open the browser print dialog (the user picks "Save as
+  // PDF"). No extra dependency, and the layout is fully controlled.
+  const downloadReportPdf = () => {
+    const html = buildReportHTML(comp);
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.cssText =
+      "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+    document.body.appendChild(iframe);
+    const win = iframe.contentWindow;
+    const doc = win?.document;
+    if (!win || !doc) {
+      iframe.remove();
+      return;
+    }
+    let cleaned = false;
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
+      iframe.remove();
+    };
+    win.onafterprint = cleanup;
+    doc.open();
+    doc.write(html);
+    doc.close();
+    // Give layout/fonts a beat, then print. Fallback cleanup if onafterprint
+    // never fires (some browsers).
+    const fire = () => {
+      try {
+        win.focus();
+        win.print();
+      } catch {
+        /* ignore */
+      }
+      setTimeout(cleanup, 60_000);
+    };
+    if (doc.readyState === "complete") setTimeout(fire, 350);
+    else iframe.onload = () => setTimeout(fire, 350);
   };
 
   const downloadBoth = async () => {
     setShared(true);
-    downloadReportTxt();
     try {
       await downloadCardPng();
     } catch {
-      /* card failed; report already downloaded */
+      /* card failed; still offer the report */
     }
+    downloadReportPdf();
   };
 
   // Native share with graceful fallback. Prefer sharing the PNG file itself
@@ -724,7 +785,7 @@ ResultsProps) {
               }}
             >
               The Download button saves the card. You can also grab the{" "}
-              <DownloadLink onClick={downloadReportTxt}>full report</DownloadLink>{" "}
+              <DownloadLink onClick={downloadReportPdf}>full report</DownloadLink>{" "}
               or <DownloadLink onClick={downloadBoth}>card + report</DownloadLink>.
             </div>
             <div
@@ -1101,7 +1162,7 @@ ResultsProps) {
           }}
         >
           The button above saves the card. You can also grab the{" "}
-          <DownloadLink onClick={downloadReportTxt}>full report</DownloadLink> or{" "}
+          <DownloadLink onClick={downloadReportPdf}>full report</DownloadLink> or{" "}
           <DownloadLink onClick={downloadBoth}>card + report</DownloadLink>.
         </div>
         <div

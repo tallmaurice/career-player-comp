@@ -85,7 +85,12 @@ The single most common failure is parking almost everyone at OVR ~86-88 and POT 
 - Accomplished, proven, real leadership or range (10-20 yrs): OVR 84-89, POT within 3-5.
 - Deep master / rare, defining career (20+ yrs or elite impact): OVR 90-96, POT at OVR or 1-2 above — they have arrived.
 - Fast riser (steep, demonstrated climb): OVR 80-87, POT notably higher (90-95) — runway earns the gap.
-POT IS NOT A FREE +7. For a mid or senior career it is CLOSE to OVR (within ~3). A 94 POT for an accomplished 15-year veteran is wrong — they are near their ceiling, so POT ≈ OVR+2. Reserve a high-90s POT for someone genuinely early or on a steep arc.
+POT IS NOT A FREE +7. POT MINUS OVR is set by career STAGE, as a hard guide:
+- Early-career / raw: +12 to +20.
+- Fast riser, steep demonstrated arc: +6 to +12.
+- Mid-career, steady: +2 to +5.
+- Senior / deep master / 15+ years: 0 to +2 (they are near their ceiling).
+A POT of OVR+7 for an accomplished senior veteran is the default error — close the gap. A 94 POT for a 15-year veteran is wrong.
 GUT-CHECK BEFORE OUTPUT: if your OVR is 86/87/88 AND your POT is 93/94/95, you almost certainly defaulted. Re-rate against the anchors and this specific record, and move the numbers off the lazy band.
 
 ## OVR_RATIONALE (ONE SHORT LINE — SHOWN UNDER THE NUMBER SO IT READS AS EARNED)
@@ -169,9 +174,12 @@ The cards are coming out over-indexed on the quiz answers, which flattens them a
  *  names (Pat Riley, Reggie Miller) instead of using the 200+ pool. */
 export const POOL_ADDENDUM: string = `
 
-## USE THE WHOLE POOL (STOP DEFAULTING TO YOUR FAVORITES)
-The pool has 200+ players for a reason: precision and variety. You are leaning on a handful of go-to names — different people keep getting the SAME player (e.g. Pat Riley for any leader, Reggie Miller for any single-lane specialist). That kills the fun and signals lazy matching.
-- Before locking a pick, scan WIDELY. For any given archetype there are many valid options in the pool — a single-lane specialist could be Reggie Miller, but also Steve Nash, Mark Price, Reggie Lewis, Dale Ellis, Klay Thompson, Peja Stojaković, a WNBA sharpshooter, a defensive specialist, a low-post technician, and many more depending on the SPECIFIC lane and era. Pick the one whose real career rhymes most exactly with THIS person's specific field, role, and arc — not the most famous one that vaguely fits.
-- A pick you have clearly handed to someone else recently is a red flag: if your front-runner is an obvious crowd-pleaser (Pat Riley, Reggie Miller, and the like), name one MORE precise, less-obvious player from the pool and prefer it unless the famous one is genuinely the tighter rhyme.
-- Reach into the deep cuts. A precise, non-obvious comp from the back of the pool delights more than the same five marquee names recycled, and it is funnier because precision is funnier than fame (this extends the locked ANTI-DEFAULT BLOCKLIST to your current favorites).
+## FULL REPORT LENGTH (OVERRIDES THE EARLIER "2-3 PARAGRAPHS MAX / SHORTER IS BETTER")
+The earlier length guidance over-corrected: reports are now coming back as a single paragraph, which is too thin. Write the full_report as 3-4 SUBSTANTIAL paragraphs. The length comes from DEPTH — several distinct, specific observations about THIS person's actual career (different employers, the shape of the moves, the recurring patterns, the self-image gap) — never from filler, restating the résumé, or admiring the comp. Every paragraph still must EARN its place with one of: a cutting insight, real talk, a roast of a real pattern, or a sharp joke; still no essay scaffolding ("Here's the play:", "In summary"); still ends on the needle, not on uplift. Cover more than one angle on them. A rich, biting 3-4 paragraph read is the target; ONE paragraph is a miss, and so is four paragraphs of vanilla. Depth with teeth, not length for its own sake.
+
+## USE THE WHOLE POOL — FIT OVER FLASH (STOP DEFAULTING TO YOUR FAVORITES)
+The pool has 200+ players for precision and variety, but you keep reaching for the same distinctive names and forcing a loose fit. OBSERVED OVERUSED MAGNETS (treat each as a RED FLAG): Manu Ginobili, Pat Riley, Jason Kidd, Reggie Miller. These are vivid, so you pattern-match on their vibe instead of reading the career. The odds that any given real person is one of these four is tiny.
+- THE TEST IS FIT, NOT FLAVOR. Pick the player whose REAL career arc rhymes most exactly with THIS person's specific field, role, level, and trajectory — move for move. A famous distinctive player who only loosely fits is a WORSE comp than a deep-cut who fits exactly. Manu Ginobili is a sixth-man/sacrifice-the-spotlight arc specifically; do not hand him to anyone who is merely versatile or clutch.
+- IF YOUR FRONT-RUNNER IS A MAGNET (the four above, or any marquee name), STOP: name two MORE precise, less-obvious players from the pool and prefer one of them unless the famous name is a near-exact career rhyme, not just a vibe match. State to yourself the one concrete arc detail that earns the famous pick; if you can't, it's the wrong pick.
+- REACH INTO THE DEEP CUTS. There are role players, specialists, glue guys, late bloomers, journeymen, system runners, and international and WNBA careers across every era in this pool. A precise non-obvious comp delights more than the same five marquee names recycled, and precision is funnier than fame. This extends the locked ANTI-DEFAULT BLOCKLIST to these current favorites.
 `;
