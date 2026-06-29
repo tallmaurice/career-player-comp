@@ -76,7 +76,14 @@ const SYSTEM_BLOCKS: Anthropic.TextBlockParam[] = [
   {
     type: "text",
     text: SYSTEM_STRING,
-    cache_control: { type: "ephemeral" },
+    // 1-hour cache TTL (vs the 5-minute default). Keeps the ~60k-token system
+    // prompt warm for a full hour after each comp, so sporadic launch traffic
+    // (people trickling in minutes-to-an-hour apart) gets a cheap cache read
+    // (~$0.04) instead of a fresh cold write (~$0.20). The 1h write costs 2x vs
+    // the 5m write's 1.25x, so a truly isolated comp is slightly pricier, but
+    // any clustering within the hour wins big; the daily spend cap bounds the
+    // downside either way.
+    cache_control: { type: "ephemeral", ttl: "1h" },
   },
 ];
 
