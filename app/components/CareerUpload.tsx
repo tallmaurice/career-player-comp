@@ -284,7 +284,9 @@ export default function CareerUpload({
                   marginBottom: "clamp(16px, 2vw, 22px)",
                 }}
               >
-                Drop a PDF here, or use the button below. PDF only.
+                Drop a PDF here, or use the button below. PDF only. Need your
+                LinkedIn PDF? On your profile, click the More (or Resources)
+                button → Save to PDF.
               </div>
 
               {/* explicit, obvious upload button — so the zone isn't an invisible
