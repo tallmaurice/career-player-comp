@@ -244,7 +244,10 @@ function buildCard(comp: Comp, w: number, h: number): El {
   const contractNote = (ct?.descriptor ?? "").toUpperCase();
   const draftPick = (comp.draft?.pick ?? "").toUpperCase();
   const draftNote = (comp.draft?.note ?? "").toUpperCase();
-  const hasDeal = Boolean(contractValue || draftPick);
+  // Show the contract/draft row only on the tall STORY card. The wide FEED
+  // (1200x630) is just the OG/link teaser and has no vertical room for it — that
+  // row is what was overflowing and cutting off the stat line on download.
+  const hasDeal = Boolean(story && (contractValue || draftPick));
 
   return el(
     "div",

@@ -169,6 +169,92 @@ function toParagraphs(text: string): string[] {
   return parts.length ? parts : [text.trim()];
 }
 
+// Format the entire scouting report as a plain-text file for the "full report"
+// download option. Captures every section the results page shows. (v1 text; a
+// designed PDF/long-image export can replace this later.)
+function buildReportText(comp: Comp): string {
+  const rule = "=".repeat(52);
+  const c = comp.contract;
+  const yrs = c?.years
+    ? /^\d+$/.test(c.years.trim())
+      ? `${c.years.trim()} yrs`
+      : c.years.trim()
+    : "";
+  const contractLine =
+    [c?.value, yrs].filter(Boolean).join(" / ") +
+    (c?.descriptor ? ` (${c.descriptor})` : "");
+  const badges = comp.badges
+    .map((b) => `  - ${b.label} [${b.tier}]: ${b.earned_by}`)
+    .join("\n");
+  const grades = `  SCORING ${comp.grades.scoring} | DEFENSE ${comp.grades.defense} | PLAYMAKING ${comp.grades.playmaking} | CULTURE ${comp.grades.culture}`;
+  const strengths = comp.strengths?.length
+    ? comp.strengths.map((s) => `  + ${s}`).join("\n")
+    : "  (none listed)";
+  const weaknesses = comp.weaknesses?.length
+    ? comp.weaknesses.map((s) => `  - ${s}`).join("\n")
+    : "  (none listed)";
+  const seasons = comp.season_stats?.length
+    ? comp.season_stats.map((s) => `  ${s.year}  ${s.team}\n      ${s.line}`).join("\n")
+    : "  (not available)";
+  return [
+    "CAREER PLAYER COMP - SCOUTING REPORT",
+    rule,
+    `PLAYER COMP:  ${comp.player_name}`,
+    `              ${comp.position_era}`,
+    `ARCHETYPE:    ${comp.archetype_title}`,
+    "",
+    `OVR ${comp.ovr}   POT ${comp.pot}`,
+    `  ${comp.ovr_rationale}`,
+    "",
+    `CONTRACT:     ${contractLine}`,
+    `DRAFT:        ${comp.draft?.pick ?? ""}${comp.draft?.note ? ` - ${comp.draft.note}` : ""}`,
+    "",
+    "WHY THIS PLAYER",
+    rule,
+    comp.why_this_player,
+    "",
+    "SCOUT'S SUMMARY",
+    rule,
+    comp.card_summary,
+    "",
+    "STANDOUT LINE",
+    rule,
+    `  "${comp.screenshot_line}"`,
+    "",
+    "GRADES",
+    rule,
+    grades,
+    "",
+    "BADGES",
+    rule,
+    badges,
+    "",
+    "STRENGTHS",
+    rule,
+    strengths,
+    "",
+    "WEAKNESSES",
+    rule,
+    weaknesses,
+    "",
+    "CAREER STATS BY SEASON",
+    rule,
+    seasons,
+    "",
+    "FULL SCOUTING REPORT",
+    rule,
+    comp.full_report,
+    "",
+    "FRONT OFFICE FIT",
+    rule,
+    comp.front_office_fit,
+    "",
+    rule,
+    "Career Player Comp - careerplayercomp.com - scouted by Claude S. (AI)",
+    "For entertainment. Not affiliated with the NBA, WNBA, or any player.",
+  ].join("\n");
+}
+
 export default function Results({
   comp,
   onAppeal,
@@ -194,17 +280,23 @@ ResultsProps) {
     status: tightenStatus(comp.stat_line.contract_status),
   };
 
-  // Build the card-image URL from the SLIM payload (see encodeCardComp), not the
+  // Build the card-image URLs from the SLIM payload (see encodeCardComp), not the
   // full-comp `cardImageUrl` prop, so a long full_report can't 414 the GET.
-  const cardUrl = `/api/card?format=feed&data=${encodeCardComp(comp)}`;
-  const fileName = `scouting-report-${comp.player_name
+  // STORY (tall) is what users download/share as a file — it fits the full card
+  // (badges, contract, draft) without the feed's 1200x630 overflow. FEED (wide)
+  // is only the OG/link-preview image when sharing the URL itself.
+  const slim = encodeCardComp(comp);
+  const cardUrlStory = `/api/card?format=story&data=${slim}`;
+  const cardUrlFeed = `/api/card?format=feed&data=${slim}`;
+  const slugBase = comp.player_name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")}.png`;
+    .replace(/^-+|-+$/g, "");
+  const fileName = `scouting-report-${slugBase}.png`;
 
   // Fetch the rendered PNG as a blob and trigger a real browser download.
   const downloadCardPng = async () => {
-    const res = await fetch(cardUrl);
+    const res = await fetch(cardUrlStory);
     if (!res.ok) throw new Error(`card fetch failed: ${res.status}`);
     const blob = await res.blob();
     const objectUrl = URL.createObjectURL(blob);
@@ -219,6 +311,32 @@ ResultsProps) {
     setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   };
 
+  // The full scouting report as a formatted text file (card-only vs full-report
+  // download choice). Captures every section the results page shows.
+  const downloadReportTxt = () => {
+    const text = buildReportText(comp);
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = `scouting-report-${slugBase}.txt`;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  };
+
+  const downloadBoth = async () => {
+    setShared(true);
+    downloadReportTxt();
+    try {
+      await downloadCardPng();
+    } catch {
+      /* card failed; report already downloaded */
+    }
+  };
+
   // Native share with graceful fallback. Prefer sharing the PNG file itself
   // (Web Share Level 2); fall back to sharing the card URL; then to copying the
   // link; then to a direct download. The soft post-share tip shows either way.
@@ -231,10 +349,11 @@ ResultsProps) {
     const shareText = comp.screenshot_line;
     const shareTitle = `Career Player Comp — ${comp.player_name}`;
 
-    // 1) Try sharing the actual PNG file (best result on mobile).
+    // 1) Try sharing the actual PNG file (best result on mobile) — the tall
+    //    story card, which fits the whole card without the feed's overflow.
     if (navAny.share) {
       try {
-        const res = await fetch(cardUrl);
+        const res = await fetch(cardUrlStory);
         if (res.ok) {
           const blob = await res.blob();
           const file = new File([blob], fileName, { type: "image/png" });
@@ -246,12 +365,12 @@ ResultsProps) {
       } catch {
         // file share unsupported or cancelled — try URL share next
       }
-      // 2) Share the absolute card URL as a link.
+      // 2) Share the absolute card URL as a link (feed = the wide OG preview).
       try {
         await navAny.share({
           title: shareTitle,
           text: shareText,
-          url: new URL(cardUrl, window.location.origin).toString(),
+          url: new URL(cardUrlFeed, window.location.origin).toString(),
         });
         return;
       } catch {
@@ -260,7 +379,7 @@ ResultsProps) {
     }
 
     // 3) No Web Share API: copy the link, else download the PNG.
-    const absolute = new URL(cardUrl, window.location.origin).toString();
+    const absolute = new URL(cardUrlFeed, window.location.origin).toString();
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(absolute);
@@ -283,7 +402,7 @@ ResultsProps) {
     } catch {
       // If the blob fetch fails, open the card URL directly as a last resort.
       window.open(
-        new URL(cardUrl, window.location.origin).toString(),
+        new URL(cardUrlStory, window.location.origin).toString(),
         "_blank",
         "noopener",
       );
@@ -530,7 +649,7 @@ ResultsProps) {
                     textTransform: "uppercase",
                   }}
                 >
-                  C. Sonnet
+                  Claude S.
                 </div>
                 <div
                   style={{
@@ -599,9 +718,20 @@ ResultsProps) {
             </div>
             <div
               style={{
+                font: "400 12px/1.5 'Inter'",
+                color: "#6b655a",
+                marginTop: 12,
+              }}
+            >
+              The Download button saves the card. You can also grab the{" "}
+              <DownloadLink onClick={downloadReportTxt}>full report</DownloadLink>{" "}
+              or <DownloadLink onClick={downloadBoth}>card + report</DownloadLink>.
+            </div>
+            <div
+              style={{
                 font: "400 12.5px/1.5 'Inter'",
                 color: "#6b655a",
-                marginTop: 16,
+                marginTop: 10,
               }}
             >
               Tip: take a screenshot before you close. We don't keep a copy.
@@ -735,7 +865,7 @@ ResultsProps) {
               letterSpacing: "0.18em",
             }}
           >
-            [ END OF REPORT · FILE No. 2026-4471 · C. SONNET ]
+            [ END OF REPORT · FILE No. 2026-4471 · CLAUDE S. ]
           </div>
         </div>
       </div>
@@ -966,6 +1096,17 @@ ResultsProps) {
         <div
           style={{
             padding: "14px 22px 0",
+            font: "400 12px/1.5 'Inter'",
+            color: "#6b655a",
+          }}
+        >
+          The button above saves the card. You can also grab the{" "}
+          <DownloadLink onClick={downloadReportTxt}>full report</DownloadLink> or{" "}
+          <DownloadLink onClick={downloadBoth}>card + report</DownloadLink>.
+        </div>
+        <div
+          style={{
+            padding: "10px 22px 0",
             font: "400 12px/1.5 'Inter'",
             color: "#6b655a",
           }}
@@ -1578,6 +1719,35 @@ function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) 
         your game is to replace, not pay or title. POT is your ceiling.
       </p>
     </div>
+  );
+}
+
+// A small inline text button styled like a scouting-doc link (green underline),
+// used for the secondary download options (full report / card + report).
+function DownloadLink({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        background: "transparent",
+        border: "none",
+        padding: 0,
+        font: "inherit",
+        color: "#2f6043",
+        textDecoration: "none",
+        borderBottom: "1px solid rgba(47,96,67,0.5)",
+        cursor: "pointer",
+      }}
+    >
+      {children}
+    </button>
   );
 }
 

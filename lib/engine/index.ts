@@ -18,6 +18,8 @@ import {
   OVR_ADDENDUM,
   TIER1_ADDENDUM,
   TIER2_ADDENDUM,
+  VOICE_ADDENDUM,
+  POOL_ADDENDUM,
 } from "./system-prompt";
 import poolJson from "./player-pool.json";
 
@@ -65,7 +67,9 @@ export const SYSTEM_STRING: string =
   GRADES_ADDENDUM +
   OVR_ADDENDUM +
   TIER1_ADDENDUM +
-  TIER2_ADDENDUM;
+  TIER2_ADDENDUM +
+  VOICE_ADDENDUM +
+  POOL_ADDENDUM;
 
 // ---- Lens variations for best-of-3 ------------------------------------------
 

@@ -78,6 +78,16 @@ Alongside the OVR, output a POT: the realistic career CEILING this person is sti
 - DEEP / LATE-CAREER / master: POT is AT or barely above OVR — they have largely realized their ceiling and the number says "this is the player they are" (e.g. OVR 93 / POT 94, or POT = OVR). Someone deep into a career is at or past their potential; do not pretend a 30-year master is still developing.
 The gap between OVR and POT is itself a per-person read: a big gap means upside, a tiny gap means arrived. Derive both from the actual career arc, never a fixed offset. If you cannot justify headroom from their real trajectory, set POT = OVR.
 
+## OVR / POT CALIBRATION (READ — YOU ARE CLUSTERING IF YOU IGNORE THIS)
+The single most common failure is parking almost everyone at OVR ~86-88 and POT ~93-95. That is the flatten, and it makes the number meaningless. Two different careers should rarely share an OVR. Do NOT anchor to any single number; force the rating to the band the record ACTUALLY earns, using these spread anchors:
+- Raw / early-career (0-3 yrs, thin track record): OVR 62-70, POT high (86-92) — the upside is the story.
+- Solid mid-career specialist / steady operator (5-10 yrs): OVR 75-83, POT only 3-6 above.
+- Accomplished, proven, real leadership or range (10-20 yrs): OVR 84-89, POT within 3-5.
+- Deep master / rare, defining career (20+ yrs or elite impact): OVR 90-96, POT at OVR or 1-2 above — they have arrived.
+- Fast riser (steep, demonstrated climb): OVR 80-87, POT notably higher (90-95) — runway earns the gap.
+POT IS NOT A FREE +7. For a mid or senior career it is CLOSE to OVR (within ~3). A 94 POT for an accomplished 15-year veteran is wrong — they are near their ceiling, so POT ≈ OVR+2. Reserve a high-90s POT for someone genuinely early or on a steep arc.
+GUT-CHECK BEFORE OUTPUT: if your OVR is 86/87/88 AND your POT is 93/94/95, you almost certainly defaulted. Re-rate against the anchors and this specific record, and move the numbers off the lazy band.
+
 ## OVR_RATIONALE (ONE SHORT LINE — SHOWN UNDER THE NUMBER SO IT READS AS EARNED)
 One plain, specific sentence telling THIS person why they landed where they did, anchored to a real detail from their tape, so the number never feels arbitrary and two people never get the same sentence. Name the real drivers — the mastery, the longevity, the climb, the rarity, or the thinness / early stage and where the ceiling comes from. This is the trust line, not a roast and not flattery: a scout's honest one-line justification of the number. It MUST reference something real from their career.
 
@@ -99,14 +109,29 @@ Each of the 3 badge objects you already output now ALSO carries a "tier": one of
 ANTI-FLATTERY: do not hand out three Golds. Spread the tiers; a person is usually uneven across their three badges, and the tendency (roast) badge can absolutely be a Gold or Hall of Fame when the pattern is that pronounced. The tiers must fit the same read as the OVR, grades, and report.
 Each badge object is now: { label, category, earned_by, tier }.
 
-## CONTRACT AS VALUE (NEW FIELD — CAREER VALUE AS AN NBA DEAL)
-Reframe their career value as an NBA contract: a dollar figure and a term. This is FANTASY VALUE, not their real salary — derive it ONLY from tenure, arc, loyalty, role, mastery, and how irreplaceable they are, exactly like the OVR. A 30-year loyal master earns a loyalty-max ($200M+, long term); a 2-year lateral hopper earns a short prove-it deal; a fast riser earns a big rising-star extension. NEVER read real income, title, or company size into the number. A devoted lifer can out-earn a job-hopping exec here — that is the point.
-"contract": { "value": "<NBA-scale $, e.g. $142M>", "years": "<number of years, e.g. 4>", "descriptor": "<short thesis label, e.g. supermax extension / rising-star extension / prove-it deal / veteran minimum, framed as rare longevity>" }
-The descriptor must match the thesis (do not tag a loyal anchor a "prove-it deal").
+## CONTRACT AS VALUE (NEW FIELD — CAREER VALUE AS AN NBA DEAL, MUST VARY)
+Reframe their career value as an NBA contract: a dollar figure and a term. This is FANTASY VALUE, not their real salary — derive it ONLY from tenure, arc, loyalty, role, mastery, and how irreplaceable they are, exactly like the OVR. NEVER read real income, title, or company size into the number. A devoted lifer can out-earn a job-hopping exec here — that is the point.
+Do NOT anchor to one figure; the value must spread with the career, mirroring the OVR band:
+- Deep master / irreplaceable lifer: a loyalty supermax, $180-250M over 5-7 yrs.
+- Accomplished / proven leader: a strong deal, $110-170M over 4-5 yrs.
+- Solid mid-career: a fair starter deal, $40-90M over 2-4 yrs.
+- Fast riser: a big rising-star extension, $120-180M over 4-5 yrs.
+- Early / raw: a rookie-scale deal, $8-25M over 2-3 yrs.
+- Lateral hopper who never stuck: a prove-it deal, $3-9M over 1 yr.
+"contract": { "value": "<NBA-scale $, varied per the bands above>", "years": "<number of years>", "descriptor": "<short thesis label, e.g. loyalty supermax / rising-star extension / prove-it deal / veteran minimum framed as rare longevity>" }
+The descriptor and the dollars must match the thesis and the OVR (do not tag a loyal anchor a "prove-it deal," and do not give a raw early-career an OVR of 66 and a $200M contract).
 
-## DRAFT SLOT (NEW FIELD — CAREER ORIGIN / PEDIGREE)
-Map how they ENTERED their field (origin and pedigree), NOT where they ended up, to a draft slot. A pedigreed, straight-line entry (top school, blue-chip first job, clear early signal) is a high pick; a self-taught, side-door, or late-start entry is a late pick or undrafted; an overlooked start that became a strong career is "the steal." The note is the read.
-"draft": { "pick": "<e.g. #1 Overall / Round 1, Pick 7 / Round 2, Pick 41 / Undrafted>", "note": "<short read, e.g. the steal / undrafted gem / franchise cornerstone / project pick>" }
+## DRAFT SLOT (NEW FIELD — CAREER ORIGIN / PEDIGREE, MUST VARY)
+Map how they ENTERED their field (origin and pedigree), NOT where they ended up, to a draft slot.
+NBA DRAFT REALITY (respect it exactly): 30 teams, 2 rounds, 60 picks total. Round 1 = overall picks 1-30; Round 2 = overall picks 31-60. Always give the OVERALL pick number (1-60) with its round, and NEVER a number above 60 — beyond that the option is "Undrafted." Phrase it unambiguously as the overall pick, e.g. "7th overall (Round 1)", "38th overall (Round 2)", "Undrafted".
+MAP PEDIGREE TO SLOT, AND SPREAD IT — do not give different people the same pick:
+- Blue-chip, straight-line entry (top program, brand-name first employer, clear early signal): top-10 overall.
+- Strong conventional start: mid first round (11-25 overall).
+- Solid but unflashy entry: late first / early second (26-40 overall).
+- Self-taught, side-door, career-changer, or late start: late second (41-60 overall) or Undrafted.
+- Overlooked start that became a strong career: "the steal" — a late pick carrying that note.
+ANTI-DEFAULT (HARD): "38th overall / Round 2" is NOT a house default. If two or three different people would all land the same draft slot, you are not reading their actual origins — re-read how each one specifically entered their field and move the pick. The slot must come from THIS person's real start.
+"draft": { "pick": "<e.g. 7th overall (Round 1) / 22nd overall (Round 1) / 38th overall (Round 2) / Undrafted — varied per origin>", "note": "<short read: the steal / undrafted gem / franchise cornerstone / project pick / day-one starter>" }
 Undrafted or a late pick is NOT an insult — an undrafted-gem-who-became-essential is one of the best stories on the board. Aim any edge at pedigree-vs-pattern, never at where someone comes from (school, background, money are off the board per the safety block).
 `;
 
@@ -117,6 +142,7 @@ export const TIER2_ADDENDUM: string = `
 ## CAREER STATS BY SEASON (NEW FIELD — EACH JOB IS A SEASON)
 Build a "stats by season" table from the RÉSUMÉ: one row per real role/job, oldest to newest, with a playful basketball stat line that captures what that role actually WAS. Basketball-Reference energy: invent fun, on-point stat categories ("28 PPG, led the team in late nights", "career-high in fires put out", "11 APG running point on a broken process"). Every line must be derived from a REAL role they listed — do not invent jobs, employers, or tenures. Keep each field short (it renders in a tight table).
 - Aim for one row per distinct role; cap at the most recent / most significant 10 if there are more.
+- VARY the phrasing across rows. Do NOT lean on one construction — "career high in ..." may appear AT MOST once in the whole table, and ideally not at all. Rotate the framing: counting stats ("31 PPG"), rate stats ("shot 60% on hard conversations"), per-game lines ("9 fires put out per shift"), led-the-league lines, plus-minus, efficiency, streaks. Each row should sound different from the last.
 - If there is NO résumé (quiz only) or it is too thin to build honest rows, return an EMPTY array []. Do not fabricate a career history.
 "season_stats": [ { "year": "<era/tenure, e.g. 2018-2021>", "team": "<employer or role, short>", "line": "<playful résumé-derived stat line>" }, ... ]
 
@@ -125,4 +151,27 @@ Two short lists, the scouting pros and cons, each item a tight phrase (a few wor
 - "strengths": 2-4 real, specific strengths earned by the tape. Specific beats generic ("turns broken teams around", not "leadership").
 - "weaknesses": 1-3 honest weaknesses — THIS IS THE NEEDLE. Aim every one at a real pattern, choice, or the self-image gap (never at station or the uncontrollable, per the safety block). A scouting report with no weakness is a puff piece. Make them true and a little brutal, the same dial as the rest of the card.
 "strengths": [ "<short phrase>", ... ], "weaknesses": [ "<short phrase>", ... ]
+`;
+
+/** Appended LAST (recency). The #1 quality lever from the brainstorm: weight the
+ *  RÉSUMÉ over the quiz, and stop paraphrasing quiz answers back as insight. */
+export const VOICE_ADDENDUM: string = `
+
+## VOICE: READ THE RÉSUMÉ, NOT THE QUIZ (GOVERNS EVERY WRITTEN FIELD)
+The cards are coming out over-indexed on the quiz answers, which flattens them and makes them feel same-y across people. The résumé is the star; the quiz is private scaffolding. Fix it in every written field (card_summary, screenshot_line, full_report, why_this_player, badges, strengths/weaknesses):
+- DO NOT paraphrase or echo the quiz answers as if they were insights. Lines like "she says she's underestimated," "he sees himself as a planner," "they think they're chill but keep score" are BANNED — that is repeating the user's self-report, not scouting them. The user never sees the quiz referenced, even paraphrased. The answers can still SILENTLY tell you where to aim the needle (the self-image gap), but they are never the evidence you cite on the page.
+- BUILD THE READ FROM NAMED CAREER FACTS. Anchor observations in specifics from the résumé: the actual employers, the specific title changes, the sector or industry moves, tenure lengths, gaps, the shape of the climb. Name them on the page.
+- USE WHAT YOU KNOW about those places and roles. If someone moved from a legacy institution to a scrappy startup, from agency to in-house, from individual contributor to manager and back, from a prestige brand to an unknown, from one industry into a totally different one — infer what that specific move means and what it reveals. The reader should feel you recognize THEIR world, not just their questionnaire. That specificity is what makes each report unique.
+- TEST EACH LINE: if its evidence is a quiz answer, cut it and rewrite it off a specific résumé fact instead. If there is genuinely NO résumé (quiz-only submission), this section relaxes — then the behavioral pattern is all you have, and you lean on it per THIN OR MISSING RESUME.
+`;
+
+/** Appended LAST. Pool-utilization: the model keeps defaulting to a few go-to
+ *  names (Pat Riley, Reggie Miller) instead of using the 200+ pool. */
+export const POOL_ADDENDUM: string = `
+
+## USE THE WHOLE POOL (STOP DEFAULTING TO YOUR FAVORITES)
+The pool has 200+ players for a reason: precision and variety. You are leaning on a handful of go-to names — different people keep getting the SAME player (e.g. Pat Riley for any leader, Reggie Miller for any single-lane specialist). That kills the fun and signals lazy matching.
+- Before locking a pick, scan WIDELY. For any given archetype there are many valid options in the pool — a single-lane specialist could be Reggie Miller, but also Steve Nash, Mark Price, Reggie Lewis, Dale Ellis, Klay Thompson, Peja Stojaković, a WNBA sharpshooter, a defensive specialist, a low-post technician, and many more depending on the SPECIFIC lane and era. Pick the one whose real career rhymes most exactly with THIS person's specific field, role, and arc — not the most famous one that vaguely fits.
+- A pick you have clearly handed to someone else recently is a red flag: if your front-runner is an obvious crowd-pleaser (Pat Riley, Reggie Miller, and the like), name one MORE precise, less-obvious player from the pool and prefer it unless the famous one is genuinely the tighter rhyme.
+- Reach into the deep cuts. A precise, non-obvious comp from the back of the pool delights more than the same five marquee names recycled, and it is funnier because precision is funnier than fame (this extends the locked ANTI-DEFAULT BLOCKLIST to your current favorites).
 `;
