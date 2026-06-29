@@ -162,6 +162,15 @@ export default function Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.screen]);
 
+  // Reset scroll to the top on every screen change. Without this the SPA keeps
+  // the previous screen's scroll offset, so a new screen appears already
+  // scrolled down (most visible on mobile). Keyed on the quiz index too (each
+  // question is its own view) and on `error` (the retry screen renders while
+  // `screen` stays "loading", so a screen-only key would miss it).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [state.screen, qIndex, error]);
+
   // ---- per-screen handlers --------------------------------------------------
 
   const onStart = useCallback(() => {

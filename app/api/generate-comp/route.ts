@@ -304,6 +304,15 @@ export async function POST(req: Request): Promise<Response> {
       );
     }
     // Anthropic API errors (overload, auth, upstream limit) → friendly 503.
+    // Surface the REAL cause in Vercel function logs so a fast-fail can be
+    // diagnosed (status + name + message); the user still gets the friendly
+    // message. Anthropic SDK errors carry a numeric `.status` (401 auth, 429
+    // rate/credit limit, 529 overloaded).
+    console.error("[generate-comp] generation failed:", {
+      name: err instanceof Error ? err.name : typeof err,
+      status: (err as { status?: unknown } | null)?.status ?? null,
+      message: err instanceof Error ? err.message : String(err),
+    });
     return Response.json(
       { error: "The scout's having a moment. Try again in a few seconds." },
       { status: 503 },
