@@ -51,7 +51,13 @@ const OVERALL_TIMEOUT_MS = 105_000;
 // Per-IP and global limits (only enforced when Upstash env is present).
 const PER_IP_LIMIT = 5; // requests
 const PER_IP_WINDOW = "1 h" as const;
-const DAILY_SPEND_CAP = 1500; // max generations per UTC day (global kill-switch)
+// Global daily kill-switch: max non-bypass generations per UTC day — the hard
+// ceiling on a runaway bill. Cost per comp is ~$0.15-0.20 COLD (the ~60k-token
+// system prompt is uncached on the first call of each ~5-min cache window) and
+// ~$0.04 WARM (steady traffic keeps the prompt cache hot). So worst-case daily
+// spend ≈ this count × ~$0.20. 100 ≈ $20/day worst case, far less in practice.
+// Raise it once launch traffic proves out. To set a $ ceiling: count = $ / 0.20.
+const DAILY_SPEND_CAP = 100;
 // IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
 const BYPASS_IPS = new Set(
   (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
