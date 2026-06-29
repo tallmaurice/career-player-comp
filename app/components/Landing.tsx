@@ -187,8 +187,8 @@ function LandingDesktop({
               textWrap: "balance",
             }}
           >
-            Find out which <span style={{ color: "#2f6043" }}>NBA player</span>{" "}
-            your career makes you.
+            Which <span style={{ color: "#2f6043" }}>NBA player</span> had your
+            career?
           </h1>
           <p
             style={{
@@ -684,8 +684,8 @@ function LandingMobile({
             textWrap: "balance",
           }}
         >
-          Find out which <span style={{ color: "#2f6043" }}>NBA player</span> your
-          career makes you.
+          Which <span style={{ color: "#2f6043" }}>NBA player</span> had your
+          career?
         </h1>
         <p
           style={{
