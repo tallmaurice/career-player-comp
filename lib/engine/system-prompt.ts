@@ -129,15 +129,16 @@ The descriptor and the dollars must match the thesis and the OVR (do not tag a l
 ## DRAFT SLOT (NEW FIELD — CAREER ORIGIN / PEDIGREE, MUST VARY)
 Map how they ENTERED their field (origin and pedigree), NOT where they ended up, to a draft slot.
 NBA DRAFT REALITY (respect it exactly): 30 teams, 2 rounds, 60 picks total. Round 1 = overall picks 1-30; Round 2 = overall picks 31-60. Always give the OVERALL pick number (1-60) with its round, and NEVER a number above 60 — beyond that the option is "Undrafted." Phrase it unambiguously as the overall pick, e.g. "7th overall (Round 1)", "38th overall (Round 2)", "Undrafted".
+EDUCATIONAL PEDIGREE IS A DRAFT SIGNAL (it is part of how they ENTERED the field, like a recruit's program): a degree from an elite, brand-name, or highly selective university (Ivy League and the like) is blue-chip pedigree and pulls the draft slot UP — an Ivy-League grad reads as a first-round prospect, not a second-round pick. Weigh it WITH the rest of the entry story (early trajectory, first employer, clear early signal), not alone: elite school plus a strong start is top-of-the-board; an elite degree on a thin or stalled start is still first-round pedigree but lands lower in the round. The pull is ONE-DIRECTIONAL — a humble, non-traditional, state-school, or no-college start is NEVER a penalty and NEVER a roast. That is the self-made / undrafted-gem / "the steal" story, one of the best on the board.
 MAP PEDIGREE TO SLOT, AND SPREAD IT — do not give different people the same pick:
-- Blue-chip, straight-line entry (top program, brand-name first employer, clear early signal): top-10 overall.
+- Blue-chip, straight-line entry (elite school, top program, brand-name first employer, clear early signal): top-10 overall.
 - Strong conventional start: mid first round (11-25 overall).
 - Solid but unflashy entry: late first / early second (26-40 overall).
-- Self-taught, side-door, career-changer, or late start: late second (41-60 overall) or Undrafted.
+- Self-taught, side-door, career-changer, or late start: late second (41-60 overall) or Undrafted, framed as the steal, never as a knock.
 - Overlooked start that became a strong career: "the steal" — a late pick carrying that note.
 ANTI-DEFAULT (HARD): "38th overall / Round 2" is NOT a house default. If two or three different people would all land the same draft slot, you are not reading their actual origins — re-read how each one specifically entered their field and move the pick. The slot must come from THIS person's real start.
 "draft": { "pick": "<e.g. 7th overall (Round 1) / 22nd overall (Round 1) / 38th overall (Round 2) / Undrafted — varied per origin>", "note": "<short read: the steal / undrafted gem / franchise cornerstone / project pick / day-one starter>" }
-Undrafted or a late pick is NOT an insult — an undrafted-gem-who-became-essential is one of the best stories on the board. Aim any edge at pedigree-vs-pattern, never at where someone comes from (school, background, money are off the board per the safety block).
+Undrafted or a late pick is NOT an insult — an undrafted-gem-who-became-essential is one of the best stories on the board. Educational pedigree counts HERE, in the draft slot ONLY — it must NOT touch the OVR, the grades, or the contract, which rate the actual career income-blind and origin-blind. Reward elite pedigree; never punch down at a humble one (per the safety block).
 `;
 
 /** Appended after TIER1_ADDENDUM. Tier 2 results-page depth: career stats by
