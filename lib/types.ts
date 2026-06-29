@@ -123,6 +123,9 @@ export interface Comp {
   strengths: string[];
   /** 2K-style weaknesses (cons) — the needle, aimed at patterns. Results only. */
   weaknesses: string[];
+  /** A secondary "also shades of ___" comp — a short line naming a second pool
+   *  player whose arc also rhymes, with a brief why. Results page, understated. */
+  secondary_comp: string;
   front_office_fit: string;
   /** Describes the reaction the card is built to produce. */
   comp_tone: string;
@@ -162,6 +165,8 @@ export interface AppState {
   careerText: string;
   answers: Partial<QuizAnswers>;
   result: Comp | null;
+  /** This user's number in the running "careers scouted" count (social proof). */
+  scouted?: number;
 }
 
 // ---- Screen component props (all presentational; navigation via callbacks) --
@@ -233,6 +238,9 @@ export interface ResultsProps {
   tipUrl: string;
   /** URL of the server-rendered card PNG for native share + download. */
   cardImageUrl: string;
+  /** This user's ordinal in the running "careers scouted" count (social proof).
+   *  Omitted when the counter isn't available (no Redis configured). */
+  scoutedNumber?: number;
 }
 
 // =============================================================================

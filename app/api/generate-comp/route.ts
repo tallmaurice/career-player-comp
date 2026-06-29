@@ -125,6 +125,25 @@ async function checkLimits(ip: string): Promise<LimitState> {
   }
 }
 
+/** Increment the global "careers scouted" counter and return this user's number
+ *  (social proof). No-ops to null when Upstash isn't configured, or for bypass
+ *  IPs (so your own test runs don't inflate it). Stores only a counter — no user
+ *  content, consistent with the no-storage promise. */
+async function recordScouted(ip: string): Promise<number | null> {
+  if (BYPASS_IPS.has(ip)) return null;
+  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
+  try {
+    const { Redis } = await import("@upstash/redis");
+    const redis = new Redis({ url, token });
+    return await redis.incr("cpc:scouted:total");
+  } catch {
+    return null;
+  }
+}
+
 function clientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0]!.trim();
@@ -228,7 +247,8 @@ export async function POST(req: Request): Promise<Response> {
   // With no resume the quiz still carries it — the v7 prompt handles a thin tape.
 
   // ---- Limits ----
-  const { rateLimited, spendExhausted } = await checkLimits(clientIp(req));
+  const ip = clientIp(req);
+  const { rateLimited, spendExhausted } = await checkLimits(ip);
   if (spendExhausted) {
     return Response.json(
       { error: "The scout is taking the rest of the day off. Back tomorrow." },
@@ -268,7 +288,11 @@ export async function POST(req: Request): Promise<Response> {
         { status: 503 },
       );
     }
-    return Response.json({ comp }, { status: 200 });
+    const scouted = await recordScouted(ip);
+    return Response.json(
+      { comp, scouted: scouted ?? undefined },
+      { status: 200 },
+    );
   } catch (err) {
     const aborted =
       controller.signal.aborted ||

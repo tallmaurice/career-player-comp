@@ -26,7 +26,7 @@ import type {
   Comp,
   Grades,
 } from "@/lib/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTilt } from "@/lib/useTilt";
 import { useIsMobile } from "@/lib/useIsMobile";
 
@@ -296,6 +296,7 @@ export default function Results({
   onAppeal,
   onHome,
   tipUrl,
+  scoutedNumber,
 }: // cardImageUrl is still part of ResultsProps (and passed by page.tsx), but we
 // no longer read it here: the card URL is now derived from a slim, 414-safe
 // payload below (see cardUrl / encodeCardComp).
@@ -883,7 +884,7 @@ ResultsProps) {
         </div>
 
         {/* STRENGTHS/WEAKNESSES + CAREER STATS BY SEASON (Tier 2 depth) */}
-        <DepthSection comp={comp} />
+        <DepthSection comp={comp} scoutedNumber={scoutedNumber} />
 
         {/* FULL SCOUTING REPORT */}
         <div style={{ maxWidth: 780, margin: "0 auto", padding: "8px 56px 80px" }}>
@@ -1218,7 +1219,7 @@ ResultsProps) {
         </div>
 
         {/* STRENGTHS/WEAKNESSES + CAREER STATS BY SEASON (Tier 2 depth) */}
-        <DepthSection comp={comp} mobile />
+        <DepthSection comp={comp} mobile scoutedNumber={scoutedNumber} />
 
         {/* FULL SCOUTING REPORT */}
         <div style={{ padding: "24px 22px 0" }}>
@@ -1318,6 +1319,33 @@ ResultsProps) {
     // (rotateX(-5deg) rotateY(8deg)) and the eased snap-back live in .tilt-card.
     const { wrapRef, cardRef } = useTilt();
 
+    // OVR count-up reveal: the hero number ticks 0 -> comp.ovr on mount (the 2K
+    // "player reveal" beat). Reduced-motion users get the final number instantly.
+    // The satori download card always uses the static comp.ovr, so this is purely
+    // on-screen and never affects the saved image.
+    const [shownOvr, setShownOvr] = useState(0);
+    useEffect(() => {
+      const reduce =
+        typeof window !== "undefined" &&
+        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) {
+        setShownOvr(comp.ovr);
+        return;
+      }
+      let raf = 0;
+      let start = 0;
+      const dur = 1000;
+      const tick = (ts: number) => {
+        if (!start) start = ts;
+        const p = Math.min(1, (ts - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+        setShownOvr(Math.round(eased * comp.ovr));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+    }, []);
+
     // Contract display: "$142M · 4 YRS" on the value line, descriptor as the note.
     const c = comp.contract ?? { value: "", years: "", descriptor: "" };
     const yrs = c.years
@@ -1412,7 +1440,7 @@ ResultsProps) {
                   letterSpacing: "-0.01em",
                 }}
               >
-                {comp.ovr}
+                {shownOvr}
               </div>
               <div
                 style={{
@@ -1812,15 +1840,34 @@ function DownloadLink({
   );
 }
 
+// Format a number as an English ordinal with thousands separators, e.g. 1848 ->
+// "1,848th" (for the "you're the Nth career scouted" social-proof line).
+function ordinal(n: number): string {
+  const v = n % 100;
+  const suffix =
+    v >= 11 && v <= 13 ? "th" : (["th", "st", "nd", "rd"][n % 10] ?? "th");
+  return `${n.toLocaleString("en-US")}${suffix}`;
+}
+
 // Tier 2 results-page depth: strengths/weaknesses (2K pros/cons) + the career
 // "stats by season" table. Renders nothing if the engine returned neither (e.g.
 // a résumé too thin to build season rows). One shared block for desktop+mobile.
-function DepthSection({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) {
+function DepthSection({
+  comp,
+  mobile = false,
+  scoutedNumber,
+}: {
+  comp: Comp;
+  mobile?: boolean;
+  scoutedNumber?: number;
+}) {
   const strengths = comp.strengths ?? [];
   const weaknesses = comp.weaknesses ?? [];
   const seasons = comp.season_stats ?? [];
+  const secondary = comp.secondary_comp?.trim() ?? "";
   const hasPC = strengths.length > 0 || weaknesses.length > 0;
-  if (!hasPC && seasons.length === 0) return null;
+  if (!hasPC && seasons.length === 0 && !secondary && scoutedNumber == null)
+    return null;
 
   const sectionLabel = (text: string) => (
     <>
@@ -1883,6 +1930,36 @@ function DepthSection({ comp, mobile = false }: { comp: Comp; mobile?: boolean }
         padding: mobile ? "24px 22px 0" : "8px 56px 0",
       }}
     >
+      {secondary && (
+        <div style={{ marginBottom: mobile ? 22 : 30 }}>
+          <div
+            style={{
+              font: "500 10px 'JetBrains Mono', monospace",
+              color: "#2f6043",
+              letterSpacing: "0.24em",
+              marginBottom: 8,
+            }}
+          >
+            [ ALSO IN THE TAPE ]
+          </div>
+          <div style={{ font: "400 14px/1.6 'Inter'", color: "#4a463d" }}>
+            {secondary}
+          </div>
+        </div>
+      )}
+      {scoutedNumber != null && (
+        <div
+          style={{
+            font: "500 11px 'JetBrains Mono', monospace",
+            color: "#a8a090",
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            marginBottom: mobile ? 22 : 30,
+          }}
+        >
+          You're the {ordinal(scoutedNumber)} career scouted.
+        </div>
+      )}
       {hasPC && (
         <div style={{ marginBottom: mobile ? 28 : 40 }}>
           {sectionLabel("STRENGTHS & WEAKNESSES")}

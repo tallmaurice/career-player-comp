@@ -121,7 +121,7 @@ export default function Page() {
       });
 
       const data = (await res.json().catch(() => null)) as
-        | { comp?: Comp; error?: string }
+        | { comp?: Comp; error?: string; scouted?: number }
         | null;
 
       if (stale()) return; // user went home mid-flight; drop the result silently
@@ -140,7 +140,12 @@ export default function Page() {
       await holdMin(); // keep the scouting room up for the full beat
       if (stale()) return;
       generatingRef.current = false;
-      setState((s) => ({ ...s, result: data.comp!, screen: "results" }));
+      setState((s) => ({
+        ...s,
+        result: data.comp!,
+        scouted: data.scouted,
+        screen: "results",
+      }));
     } catch {
       await holdMin();
       if (stale()) return;
@@ -317,6 +322,7 @@ export default function Page() {
             onHome={onHome}
             tipUrl={TIP_URL}
             cardImageUrl={`/api/card?format=feed&data=${encodeComp(state.result)}`}
+            scoutedNumber={state.scouted}
           />
           <Disclaimer />
         </>

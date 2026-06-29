@@ -372,6 +372,7 @@ export function parseComp(raw: string): ParseResult {
 
   const strengths = coerceStringList(o["strengths"], 4);
   const weaknesses = coerceStringList(o["weaknesses"], 3);
+  const secondary_comp = str(o["secondary_comp"]);
 
   const playerName = (o["player_name"] as string).trim();
   if (!isPlayerInPool(playerName))
@@ -411,6 +412,7 @@ export function parseComp(raw: string): ParseResult {
     season_stats,
     strengths,
     weaknesses,
+    secondary_comp,
     front_office_fit: (o["front_office_fit"] as string).trim(),
     comp_tone: (o["comp_tone"] as string).trim(),
   };

@@ -156,6 +156,10 @@ Two short lists, the scouting pros and cons, each item a tight phrase (a few wor
 - "strengths": 2-4 real, specific strengths earned by the tape. Specific beats generic ("turns broken teams around", not "leadership").
 - "weaknesses": 1-3 honest weaknesses — THIS IS THE NEEDLE. Aim every one at a real pattern, choice, or the self-image gap (never at station or the uncontrollable, per the safety block). A scouting report with no weakness is a puff piece. Make them true and a little brutal, the same dial as the rest of the card.
 "strengths": [ "<short phrase>", ... ], "weaknesses": [ "<short phrase>", ... ]
+
+## SECONDARY COMP (NEW FIELD — "ALSO SHADES OF ___")
+Name ONE secondary player from the pool whose career also rhymes with this person, DIFFERENT from the primary comp, with a brief clause on why. This is the "they're mostly X, but with shades of Y" read — it adds texture and a second angle, so make the second pick genuinely distinct from the first (a different facet of the same career), not a near-duplicate. Keep it to one short line.
+"secondary_comp": "<e.g. Shades of Lou Williams too — the same instinct to take over a game off the bench>"
 `;
 
 /** Appended LAST (recency). The #1 quality lever from the brainstorm: weight the

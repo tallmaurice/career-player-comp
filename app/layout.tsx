@@ -43,10 +43,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        // Static generic OG image for v1 (keeps the no-storage promise; the
-        // personalized card travels via the user-downloaded PNG). Add this asset
-        // to /public before launch.
-        url: "/og-default.png",
+        // Default OG image (bare-domain share). Rendered server-side by
+        // /api/og — headline + a sample scouting card — so the link preview
+        // shows the payoff. Per-comp cards have their own image via /api/card.
+        url: "/api/og",
         width: 1200,
         height: 630,
         alt: "Career Player Comp scouting report",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: "Career Player Comp — What player is your career?",
     description:
       "A scouting report that reads your work history the way a front office reads a prospect.",
-    images: ["/og-default.png"],
+    images: ["/api/og"],
   },
 };
 
