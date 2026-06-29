@@ -626,11 +626,22 @@ ResultsProps) {
               </span>
               {comp.card_summary}
             </p>
-            {/* prose para 2 = front_office_fit (11.5px, a notch under para 1) */}
+            {/* Front office fit — its OWN labeled section (matches the PDF),
+                not a bare second paragraph tacked under the summary. */}
+            <div
+              style={{
+                font: "500 10px 'JetBrains Mono', monospace",
+                color: "#2f6043",
+                letterSpacing: "0.24em",
+                margin: "0 0 10px",
+              }}
+            >
+              [ FRONT OFFICE FIT ]
+            </div>
             <p
               style={{
-                font: "400 11.5px/1.6 'Inter'",
-                color: "#6b655a",
+                font: "400 12px/1.65 'Inter'",
+                color: "#4a463d",
                 margin: "0 0 34px",
               }}
             >
@@ -1046,6 +1057,27 @@ ResultsProps) {
               In summary,{" "}
             </span>
             {comp.card_summary}
+          </p>
+          {/* Front office fit — its own labeled section (parity with desktop +
+              PDF; was previously omitted on mobile entirely). */}
+          <div
+            style={{
+              font: "500 10px 'JetBrains Mono', monospace",
+              color: "#2f6043",
+              letterSpacing: "0.24em",
+              margin: "18px 0 8px",
+            }}
+          >
+            [ FRONT OFFICE FIT ]
+          </div>
+          <p
+            style={{
+              font: "400 12px/1.6 'Inter'",
+              color: "#4a463d",
+              margin: 0,
+            }}
+          >
+            {comp.front_office_fit}
           </p>
         </div>
 
