@@ -14,12 +14,51 @@
  *  categories, and at least one MUST be "tendency" (the wry/roast badge). */
 export type BadgeCategory = "skill" | "temperament" | "intangible" | "tendency";
 
+/** 2K-style badge tier. Bronze (real) -> Silver -> Gold -> Hall of Fame
+ *  (a defining, elite-level trait). The tier reflects how strongly THIS
+ *  person's record earns the badge, not flattery. */
+export type BadgeTier = "Bronze" | "Silver" | "Gold" | "Hall of Fame";
+
 export interface Badge {
   /** Short display label, e.g. "Won't Call His Own Number". */
   label: string;
   category: BadgeCategory;
   /** The specific real-career (or behavioral) detail that earns this badge. */
   earned_by: string;
+  /** How strongly the record earns it: Bronze..Hall of Fame. */
+  tier: BadgeTier;
+}
+
+/** Career value reframed as an NBA contract — derived from tenure, arc,
+ *  loyalty, and role, NEVER from real income (fairness). A 30-yr lifer earns a
+ *  loyalty-max; a 2-yr hopper a prove-it deal. */
+export interface Contract {
+  /** NBA-scale dollar value, e.g. "$142M". A figure, not real salary. */
+  value: string;
+  /** Years on the deal, e.g. "4". */
+  years: string;
+  /** Short thesis label, e.g. "supermax extension", "prove-it deal". */
+  descriptor: string;
+}
+
+/** Draft slot mapped to career origin / pedigree (how they entered, not where
+ *  they ended). e.g. "#1 Overall", "Round 2, Pick 41", "Undrafted". */
+export interface Draft {
+  /** The slot, e.g. "Round 2, Pick 41" / "Undrafted" / "#1 Overall". */
+  pick: string;
+  /** Short read, e.g. "the steal", "undrafted gem", "franchise cornerstone". */
+  note: string;
+}
+
+/** One row of the "career stats by season" table — each job is a season,
+ *  with a playful, résumé-derived stat line (Basketball-Reference energy). */
+export interface SeasonStat {
+  /** The era/tenure, e.g. "2018-2021" or a short season label. */
+  year: string;
+  /** The employer (or the role), kept short for the table. */
+  team: string;
+  /** A playful stat line built from what that role actually was. */
+  line: string;
 }
 
 export interface StatLine {
@@ -73,6 +112,17 @@ export interface Comp {
   stat_line: StatLine;
   /** Four per-user letter grades for the card's scouting bars. */
   grades: Grades;
+  /** Career value as an NBA contract (value/years/descriptor), income-blind. */
+  contract: Contract;
+  /** Draft slot mapped to career origin / pedigree. */
+  draft: Draft;
+  /** "Career stats by season" — each job a season. Results page only; may be
+   *  empty when the résumé is too thin to build rows. */
+  season_stats: SeasonStat[];
+  /** 2K-style strengths (pros). Results page only. */
+  strengths: string[];
+  /** 2K-style weaknesses (cons) — the needle, aimed at patterns. Results only. */
+  weaknesses: string[];
   front_office_fit: string;
   /** Describes the reaction the card is built to produce. */
   comp_tone: string;

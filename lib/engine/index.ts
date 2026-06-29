@@ -10,7 +10,15 @@
 // =============================================================================
 
 import type { Comp, QuizAnswers } from "@/lib/types";
-import { SYSTEM_PROMPT_V7, PLAYER_POOL_SLOT, GRADES_ADDENDUM, OVR_ADDENDUM } from "./system-prompt";
+import type { BadgeTier, Contract, Draft, SeasonStat } from "@/lib/types";
+import {
+  SYSTEM_PROMPT_V7,
+  PLAYER_POOL_SLOT,
+  GRADES_ADDENDUM,
+  OVR_ADDENDUM,
+  TIER1_ADDENDUM,
+  TIER2_ADDENDUM,
+} from "./system-prompt";
 import poolJson from "./player-pool.json";
 
 // ---- Player pool ------------------------------------------------------------
@@ -55,7 +63,9 @@ export function isPlayerInPool(name: string): boolean {
 export const SYSTEM_STRING: string =
   SYSTEM_PROMPT_V7.replace(PLAYER_POOL_SLOT, JSON.stringify(PLAYER_POOL)) +
   GRADES_ADDENDUM +
-  OVR_ADDENDUM;
+  OVR_ADDENDUM +
+  TIER1_ADDENDUM +
+  TIER2_ADDENDUM;
 
 // ---- Lens variations for best-of-3 ------------------------------------------
 
@@ -180,6 +190,35 @@ function coerceRating(v: unknown, fallback: number, min: number, max: number): n
   return Math.max(min, Math.min(max, Math.round(n)));
 }
 
+/** Coerce a model badge tier to one of the four, else fall back to Silver.
+ *  Tolerant of case and "HOF"/"hall-of-fame" spellings. */
+function coerceTier(v: unknown): BadgeTier {
+  if (typeof v === "string") {
+    const t = v.trim().toLowerCase();
+    if (t === "bronze") return "Bronze";
+    if (t === "silver") return "Silver";
+    if (t === "gold") return "Gold";
+    if (t === "hall of fame" || t === "hall-of-fame" || t === "hof" || t === "hall_of_fame")
+      return "Hall of Fame";
+  }
+  return "Silver";
+}
+
+/** Coerce a value to a trimmed non-empty string, else the fallback. */
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" && v.trim().length > 0 ? v.trim() : fallback;
+}
+
+/** Coerce an unknown to an array of short trimmed strings (deduped on emptiness),
+ *  capped to `cap`. Non-array or junk -> []. Used for strengths/weaknesses. */
+function coerceStringList(v: unknown, cap: number): string[] {
+  if (!Array.isArray(v)) return [];
+  return v
+    .map((x) => (typeof x === "string" ? x.trim() : ""))
+    .filter((x) => x.length > 0)
+    .slice(0, cap);
+}
+
 const VALID_GRADE = /^[A-DF][+-]?$/;
 /** Coerce a model grade to a clean ASCII letter grade (e.g. "A-"), else fall
  *  back. Grades are optional: a missing/garbled grade never rejects a comp. */
@@ -292,6 +331,44 @@ export function parseComp(raw: string): ParseResult {
     ? (o["ovr_rationale"] as string).trim()
     : "Rated on career mastery, longevity, trajectory, impact, and how hard the game is to replace.";
 
+  // contract / draft / season_stats / strengths / weaknesses: all optional
+  // enrichment, coerced with safe fallbacks, never reject the comp for them.
+  const contractObj =
+    typeof o["contract"] === "object" && o["contract"] !== null
+      ? (o["contract"] as Record<string, unknown>)
+      : {};
+  const contract: Contract = {
+    value: str(contractObj["value"]),
+    years: str(contractObj["years"]),
+    // fall back to the stat_line contract_status label when missing
+    descriptor: str(contractObj["descriptor"], String(slo["contract_status"]).trim()),
+  };
+
+  const draftObj =
+    typeof o["draft"] === "object" && o["draft"] !== null
+      ? (o["draft"] as Record<string, unknown>)
+      : {};
+  const draft: Draft = {
+    pick: str(draftObj["pick"]),
+    note: str(draftObj["note"]),
+  };
+
+  const season_stats: SeasonStat[] = Array.isArray(o["season_stats"])
+    ? (o["season_stats"] as unknown[])
+        .map((r) => {
+          const ro =
+            typeof r === "object" && r !== null
+              ? (r as Record<string, unknown>)
+              : {};
+          return { year: str(ro["year"]), team: str(ro["team"]), line: str(ro["line"]) };
+        })
+        .filter((r) => r.year || r.team || r.line)
+        .slice(0, 12)
+    : [];
+
+  const strengths = coerceStringList(o["strengths"], 4);
+  const weaknesses = coerceStringList(o["weaknesses"], 3);
+
   const playerName = (o["player_name"] as string).trim();
   if (!isPlayerInPool(playerName))
     return { ok: false, reason: "out_of_pool", detail: `not in pool: ${playerName}` };
@@ -312,6 +389,7 @@ export function parseComp(raw: string): ParseResult {
       label: b.label.trim(),
       category: b.category,
       earned_by: b.earned_by.trim(),
+      tier: coerceTier(b.tier),
     })),
     card_summary: (o["card_summary"] as string).trim(),
     screenshot_line: (o["screenshot_line"] as string).trim(),
@@ -324,6 +402,11 @@ export function parseComp(raw: string): ParseResult {
       contract_status: String(slo["contract_status"]).trim(),
     },
     grades,
+    contract,
+    draft,
+    season_stats,
+    strengths,
+    weaknesses,
     front_office_fit: (o["front_office_fit"] as string).trim(),
     comp_tone: (o["comp_tone"] as string).trim(),
   };

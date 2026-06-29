@@ -34,10 +34,12 @@ export const maxDuration = 60;
 // ---- Tunables ---------------------------------------------------------------
 
 const MODEL = "claude-sonnet-4-6";
-// The Comp is 11 fields including a 2-4 paragraph full_report. max_tokens is a
-// cap, not a target — the model stops when done (~900-1200 tokens typical), so
-// this only sets headroom, not latency.
-const GEN_MAX_TOKENS = 2000;
+// The Comp now carries the full_report plus the enrichment fields (OVR/POT/
+// rationale, badge tiers, contract, draft, a stats-by-season table, and
+// strengths/weaknesses). max_tokens is a cap, not a target — the model stops
+// when done (~1200-1600 tokens typical now), so this only sets headroom (enough
+// that a long résumé's season table can't truncate the JSON), not latency.
+const GEN_MAX_TOKENS = 2400;
 // Abort just under maxDuration so the user gets the friendly message, not a 504.
 const OVERALL_TIMEOUT_MS = 52_000;
 

@@ -84,3 +84,45 @@ One plain, specific sentence telling THIS person why they landed where they did,
 Add these fields to your JSON output, IN ADDITION to every field already specified:
 "ovr": <integer 0-99>, "pot": <integer OVR-99>, "ovr_rationale": "<one sentence>"
 `;
+
+/** Appended after OVR_ADDENDUM. Tier 1 on-card enrichment: badge tiers, the
+ *  contract-as-value, and the draft slot. All résumé-derived, income-blind,
+ *  one call. Locked v7 literal untouched. */
+export const TIER1_ADDENDUM: string = `
+
+## BADGE TIERS (ADD A TIER TO EACH OF THE 3 BADGES)
+Each of the 3 badge objects you already output now ALSO carries a "tier": one of [ "Bronze", "Silver", "Gold", "Hall of Fame" ]. The tier is how STRONGLY this person's actual record earns that badge — a real read, not a flatter dial.
+- Bronze: a real but modest or occasional version of the trait.
+- Silver: a solid, consistent version.
+- Gold: a defining strength, clearly above the bar.
+- Hall of Fame: a rare, elite, career-defining version of the trait. RESERVED — most badges are not HOF.
+ANTI-FLATTERY: do not hand out three Golds. Spread the tiers; a person is usually uneven across their three badges, and the tendency (roast) badge can absolutely be a Gold or Hall of Fame when the pattern is that pronounced. The tiers must fit the same read as the OVR, grades, and report.
+Each badge object is now: { label, category, earned_by, tier }.
+
+## CONTRACT AS VALUE (NEW FIELD — CAREER VALUE AS AN NBA DEAL)
+Reframe their career value as an NBA contract: a dollar figure and a term. This is FANTASY VALUE, not their real salary — derive it ONLY from tenure, arc, loyalty, role, mastery, and how irreplaceable they are, exactly like the OVR. A 30-year loyal master earns a loyalty-max ($200M+, long term); a 2-year lateral hopper earns a short prove-it deal; a fast riser earns a big rising-star extension. NEVER read real income, title, or company size into the number. A devoted lifer can out-earn a job-hopping exec here — that is the point.
+"contract": { "value": "<NBA-scale $, e.g. $142M>", "years": "<number of years, e.g. 4>", "descriptor": "<short thesis label, e.g. supermax extension / rising-star extension / prove-it deal / veteran minimum, framed as rare longevity>" }
+The descriptor must match the thesis (do not tag a loyal anchor a "prove-it deal").
+
+## DRAFT SLOT (NEW FIELD — CAREER ORIGIN / PEDIGREE)
+Map how they ENTERED their field (origin and pedigree), NOT where they ended up, to a draft slot. A pedigreed, straight-line entry (top school, blue-chip first job, clear early signal) is a high pick; a self-taught, side-door, or late-start entry is a late pick or undrafted; an overlooked start that became a strong career is "the steal." The note is the read.
+"draft": { "pick": "<e.g. #1 Overall / Round 1, Pick 7 / Round 2, Pick 41 / Undrafted>", "note": "<short read, e.g. the steal / undrafted gem / franchise cornerstone / project pick>" }
+Undrafted or a late pick is NOT an insult — an undrafted-gem-who-became-essential is one of the best stories on the board. Aim any edge at pedigree-vs-pattern, never at where someone comes from (school, background, money are off the board per the safety block).
+`;
+
+/** Appended after TIER1_ADDENDUM. Tier 2 results-page depth: career stats by
+ *  season + strengths/weaknesses. More output tokens, still one call. */
+export const TIER2_ADDENDUM: string = `
+
+## CAREER STATS BY SEASON (NEW FIELD — EACH JOB IS A SEASON)
+Build a "stats by season" table from the RÉSUMÉ: one row per real role/job, oldest to newest, with a playful basketball stat line that captures what that role actually WAS. Basketball-Reference energy: invent fun, on-point stat categories ("28 PPG, led the team in late nights", "career-high in fires put out", "11 APG running point on a broken process"). Every line must be derived from a REAL role they listed — do not invent jobs, employers, or tenures. Keep each field short (it renders in a tight table).
+- Aim for one row per distinct role; cap at the most recent / most significant 10 if there are more.
+- If there is NO résumé (quiz only) or it is too thin to build honest rows, return an EMPTY array []. Do not fabricate a career history.
+"season_stats": [ { "year": "<era/tenure, e.g. 2018-2021>", "team": "<employer or role, short>", "line": "<playful résumé-derived stat line>" }, ... ]
+
+## STRENGTHS & WEAKNESSES (NEW FIELDS — 2K PROS / CONS)
+Two short lists, the scouting pros and cons, each item a tight phrase (a few words, not a sentence).
+- "strengths": 2-4 real, specific strengths earned by the tape. Specific beats generic ("turns broken teams around", not "leadership").
+- "weaknesses": 1-3 honest weaknesses — THIS IS THE NEEDLE. Aim every one at a real pattern, choice, or the self-image gap (never at station or the uncontrollable, per the safety block). A scouting report with no weakness is a puff piece. Make them true and a little brutal, the same dial as the rest of the card.
+"strengths": [ "<short phrase>", ... ], "weaknesses": [ "<short phrase>", ... ]
+`;

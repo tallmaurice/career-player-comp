@@ -18,7 +18,14 @@
 // .cta-green, .ghost-ln) come from app/globals.css and are NOT re-expressed.
 // =============================================================================
 
-import type { ResultsProps, Badge, BadgeCategory, Comp, Grades } from "@/lib/types";
+import type {
+  ResultsProps,
+  Badge,
+  BadgeCategory,
+  BadgeTier,
+  Comp,
+  Grades,
+} from "@/lib/types";
 import { useState } from "react";
 import { useTilt } from "@/lib/useTilt";
 import { useIsMobile } from "@/lib/useIsMobile";
@@ -53,6 +60,8 @@ function encodeCardComp(comp: Comp): string {
     badges: comp.badges,
     card_summary: comp.card_summary,
     stat_line: comp.stat_line,
+    contract: comp.contract,
+    draft: comp.draft,
   };
   const json = JSON.stringify(slim);
   const b64 = btoa(
@@ -79,6 +88,16 @@ const BADGE_COLOR: Record<BadgeCategory, string> = {
   temperament: "#356287",
   intangible: "#8f7220",
   tendency: "#3a8054",
+};
+
+// Badge tier -> pip count (a 4-slot meter). Bronze 1 ... Hall of Fame 4. Shown
+// as filled dots in the badge's category color so tier reads at a glance without
+// fighting the category color system.
+const TIER_RANK: Record<BadgeTier, number> = {
+  Bronze: 1,
+  Silver: 2,
+  Gold: 3,
+  "Hall of Fame": 4,
 };
 
 // ---- Grade bars are PER-USER (engine-derived) -------------------------------
@@ -511,7 +530,7 @@ ResultsProps) {
                     textTransform: "uppercase",
                   }}
                 >
-                  J. Rivera
+                  C. Sonnet
                 </div>
                 <div
                   style={{
@@ -521,7 +540,7 @@ ResultsProps) {
                     marginTop: 3,
                   }}
                 >
-                  [ SCOUTING DEPT. · 17 YRS ]
+                  [ AI SCOUT · 10,000+ CAREERS READ ]
                 </div>
               </div>
               <div
@@ -536,7 +555,7 @@ ResultsProps) {
                   borderRadius: 2,
                 }}
               >
-                JR
+                CS
               </div>
             </div>
 
@@ -672,6 +691,9 @@ ResultsProps) {
           </div>
         </div>
 
+        {/* STRENGTHS/WEAKNESSES + CAREER STATS BY SEASON (Tier 2 depth) */}
+        <DepthSection comp={comp} />
+
         {/* FULL SCOUTING REPORT */}
         <div style={{ maxWidth: 780, margin: "0 auto", padding: "8px 56px 80px" }}>
           <div
@@ -713,7 +735,7 @@ ResultsProps) {
               letterSpacing: "0.18em",
             }}
           >
-            [ END OF REPORT · FILE No. 2026-4471 · J. RIVERA ]
+            [ END OF REPORT · FILE No. 2026-4471 · C. SONNET ]
           </div>
         </div>
       </div>
@@ -993,6 +1015,9 @@ ResultsProps) {
           )}
         </div>
 
+        {/* STRENGTHS/WEAKNESSES + CAREER STATS BY SEASON (Tier 2 depth) */}
+        <DepthSection comp={comp} mobile />
+
         {/* FULL SCOUTING REPORT */}
         <div style={{ padding: "24px 22px 0" }}>
           <div
@@ -1090,6 +1115,16 @@ ResultsProps) {
     // Pointer + touch tilt, reduced-motion-aware. The resting lean
     // (rotateX(-5deg) rotateY(8deg)) and the eased snap-back live in .tilt-card.
     const { wrapRef, cardRef } = useTilt();
+
+    // Contract display: "$142M · 4 YRS" on the value line, descriptor as the note.
+    const c = comp.contract ?? { value: "", years: "", descriptor: "" };
+    const yrs = c.years
+      ? /^\d+$/.test(c.years.trim())
+        ? `${c.years.trim()} YRS`
+        : c.years.trim().toUpperCase()
+      : "";
+    const contractValue = [c.value, yrs].filter(Boolean).join(" · ");
+    const contractNote = c.descriptor ?? "";
 
     return (
       <div
@@ -1255,11 +1290,15 @@ ResultsProps) {
           >
             {badges.map((b: Badge, i) => {
               const c = BADGE_COLOR[b.category];
+              const rank = TIER_RANK[b.tier] ?? 2;
               return (
                 <span
                   key={i}
-                  title={b.earned_by}
+                  title={`${b.tier} · ${b.earned_by}`}
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: mobile ? 5 : 6,
                     font: mobile
                       ? "500 9px 'JetBrains Mono', monospace"
                       : "500 11px 'JetBrains Mono', monospace",
@@ -1273,6 +1312,21 @@ ResultsProps) {
                   }}
                 >
                   {b.label}
+                  <span style={{ display: "inline-flex", gap: 2 }}>
+                    {[0, 1, 2, 3].map((p) => (
+                      <span
+                        key={p}
+                        style={{
+                          width: mobile ? 3 : 4,
+                          height: mobile ? 3 : 4,
+                          borderRadius: "50%",
+                          background: p < rank ? c : "transparent",
+                          border: `1px solid ${c}`,
+                          opacity: p < rank ? 1 : 0.35,
+                        }}
+                      />
+                    ))}
+                  </span>
                 </span>
               );
             })}
@@ -1336,6 +1390,35 @@ ResultsProps) {
             <StatCell label="PIVOTS" value={stat.pivots} mobile={mobile} />
             <StatCell label="STATUS" value={stat.status} mobile={mobile} accent />
           </div>
+
+          {/* contract value + draft slot (Tier 1 on-card enrichment) */}
+          {(comp.contract?.value || comp.draft?.pick) && (
+            <div
+              className="layer-z2"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: mobile ? 8 : 14,
+                marginTop: mobile ? 12 : 16,
+                paddingTop: mobile ? 12 : 16,
+                borderTop: "1px solid rgba(33,30,23,0.1)",
+              }}
+            >
+              <DealCell
+                label="CONTRACT"
+                value={contractValue}
+                note={contractNote}
+                mobile={mobile}
+              />
+              <DealCell
+                label="DRAFT"
+                value={comp.draft?.pick ?? ""}
+                note={comp.draft?.note ?? ""}
+                mobile={mobile}
+                accent
+              />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1494,6 +1577,206 @@ function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) 
         OVR weighs career mastery, longevity, trajectory, impact, and how hard
         your game is to replace, not pay or title. POT is your ceiling.
       </p>
+    </div>
+  );
+}
+
+// Tier 2 results-page depth: strengths/weaknesses (2K pros/cons) + the career
+// "stats by season" table. Renders nothing if the engine returned neither (e.g.
+// a résumé too thin to build season rows). One shared block for desktop+mobile.
+function DepthSection({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) {
+  const strengths = comp.strengths ?? [];
+  const weaknesses = comp.weaknesses ?? [];
+  const seasons = comp.season_stats ?? [];
+  const hasPC = strengths.length > 0 || weaknesses.length > 0;
+  if (!hasPC && seasons.length === 0) return null;
+
+  const sectionLabel = (text: string) => (
+    <>
+      <div
+        style={{
+          font: "500 10px 'JetBrains Mono', monospace",
+          color: "#2f6043",
+          letterSpacing: "0.24em",
+          marginBottom: 14,
+        }}
+      >
+        [ {text} ]
+      </div>
+      <div
+        style={{
+          height: 1,
+          background: "rgba(47,96,67,0.32)",
+          marginBottom: mobile ? 18 : 24,
+        }}
+      />
+    </>
+  );
+
+  const list = (items: string[], sign: string, color: string, heading: string) => (
+    <div style={{ marginBottom: mobile ? 18 : 0 }}>
+      <div
+        style={{
+          font: "500 11px 'JetBrains Mono', monospace",
+          color,
+          letterSpacing: "0.18em",
+          marginBottom: 10,
+          textTransform: "uppercase",
+        }}
+      >
+        {heading}
+      </div>
+      {items.map((it, i) => (
+        <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <span
+            style={{
+              font: "600 15px 'Barlow Condensed'",
+              color,
+              flexShrink: 0,
+              width: 10,
+            }}
+          >
+            {sign}
+          </span>
+          <span style={{ font: "400 14px/1.5 'Inter'", color: "#4a463d" }}>{it}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div
+      style={{
+        maxWidth: mobile ? undefined : 780,
+        margin: "0 auto",
+        padding: mobile ? "24px 22px 0" : "8px 56px 0",
+      }}
+    >
+      {hasPC && (
+        <div style={{ marginBottom: mobile ? 28 : 40 }}>
+          {sectionLabel("STRENGTHS & WEAKNESSES")}
+          <div
+            style={{
+              display: mobile ? "block" : "grid",
+              gridTemplateColumns: mobile ? undefined : "1fr 1fr",
+              gap: mobile ? 0 : 40,
+            }}
+          >
+            {strengths.length > 0 && list(strengths, "+", "#2f6043", "Strengths")}
+            {weaknesses.length > 0 && list(weaknesses, "−", "#bd5024", "Weaknesses")}
+          </div>
+        </div>
+      )}
+      {seasons.length > 0 && (
+        <div style={{ marginBottom: mobile ? 28 : 40 }}>
+          {sectionLabel("CAREER STATS BY SEASON")}
+          <div>
+            {seasons.map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: mobile ? "1fr" : "92px 160px 1fr",
+                  gap: mobile ? 2 : 16,
+                  padding: mobile ? "10px 0" : "12px 0",
+                  borderBottom: "1px solid rgba(33,30,23,0.08)",
+                  alignItems: mobile ? "start" : "baseline",
+                }}
+              >
+                <div
+                  style={{
+                    font: "500 11px 'JetBrains Mono', monospace",
+                    color: "#2f6043",
+                    letterSpacing: "0.1em",
+                  }}
+                >
+                  {s.year}
+                </div>
+                <div
+                  style={{
+                    font: "600 13px 'Barlow Condensed'",
+                    color: "#211e17",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  {s.team}
+                </div>
+                <div
+                  style={{
+                    font: "400 13px/1.5 'Inter'",
+                    color: "#4a463d",
+                    marginTop: mobile ? 4 : 0,
+                  }}
+                >
+                  {s.line}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Contract/draft cell: a label, a short text value, and an optional small note
+// underneath (years+descriptor for contract; the read for draft). Wider/text
+// values than StatCell's single numerics, so it runs a smaller value font.
+function DealCell({
+  label,
+  value,
+  note,
+  mobile,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  mobile: boolean;
+  accent?: boolean;
+}) {
+  if (!value) return <div />;
+  return (
+    <div>
+      <div
+        style={{
+          font: mobile
+            ? "400 8px 'JetBrains Mono', monospace"
+            : "400 10px 'JetBrains Mono', monospace",
+          color: "#a8a090",
+          letterSpacing: mobile ? "0.16em" : "0.18em",
+          marginBottom: mobile ? 2 : 4,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          font: mobile
+            ? "500 12px 'JetBrains Mono', monospace"
+            : "500 15px 'JetBrains Mono', monospace",
+          color: accent ? "#2f6043" : "#211e17",
+          textTransform: "uppercase",
+        }}
+      >
+        {value}
+      </div>
+      {note ? (
+        <div
+          style={{
+            font: mobile
+              ? "400 8px 'JetBrains Mono', monospace"
+              : "400 9px 'JetBrains Mono', monospace",
+            color: "#6b655a",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            marginTop: 3,
+          }}
+        >
+          {note}
+        </div>
+      ) : null}
     </div>
   );
 }

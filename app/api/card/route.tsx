@@ -46,6 +46,14 @@ const BADGE_COLOR: Record<BadgeCategory, string> = {
   tendency: "#3a8054",
 };
 
+// Badge tier -> pip count (mirrors Results.tsx TIER_RANK).
+const TIER_RANK: Record<string, number> = {
+  Bronze: 1,
+  Silver: 2,
+  Gold: 3,
+  "Hall of Fame": 4,
+};
+
 // ---- fonts (fetched once, cached for the process life) ----------------------
 // satori needs raw font bytes (TTF/OTF/WOFF — NOT WOFF2). We pull the exact
 // families used on screen from Google Fonts, asking for TTF via an old UA.
@@ -183,6 +191,60 @@ function buildCard(comp: Comp, w: number, h: number): El {
         ),
       ],
     );
+
+  // contract/draft deal cell: label, short text value, optional small note.
+  const dealCell = (label: string, value: string, note: string, accent = false) =>
+    el("div", { display: "flex", flexDirection: "column", flex: 1 }, [
+      el(
+        "div",
+        {
+          fontFamily: mono,
+          fontSize: story ? 17 : 13,
+          color: C.faint,
+          letterSpacing: "0.14em",
+          marginBottom: 5,
+        },
+        label,
+      ),
+      el(
+        "div",
+        {
+          fontFamily: mono,
+          fontWeight: 500,
+          fontSize: story ? 26 : 18,
+          color: accent ? C.green : C.ink,
+          textTransform: "uppercase",
+        },
+        value,
+      ),
+      note
+        ? el(
+            "div",
+            {
+              fontFamily: mono,
+              fontSize: story ? 15 : 11,
+              color: C.muted,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              marginTop: 4,
+            },
+            note,
+          )
+        : el("div", {}),
+    ]);
+
+  // contract value line ("$142M · 4 YRS") + draft slot, mirrors Results.tsx.
+  const ct = comp.contract;
+  const yrs = ct?.years
+    ? /^\d+$/.test(ct.years.trim())
+      ? `${ct.years.trim()} YRS`
+      : ct.years.trim().toUpperCase()
+    : "";
+  const contractValue = [ct?.value, yrs].filter(Boolean).join(" · ");
+  const contractNote = (ct?.descriptor ?? "").toUpperCase();
+  const draftPick = (comp.draft?.pick ?? "").toUpperCase();
+  const draftNote = (comp.draft?.note ?? "").toUpperCase();
+  const hasDeal = Boolean(contractValue || draftPick);
 
   return el(
     "div",
@@ -361,15 +423,12 @@ function buildCard(comp: Comp, w: number, h: number): El {
             },
             badges.map((b: Badge) => {
               const color = BADGE_COLOR[b.category] ?? C.green;
+              const rank = TIER_RANK[b.tier] ?? 2;
+              const pip = story ? 7 : 5;
               return el(
                 "div",
                 {
-                  fontFamily: mono,
-                  fontWeight: 500,
-                  fontSize: story ? 22 : 17,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color,
+                  alignItems: "center",
                   border: `1px solid ${color}`,
                   borderRadius: 4,
                   padding: story ? "8px 14px" : "6px 11px",
@@ -377,7 +436,34 @@ function buildCard(comp: Comp, w: number, h: number): El {
                   marginBottom: 10,
                   flexShrink: 0,
                 },
-                b.label,
+                [
+                  el(
+                    "div",
+                    {
+                      fontFamily: mono,
+                      fontWeight: 500,
+                      fontSize: story ? 22 : 17,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color,
+                    },
+                    b.label,
+                  ),
+                  el(
+                    "div",
+                    { alignItems: "center", marginLeft: story ? 9 : 7 },
+                    [0, 1, 2, 3].map((p) =>
+                      el("div", {
+                        width: pip,
+                        height: pip,
+                        borderRadius: 99,
+                        marginLeft: p === 0 ? 0 : 3,
+                        background: p < rank ? color : "transparent",
+                        border: `1px solid ${color}`,
+                      }),
+                    ),
+                  ),
+                ],
               );
             }),
           ),
@@ -404,7 +490,11 @@ function buildCard(comp: Comp, w: number, h: number): El {
           // stat line
           el(
             "div",
-            { width: "100%", flexShrink: 0, marginBottom: story ? 28 : 10 },
+            {
+              width: "100%",
+              flexShrink: 0,
+              marginBottom: hasDeal ? (story ? 16 : 8) : story ? 28 : 10,
+            },
             [
               statCell("SEASONS", stat.seasons),
               statCell("TEAMS", stat.teams),
@@ -412,6 +502,23 @@ function buildCard(comp: Comp, w: number, h: number): El {
               statCell("STATUS", stat.status, true),
             ],
           ),
+          // contract value + draft slot (Tier 1 on-card enrichment)
+          hasDeal
+            ? el(
+                "div",
+                {
+                  width: "100%",
+                  flexShrink: 0,
+                  paddingTop: story ? 16 : 8,
+                  marginBottom: story ? 28 : 10,
+                  borderTop: "1px solid rgba(33,30,23,0.1)",
+                },
+                [
+                  dealCell("CONTRACT", contractValue, contractNote),
+                  dealCell("DRAFT", draftPick, draftNote, true),
+                ],
+              )
+            : el("div", {}),
           // watermark
           el(
             "div",
