@@ -41,7 +41,8 @@ const MODEL = "claude-sonnet-4-6";
 // that a long résumé's season table can't truncate the JSON), not latency.
 const GEN_MAX_TOKENS = 2400;
 // Abort just under maxDuration so the user gets the friendly message, not a 504.
-const OVERALL_TIMEOUT_MS = 52_000;
+// Streaming keeps the call robust near the budget, so we use more of the 60s.
+const OVERALL_TIMEOUT_MS = 57_000;
 
 // Per-IP and global limits (only enforced when Upstash env is present).
 const PER_IP_LIMIT = 5; // requests
@@ -143,24 +144,31 @@ async function generateCandidate(
   signal: AbortSignal,
 ): Promise<Comp | null> {
   for (let attempt = 0; attempt < 2; attempt++) {
-    const msg = await client.messages.create(
-      {
-        model: MODEL,
-        max_tokens: GEN_MAX_TOKENS,
-        system: SYSTEM_BLOCKS,
-        messages: [
-          {
-            role: "user",
-            content:
-              attempt === 0
-                ? userMessage
-                : userMessage +
-                  "\n\nREMINDER: output VALID JSON ONLY, exactly the schema, and player_name MUST be one of the approved pool names exactly.",
-          },
-        ],
-      },
-      { signal },
-    );
+    // Stream the generation. The output is large now (full report + season table
+    // + enrichment fields); a non-streaming blocking call risks socket/idle
+    // timeouts as it approaches the function budget. Streaming keeps the
+    // connection active and reliably completes within maxDuration. We still only
+    // act on the final assembled message.
+    const msg = await client.messages
+      .stream(
+        {
+          model: MODEL,
+          max_tokens: GEN_MAX_TOKENS,
+          system: SYSTEM_BLOCKS,
+          messages: [
+            {
+              role: "user",
+              content:
+                attempt === 0
+                  ? userMessage
+                  : userMessage +
+                    "\n\nREMINDER: output VALID JSON ONLY, exactly the schema, and player_name MUST be one of the approved pool names exactly.",
+            },
+          ],
+        },
+        { signal },
+      )
+      .finalMessage();
     const parsed = parseComp(textFromMessage(msg));
     if (parsed.ok) return parsed.comp;
   }
