@@ -31,6 +31,7 @@ const SITE_URL =
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: "Career Player Comp",
   description:
     "Find out which NBA player your career makes you. Upload your LinkedIn, answer 8 questions, get a scouting report that reads your work history the way a front office reads a prospect. No account, nothing stored.",
