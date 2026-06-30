@@ -418,67 +418,67 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
           font: "400 15px/1.6 var(--font-body)",
           color: "var(--muted, #5a5347)",
           maxWidth: 480,
-          marginBottom: 32,
+          marginBottom: 30,
         }}
       >
         Every report here is a real AI scout reading your whole career, not a
         template spitting out a name. That costs real money every run, and
-        today&rsquo;s scouting budget is spent. Two ways to get them back to
-        work:
+        today&rsquo;s scouting budget is spent. The room reopens tomorrow.
       </p>
 
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 14,
+          gap: 10,
           width: "100%",
-          maxWidth: 360,
+          maxWidth: 400,
         }}
       >
         <a
-          href={tipUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={sponsorUrl}
           className="cta-green"
           style={{
             background: "var(--green)",
             color: "#f1ece0",
             textDecoration: "none",
-            padding: "15px 24px",
-            font: "600 13px var(--font-body)",
-            letterSpacing: "0.12em",
+            padding: "17px 24px",
+            font: "700 14px var(--font-body)",
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
             borderRadius: 4,
           }}
         >
-          Buy the scouts another round
+          Sponsor Career Player Comp
         </a>
-        <div style={{ font: "400 12px var(--font-body)", color: "var(--muted, #5a5347)", marginTop: -6 }}>
-          A tip puts them back to work and funds more reads.
+        <div style={{ font: "400 12.5px/1.5 var(--font-body)", color: "var(--muted, #5a5347)", marginBottom: 16 }}>
+          If this is in front of your audience right now, it&rsquo;s working. It
+          costs real money to keep the scouts reading careers around the clock.
+          Put your brand on the scouting room and keep it open.
         </div>
 
         <a
-          href={sponsorUrl}
+          href={tipUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="ghost-ln"
           style={{
             background: "transparent",
-            border: "1px solid rgba(33,30,23,0.25)",
+            border: "1px solid rgba(33,30,23,0.22)",
             color: "var(--ink)",
             textDecoration: "none",
-            padding: "15px 24px",
-            font: "600 13px var(--font-body)",
+            padding: "13px 24px",
+            font: "600 12px var(--font-body)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             borderRadius: 4,
-            marginTop: 8,
           }}
         >
-          Sponsor the scouting room
+          Or tip the scouts
         </a>
-        <div style={{ font: "400 12px var(--font-body)", color: "var(--muted, #5a5347)", marginTop: -6 }}>
-          It costs too much to keep the scouts working 24/7 on one person&rsquo;s
-          dime. Put your brand on the room and keep it open.
+        <div style={{ font: "400 12px/1.5 var(--font-body)", color: "var(--muted, #5a5347)" }}>
+          A tip won&rsquo;t reopen the room today. It just helps cover the bill so
+          this can keep running.
         </div>
       </div>
 
@@ -496,7 +496,7 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
           textDecoration: "underline",
         }}
       >
-        Or come back tomorrow. Head home.
+        Come back tomorrow. Head home.
       </button>
     </div>
   );

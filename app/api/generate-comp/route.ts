@@ -57,10 +57,11 @@ const PER_IP_WINDOW = "1 h" as const;
 // far less warm, and the rebuild shrank the prompt so real cost is lower still.
 // So worst-case daily spend ≈ this count × ~$0.20. To set a $ ceiling:
 // count = $ / 0.20.
-// LAUNCH WEEK (set 2026-06-30): $250/day ceiling = 1250. REVISIT after this week
-// (Maurice) — drop back down once the launch spike passes. When this trips, the
-// front end shows the branded "scouts are out for the day" page (tip + sponsor).
-const DAILY_SPEND_CAP = 1250;
+// LAUNCH WEEK (set 2026-06-30): 2500/day. Worst case (all cold) ≈ $500, but warm
+// launch traffic runs ~$0.08-0.12/comp so realistic spend is ~$200-300. REVISIT
+// after this week (Maurice) — drop back down once the spike passes. When this
+// trips, the front end shows the branded "scouts are out" page (sponsor + tip).
+const DAILY_SPEND_CAP = 2500;
 // IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
 const BYPASS_IPS = new Set(
   (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
