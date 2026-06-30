@@ -53,12 +53,14 @@ const OVERALL_TIMEOUT_MS = 105_000;
 const PER_IP_LIMIT = 5; // requests
 const PER_IP_WINDOW = "1 h" as const;
 // Global daily kill-switch: max non-bypass generations per UTC day — the hard
-// ceiling on a runaway bill. Cost per comp is ~$0.15-0.20 COLD (the ~60k-token
-// system prompt is uncached on the first call of each ~5-min cache window) and
-// ~$0.04 WARM (steady traffic keeps the prompt cache hot). So worst-case daily
-// spend ≈ this count × ~$0.20. 100 ≈ $20/day worst case, far less in practice.
-// Raise it once launch traffic proves out. To set a $ ceiling: count = $ / 0.20.
-const DAILY_SPEND_CAP = 100;
+// ceiling on a runaway bill. Worst-case cost per comp ≈ $0.20 (cold prefill);
+// far less warm, and the rebuild shrank the prompt so real cost is lower still.
+// So worst-case daily spend ≈ this count × ~$0.20. To set a $ ceiling:
+// count = $ / 0.20.
+// LAUNCH WEEK (set 2026-06-30): $250/day ceiling = 1250. REVISIT after this week
+// (Maurice) — drop back down once the launch spike passes. When this trips, the
+// front end shows the branded "scouts are out for the day" page (tip + sponsor).
+const DAILY_SPEND_CAP = 1250;
 // IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
 const BYPASS_IPS = new Set(
   (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
@@ -264,14 +266,21 @@ export async function POST(req: Request): Promise<Response> {
   const ip = clientIp(req);
   const { rateLimited, spendExhausted } = await checkLimits(ip);
   if (spendExhausted) {
+    // Global daily cap tripped -> the branded "scouts are out for the day" page.
     return Response.json(
-      { error: "The scout is taking the rest of the day off. Back tomorrow." },
+      {
+        error: "The scouts are out for the day. Back tomorrow.",
+        reason: "daily_cap",
+      },
       { status: 429 },
     );
   }
   if (rateLimited) {
     return Response.json(
-      { error: "Easy — the scout can only read so many careers an hour. Try again soon." },
+      {
+        error: "Easy. The scout can only read so many careers an hour. Try again soon.",
+        reason: "rate_limit",
+      },
       { status: 429 },
     );
   }

@@ -67,6 +67,9 @@ export default function Page() {
   // 0..7 while in the quiz; which question is showing.
   const [qIndex, setQIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // When the global daily spend cap trips, the API returns reason:"daily_cap";
+  // we render the branded "scouts are out" page instead of the retry screen.
+  const [errorReason, setErrorReason] = useState<string | null>(null);
 
   // Guard so React 18 StrictMode double-invoke doesn't fire two generations.
   const generatingRef = useRef(false);
@@ -83,6 +86,7 @@ export default function Page() {
     generatingRef.current = false;
     genTokenRef.current += 1; // invalidate any in-flight generation
     setError(null);
+    setErrorReason(null);
     setQIndex(0);
     setState(INITIAL);
   }, []);
@@ -96,6 +100,7 @@ export default function Page() {
     if (generatingRef.current) return;
     generatingRef.current = true;
     setError(null);
+    setErrorReason(null);
 
     // Snapshot the token; if onHome/reset fires while we're awaiting, this
     // generation is stale and must not write any state when it resolves.
@@ -121,7 +126,7 @@ export default function Page() {
       });
 
       const data = (await res.json().catch(() => null)) as
-        | { comp?: Comp; error?: string; scouted?: number }
+        | { comp?: Comp; error?: string; reason?: string; scouted?: number }
         | null;
 
       if (stale()) return; // user went home mid-flight; drop the result silently
@@ -129,6 +134,7 @@ export default function Page() {
       if (!res.ok || !data?.comp) {
         await holdMin();
         if (stale()) return;
+        setErrorReason(data?.reason ?? null);
         setError(
           data?.error ??
             "The scout couldn't finish the report. Take another shot.",
@@ -303,8 +309,13 @@ export default function Page() {
       );
 
     case "loading":
-      // If generation already failed, show the retry over the scouting room.
+      // If generation already failed, show the retry over the scouting room —
+      // unless the GLOBAL daily cap tripped, which retrying won't fix. Then show
+      // the branded "scouts are out for the day" page (tip + sponsor).
       if (error) {
+        if (errorReason === "daily_cap") {
+          return <ScoutsOut tipUrl={TIP_URL} onReset={reset} />;
+        }
         return (
           <RetryScreen
             message={error}
@@ -358,6 +369,139 @@ function Disclaimer() {
 }
 
 // ---- friendly retry (generation failure) -----------------------------------
+// The branded "scouts are out for the day" page — shown when the GLOBAL daily
+// spend cap trips. Honest scarcity in the scout's voice (every report is a real
+// AI read, which costs real money), converting to the tip jar ("another round")
+// and the #1 sponsor inventory ("keep the room open"). Not a fake apology.
+function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void }) {
+  const sponsorUrl =
+    "mailto:hello@careerplayercomp.com?subject=Sponsoring%20the%20scouting%20room";
+  return (
+    <div
+      className="paper-bg"
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "48px 24px",
+        textAlign: "center",
+        fontFamily: "var(--font-body)",
+      }}
+    >
+      <div
+        style={{
+          font: "500 11px var(--font-mono)",
+          color: "var(--green)",
+          letterSpacing: "0.3em",
+          marginBottom: 22,
+        }}
+      >
+        [ SCOUTS ARE OUT ]
+      </div>
+      <div
+        style={{
+          font: "600 clamp(28px, 6vw, 38px) var(--font-display)",
+          color: "var(--ink)",
+          textTransform: "uppercase",
+          letterSpacing: "-0.005em",
+          lineHeight: 1.05,
+          maxWidth: 560,
+          marginBottom: 20,
+        }}
+      >
+        The scouts are out for the day.
+      </div>
+      <p
+        style={{
+          font: "400 15px/1.6 var(--font-body)",
+          color: "var(--muted, #5a5347)",
+          maxWidth: 480,
+          marginBottom: 32,
+        }}
+      >
+        Every report here is a real AI scout reading your whole career, not a
+        template spitting out a name. That costs real money every run, and
+        today&rsquo;s scouting budget is spent. Two ways to get them back to
+        work:
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+          width: "100%",
+          maxWidth: 360,
+        }}
+      >
+        <a
+          href={tipUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cta-green"
+          style={{
+            background: "var(--green)",
+            color: "#f1ece0",
+            textDecoration: "none",
+            padding: "15px 24px",
+            font: "600 13px var(--font-body)",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            borderRadius: 4,
+          }}
+        >
+          Buy the scouts another round
+        </a>
+        <div style={{ font: "400 12px var(--font-body)", color: "var(--muted, #5a5347)", marginTop: -6 }}>
+          A tip puts them back to work and funds more reads.
+        </div>
+
+        <a
+          href={sponsorUrl}
+          className="ghost-ln"
+          style={{
+            background: "transparent",
+            border: "1px solid rgba(33,30,23,0.25)",
+            color: "var(--ink)",
+            textDecoration: "none",
+            padding: "15px 24px",
+            font: "600 13px var(--font-body)",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            borderRadius: 4,
+            marginTop: 8,
+          }}
+        >
+          Sponsor the scouting room
+        </a>
+        <div style={{ font: "400 12px var(--font-body)", color: "var(--muted, #5a5347)", marginTop: -6 }}>
+          It costs too much to keep the scouts working 24/7 on one person&rsquo;s
+          dime. Put your brand on the room and keep it open.
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onReset}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--muted, #5a5347)",
+          font: "500 12px var(--font-body)",
+          letterSpacing: "0.04em",
+          marginTop: 34,
+          cursor: "pointer",
+          textDecoration: "underline",
+        }}
+      >
+        Or come back tomorrow. Head home.
+      </button>
+    </div>
+  );
+}
+
 function RetryScreen({
   message,
   onRetry,
