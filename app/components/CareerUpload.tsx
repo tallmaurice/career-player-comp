@@ -409,7 +409,7 @@ export default function CareerUpload({
                         <strong style={{ color: INK, fontWeight: 600 }}>
                           <span aria-hidden>&bull;&bull;&bull;</span>
                         </strong>{" "}
-                        (top right) &rarr;{" "}
+                        &rarr;{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
                           Share via&hellip;
                         </strong>{" "}
