@@ -419,7 +419,13 @@ export function parseComp(raw: string): ParseResult {
       seasons: String(slo["seasons"]).trim(),
       teams: String(slo["teams"]).trim(),
       pivots: String(slo["pivots"]).trim(),
-      contract_status: String(slo["contract_status"]).trim(),
+      // Strip a stray year-range parenthetical the model sometimes copies from
+      // the prompt's formula (e.g. "Rising (4-8 yrs)", "Max (15-25)", or a
+      // truncated "Rising (4-8") so the short label can't overflow/cut off the
+      // card. The prompt forbids printing it; this is the belt-and-suspenders.
+      contract_status: String(slo["contract_status"])
+        .replace(/\s*\(\s*\d+\s*[-–—]\s*\d+\+?(\s*(yrs?|years?))?\s*\)?\s*$/i, "")
+        .trim(),
     },
     grades,
     contract,
