@@ -331,6 +331,9 @@ export default function CareerUpload({
                   file is attached. */}
               {!hasUsableFile && (
                 <div
+                  // The drop-zone wrapping this opens the file picker on click;
+                  // stop clicks inside the helper from bubbling up to it.
+                  onClick={(e) => e.stopPropagation()}
                   style={{
                     alignSelf: "stretch",
                     maxWidth: 480,
@@ -339,7 +342,10 @@ export default function CareerUpload({
                 >
                   <button
                     type="button"
-                    onClick={() => setShowPdfHelp((v) => !v)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPdfHelp((v) => !v);
+                    }}
                     aria-expanded={showPdfHelp}
                     style={{
                       display: "inline-flex",
