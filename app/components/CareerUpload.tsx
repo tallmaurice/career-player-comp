@@ -284,9 +284,8 @@ export default function CareerUpload({
                   marginBottom: "clamp(16px, 2vw, 22px)",
                 }}
               >
-                Drop a PDF here, or use the button below. PDF only. Need your
-                LinkedIn PDF? On your profile, click More (the three-dot button)
-                → Save to PDF. On a paid plan, look under Resources instead.
+                Drop a PDF here, or use the button below. PDF only. A résumé or
+                a LinkedIn export both work.
               </div>
 
               {/* explicit, obvious upload button — so the zone isn't an invisible
@@ -320,6 +319,58 @@ export default function CareerUpload({
                 </span>
                 {hasUsableFile ? "Choose a different file" : "Choose PDF file"}
               </button>
+
+              {/* LinkedIn-PDF helper — the #1 upload friction is people not
+                  finding where to export their profile as a PDF. LinkedIn labels
+                  the menu differently by account type (most: "More" / •••;
+                  Premium: "Resources"), so route both explicitly. Sits AFTER the
+                  CTA so it catches the stuck user without pushing the button
+                  down. Hidden once a file is attached (no longer needed). */}
+              {!hasUsableFile && (
+                <div
+                  style={{
+                    alignSelf: "stretch",
+                    maxWidth: 460,
+                    borderLeft: `2px solid ${GREEN}`,
+                    paddingLeft: 13,
+                    marginBottom: "clamp(16px, 2vw, 20px)",
+                  }}
+                >
+                  <div
+                    style={{
+                      font: `600 11px ${BODY}`,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: GREEN,
+                      marginBottom: 7,
+                    }}
+                  >
+                    Need your LinkedIn PDF?
+                  </div>
+                  <div style={{ font: `400 12.5px/1.5 ${BODY}`, color: MUTED }}>
+                    Open your profile, then:
+                    <div style={{ marginTop: 5 }}>
+                      <strong style={{ color: INK, fontWeight: 600 }}>
+                        Most people:
+                      </strong>{" "}
+                      click{" "}
+                      <strong style={{ color: INK, fontWeight: 600 }}>More</strong>{" "}
+                      (the <span aria-hidden>&bull;&bull;&bull;</span> button){" "}
+                      &rarr; Save to PDF
+                    </div>
+                    <div style={{ marginTop: 2 }}>
+                      <strong style={{ color: INK, fontWeight: 600 }}>
+                        On LinkedIn Premium:
+                      </strong>{" "}
+                      it&rsquo;s under{" "}
+                      <strong style={{ color: INK, fontWeight: 600 }}>
+                        Resources
+                      </strong>{" "}
+                      &rarr; Save to PDF
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* file chip — only after a PDF is attached */}
               {fileName && (
@@ -449,7 +500,8 @@ export default function CareerUpload({
                 }}
               >
                 <span style={{ color: MUTED, fontWeight: 500 }}>From LinkedIn:</span>{" "}
-                your profile &rarr; More &rarr; Save to PDF.
+                profile &rarr; More (&bull;&bull;&bull;), or Resources on Premium,
+                &rarr; Save to PDF.
               </div>
 
               <input
