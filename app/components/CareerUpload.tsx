@@ -564,20 +564,6 @@ export default function CareerUpload({
                 </>
               )}
 
-              <div
-                style={{
-                  marginTop: "auto",
-                  paddingTop: 20,
-                  borderTop: "1px solid rgba(33,30,23,0.1)",
-                  font: `400 12px/1.5 ${BODY}`,
-                  color: FAINT,
-                }}
-              >
-                <span style={{ color: MUTED, fontWeight: 500 }}>From LinkedIn:</span>{" "}
-                profile &rarr; More (&bull;&bull;&bull;), or Resources on Premium,
-                &rarr; Save to PDF.
-              </div>
-
               <input
                 ref={fileInputRef}
                 type="file"
