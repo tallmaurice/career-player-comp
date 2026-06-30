@@ -184,3 +184,12 @@ body {
 .cpc-home:hover { opacity:0.6; }
 textarea[data-rotate]::placeholder { color:#a8a090; opacity:1; transition: opacity 480ms ease; }
 textarea[data-rotate].ph-fade::placeholder { opacity:0; }
+
+/* ---- legal / static content pages (privacy, terms) -------------------- */
+.legal { font: 400 15px/1.7 var(--font-body); color: var(--muted); }
+.legal h2 { font: 600 22px var(--font-display); color: var(--ink); text-transform: uppercase; letter-spacing: 0.01em; margin: 34px 0 10px; }
+.legal p { margin: 0 0 14px; }
+.legal ul { margin: 0 0 14px; padding-left: 20px; }
+.legal li { margin: 0 0 8px; }
+.legal a { color: var(--green); }
+.legal strong { color: var(--ink); font-weight: 600; }

@@ -364,6 +364,16 @@ function Disclaimer() {
       }}
     >
       For entertainment. Not affiliated with the NBA, WNBA, or any player.
+      <div style={{ marginTop: 8 }}>
+        <a href="/privacy" style={{ color: "var(--faint)" }}>
+          Privacy
+        </a>{" "}
+        ·{" "}
+        <a href="/terms" style={{ color: "var(--faint)" }}>
+          Terms
+        </a>{" "}
+        · © 2026 Drapetomania LLC
+      </div>
     </div>
   );
 }

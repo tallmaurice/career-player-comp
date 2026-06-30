@@ -704,7 +704,7 @@ export default function CareerUpload({
             letterSpacing: "0.18em",
           }}
         >
-          [ NOTHING IS STORED · PROCESSED IN YOUR BROWSER ]
+          [ NOTHING STORED · PDF READ IN YOUR BROWSER ]
         </div>
         <div
           style={{
