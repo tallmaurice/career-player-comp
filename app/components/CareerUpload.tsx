@@ -431,9 +431,11 @@ export default function CareerUpload({
                         >
                           On a computer (linkedin.com)
                         </div>
-                        Your profile &rarr;{" "}
-                        <strong style={{ color: INK, fontWeight: 600 }}>More</strong>{" "}
-                        &rarr; Save to PDF. On{" "}
+                        Your profile &rarr; the{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          More (<span aria-hidden>&bull;&bull;&bull;</span>)
+                        </strong>{" "}
+                        button &rarr; Save to PDF. On{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>Premium</strong>,
                         it&rsquo;s under{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>Resources</strong>{" "}
