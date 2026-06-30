@@ -403,17 +403,21 @@ export default function CareerUpload({
                             marginBottom: 3,
                           }}
                         >
-                          On your phone (LinkedIn app)
+                          On your phone (iPhone)
                         </div>
-                        Your profile &rarr; the{" "}
+                        Your profile &rarr; tap{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          <span aria-hidden>&bull;&bull;&bull;</span> / Share
+                          <span aria-hidden>&bull;&bull;&bull;</span>
                         </strong>{" "}
-                        button (top right) &rarr;{" "}
+                        (top right) &rarr;{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          Share via&hellip;
+                        </strong>{" "}
+                        &rarr;{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
                           Save to Files
                         </strong>{" "}
-                        (that saves a PDF).
+                        (saves a PDF).
                       </div>
                       <div>
                         <div
