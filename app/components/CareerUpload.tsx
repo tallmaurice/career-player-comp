@@ -47,6 +47,7 @@ export default function CareerUpload({
   const [fileText, setFileText] = useState("");
   const [fileStatus, setFileStatus] = useState<FileStatus | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showPdfHelp, setShowPdfHelp] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function openPicker() {
@@ -321,54 +322,115 @@ export default function CareerUpload({
               </button>
 
               {/* LinkedIn-PDF helper — the #1 upload friction is people not
-                  finding where to export their profile as a PDF. LinkedIn labels
-                  the menu differently by account type (most: "More" / •••;
-                  Premium: "Resources"), so route both explicitly. Sits AFTER the
-                  CTA so it catches the stuck user without pushing the button
-                  down. Hidden once a file is attached (no longer needed). */}
+                  finding where to export their profile as a PDF. There are four
+                  paths (desktop/mobile x free/Premium) and LinkedIn labels them
+                  differently, which is too much to show always-on. So: a visible
+                  "Need your LinkedIn PDF?" prompt with a tappable info toggle
+                  that reveals the full matrix inline (no navigation away). Sits
+                  AFTER the CTA so it never pushes the button down; hidden once a
+                  file is attached. */}
               {!hasUsableFile && (
                 <div
                   style={{
                     alignSelf: "stretch",
-                    maxWidth: 460,
-                    borderLeft: `2px solid ${GREEN}`,
-                    paddingLeft: 13,
+                    maxWidth: 480,
                     marginBottom: "clamp(16px, 2vw, 20px)",
                   }}
                 >
-                  <div
+                  <button
+                    type="button"
+                    onClick={() => setShowPdfHelp((v) => !v)}
+                    aria-expanded={showPdfHelp}
                     style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 7,
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
                       font: `600 11px ${BODY}`,
                       letterSpacing: "0.1em",
                       textTransform: "uppercase",
                       color: GREEN,
-                      marginBottom: 7,
                     }}
                   >
+                    <span
+                      aria-hidden
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 16,
+                        height: 16,
+                        borderRadius: "50%",
+                        border: `1.5px solid ${GREEN}`,
+                        font: `700 10px ${BODY}`,
+                        lineHeight: 1,
+                      }}
+                    >
+                      i
+                    </span>
                     Need your LinkedIn PDF?
-                  </div>
-                  <div style={{ font: `400 12.5px/1.5 ${BODY}`, color: MUTED }}>
-                    Open your profile, then:
-                    <div style={{ marginTop: 5 }}>
-                      <strong style={{ color: INK, fontWeight: 600 }}>
-                        Most people:
-                      </strong>{" "}
-                      click{" "}
-                      <strong style={{ color: INK, fontWeight: 600 }}>More</strong>{" "}
-                      (the <span aria-hidden>&bull;&bull;&bull;</span> button){" "}
-                      &rarr; Save to PDF
+                    <span aria-hidden style={{ font: `600 9px ${BODY}`, opacity: 0.7 }}>
+                      {showPdfHelp ? "▲" : "▼"}
+                    </span>
+                  </button>
+
+                  {showPdfHelp && (
+                    <div
+                      style={{
+                        marginTop: 9,
+                        borderLeft: `2px solid ${GREEN}`,
+                        paddingLeft: 13,
+                        font: `400 12.5px/1.55 ${BODY}`,
+                        color: MUTED,
+                      }}
+                    >
+                      <div style={{ marginBottom: 9 }}>
+                        <div
+                          style={{
+                            font: `600 11px ${BODY}`,
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            color: INK,
+                            marginBottom: 3,
+                          }}
+                        >
+                          On your phone (LinkedIn app)
+                        </div>
+                        Your profile &rarr; the{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          <span aria-hidden>&bull;&bull;&bull;</span> / Share
+                        </strong>{" "}
+                        button (top right) &rarr;{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          Save to Files
+                        </strong>{" "}
+                        (that saves a PDF).
+                      </div>
+                      <div>
+                        <div
+                          style={{
+                            font: `600 11px ${BODY}`,
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            color: INK,
+                            marginBottom: 3,
+                          }}
+                        >
+                          On a computer (linkedin.com)
+                        </div>
+                        Your profile &rarr;{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>More</strong>{" "}
+                        &rarr; Save to PDF. On{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>Premium</strong>,
+                        it&rsquo;s under{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>Resources</strong>{" "}
+                        instead.
+                      </div>
                     </div>
-                    <div style={{ marginTop: 2 }}>
-                      <strong style={{ color: INK, fontWeight: 600 }}>
-                        On LinkedIn Premium:
-                      </strong>{" "}
-                      it&rsquo;s under{" "}
-                      <strong style={{ color: INK, fontWeight: 600 }}>
-                        Resources
-                      </strong>{" "}
-                      &rarr; Save to PDF
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
 
