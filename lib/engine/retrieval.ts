@@ -242,9 +242,18 @@ const W_ARCHETYPE = 3.0;
 const W_TRAJECTORY = 2.5;
 const W_BUILD = 2.0;
 const W_DESCRIPTOR = 1.4;
-// Prominence is a distance PENALTY per ordinal step of mismatch. This is what
-// stops a modest career from pulling the whole superstar tier.
-const W_PROMINENCE = 1.1;
+// Prominence penalty, ASYMMETRIC. A player MORE famous than the career warrants
+// (overshoot) is penalized harder than one LESS famous (undershoot). A symmetric
+// distance term treats a mid-level career as equally far from a star and a role
+// player, so it never prefers the role player — which is exactly why the model
+// kept getting handed (and picking) the famous exemplar of each archetype.
+// Overshoot-heavy weights pull a modest career's shortlist toward role/deep-cut
+// alternatives and let some magnets fall out of the 40 entirely. Genuine high-
+// prominence careers have little overshoot available, so their star comps stand.
+// Both weights stay below one archetype match (3.0), so a strong tag rhyme still
+// wins — this only decides near-ties, by fame.
+const W_PROM_OVER = 1.5;
+const W_PROM_UNDER = 0.5;
 
 function overlapCount(a: string[], b: string[]): number {
   let n = 0;
@@ -260,7 +269,8 @@ export function scorePlayer(query: CareerQuery, p: TaggedPlayer): number {
   s += W_TRAJECTORY * overlapCount(query.trajectory, t.trajectory);
   s += W_BUILD * overlapCount(query.build, t.build);
   s += W_DESCRIPTOR * overlapCount(query.descriptors, t.descriptors);
-  s -= W_PROMINENCE * Math.abs(query.prominenceLevel - prominenceOrd(t.prominence));
+  const promGap = prominenceOrd(t.prominence) - query.prominenceLevel;
+  s -= promGap > 0 ? W_PROM_OVER * promGap : W_PROM_UNDER * -promGap;
   return s;
 }
 
