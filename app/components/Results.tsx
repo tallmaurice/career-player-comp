@@ -158,15 +158,23 @@ function tightenStatus(raw: string): string {
 }
 
 // Split full_report prose into paragraphs. The contract says full_report is
-// "2-4 short paragraphs" as a single string; the export's named subsections
-// (Floor Game / Intangibles / ...) are NOT in the data, so we render plain
-// paragraphs split on blank lines (falling back to the whole string).
+// exactly 3 paragraphs as a single string. Prefer blank-line separators, but
+// the model sometimes separates paragraphs with a SINGLE newline — in that case
+// a naive blank-line split collapses the whole report into one block (the
+// "shows as one paragraph" bug). So if blank-line splitting yields a single
+// chunk but single newlines exist, fall back to splitting on those.
 function toParagraphs(text: string): string[] {
-  const parts = text
+  const byBlank = text
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
-  return parts.length ? parts : [text.trim()];
+  if (byBlank.length > 1) return byBlank;
+  const bySingle = text
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (bySingle.length > 1) return bySingle;
+  return text.trim() ? [text.trim()] : [];
 }
 
 // Escape user/model text for safe HTML interpolation in the printable report.
