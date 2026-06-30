@@ -23,7 +23,8 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { Comp, QuizAnswers } from "@/lib/types";
-import { SYSTEM_STRING, buildUserMessage, parseComp } from "@/lib/engine";
+import { SYSTEM_STRING, buildUserMessage, parseComp, PLAYER_POOL } from "@/lib/engine";
+import { retrieveCandidates } from "@/lib/engine/retrieval";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -280,18 +281,24 @@ export async function POST(req: Request): Promise<Response> {
   const timer = setTimeout(() => controller.abort(), OVERALL_TIMEOUT_MS);
 
   try {
+    // RETRIEVAL: deterministically classify this career and pick a ~40-player
+    // candidate roster that is relevant but internally varied (no API call).
+    // Only this shortlist is shown to the model — it forces variety across users
+    // (the ~12-20-names-only problem) and keeps the per-call payload small.
+    const { candidates } = retrieveCandidates(careerText, answers, PLAYER_POOL);
+
     // The balanced "best" lens: maximum accuracy AND maximum earned bite in one
     // pass (the v7 spot-check config). The system prompt makes both co-primary.
     let comp = await generateCandidate(
       anthropic,
-      buildUserMessage(careerText, answers, "best"),
+      buildUserMessage(careerText, answers, "best", candidates),
       controller.signal,
     );
     // If the first pass failed twice (rare), one fallback on the roast lens.
     if (!comp) {
       comp = await generateCandidate(
         anthropic,
-        buildUserMessage(careerText, answers, "roast"),
+        buildUserMessage(careerText, answers, "roast", candidates),
         controller.signal,
       );
     }

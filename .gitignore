@@ -29,3 +29,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CPC A/B harness outputs (raw model dumps, reconstructed old prompt)
+scripts/ab/out/

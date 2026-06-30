@@ -11,23 +11,17 @@
 
 import type { Comp, QuizAnswers } from "@/lib/types";
 import type { BadgeTier, Contract, Draft, SeasonStat } from "@/lib/types";
-import {
-  SYSTEM_PROMPT_V7,
-  PLAYER_POOL_SLOT,
-  GRADES_ADDENDUM,
-  OVR_ADDENDUM,
-  TIER1_ADDENDUM,
-  TIER2_ADDENDUM,
-  VOICE_ADDENDUM,
-  POOL_ADDENDUM,
-} from "./system-prompt";
+import { SYSTEM_PROMPT } from "./system-prompt";
+import type { PlayerTags, TaggedPlayer } from "./retrieval";
 import poolJson from "./player-pool.json";
 
 // ---- Player pool ------------------------------------------------------------
 
-/** One entry in the approved roster (player-pool-v3.json). Only `name` is
- *  load-bearing for engine validation; the rest is matching context for the
- *  model. Kept loose on purpose — the JSON is the source of truth. */
+/** One entry in the approved roster. Only `name` is load-bearing for engine
+ *  validation; the rest is matching context for the model. `tags` (added on the
+ *  rebuild-variation branch) is the controlled multi-dimensional fingerprint the
+ *  deterministic retrieval pre-filter scores on. Kept loose on purpose — the
+ *  JSON is the source of truth. */
 export interface PoolPlayer {
   name: string;
   position_era: string;
@@ -40,9 +34,10 @@ export interface PoolPlayer {
   "2k_label": string;
   comp_tone: string;
   league: string;
+  tags: PlayerTags;
 }
 
-export const PLAYER_POOL = poolJson as PoolPlayer[];
+export const PLAYER_POOL = poolJson as TaggedPlayer[];
 
 /** Lowercased set of every valid player name, for out-of-pool validation. */
 const POOL_NAMES = new Set(PLAYER_POOL.map((p) => p.name.trim().toLowerCase()));
@@ -54,22 +49,39 @@ export function isPlayerInPool(name: string): boolean {
 // ---- System string (stable, cacheable prefix) -------------------------------
 
 /**
- * The full system string: v7 prompt with the player pool injected at its slot.
- *
- * This is byte-identical across every request and every user, so it is the
- * prompt-cache prefix. NOTHING per-request (career text, answers, lens) goes
- * in here — those live in the user message after the cache breakpoint.
+ * The consolidated system prompt. On the rebuild-variation branch the 204-player
+ * pool is NO LONGER injected here — a deterministic pre-filter builds a ~40-
+ * player candidate roster per career and injects it into the USER message
+ * instead (see retrieval.ts + buildUserMessage). So this string is small and
+ * byte-identical across every request = a clean, cheap prompt-cache prefix.
  *
  * Computed once at module load.
  */
-export const SYSTEM_STRING: string =
-  SYSTEM_PROMPT_V7.replace(PLAYER_POOL_SLOT, JSON.stringify(PLAYER_POOL)) +
-  GRADES_ADDENDUM +
-  OVR_ADDENDUM +
-  TIER1_ADDENDUM +
-  TIER2_ADDENDUM +
-  VOICE_ADDENDUM +
-  POOL_ADDENDUM;
+export const SYSTEM_STRING: string = SYSTEM_PROMPT;
+
+// ---- Candidate roster injection ---------------------------------------------
+
+/** Render the per-call candidate shortlist as the roster block for the user
+ *  message. Only the fields the model needs to pick + write are included (the
+ *  controlled tags drive the pick; distinctive_detail/work_style/hook drive the
+ *  prose). Keeps the injected payload tight (~40 players, not 204). */
+export function buildRosterBlock(candidates: TaggedPlayer[]): string {
+  const slim = candidates.map((p) => ({
+    name: p.name,
+    position_era: p.position_era,
+    league: p.league,
+    archetype: p.tags.archetype,
+    build: p.tags.build,
+    trajectory: p.tags.trajectory,
+    prominence: p.tags.prominence,
+    era: p.tags.era,
+    descriptors: p.tags.descriptors,
+    hook: p.tags.hook,
+    distinctive_detail: p.distinctive_detail,
+    work_style: p.work_style,
+  }));
+  return `CANDIDATE ROSTER (${slim.length} players, pre-matched to this career — relevant but varied; assign exactly ONE, read all of them first):\n${JSON.stringify(slim)}`;
+}
 
 // ---- Lens variations for best-of-3 ------------------------------------------
 
@@ -79,13 +91,13 @@ export type Lens = "sharp" | "roast" | "pattern" | "best";
 
 const LENS_NOTE: Record<Lens, string> = {
   sharp:
-    "LENS FOR THIS PASS: precision. Find the single most exact, non-obvious player in the pool whose real arc rhymes with this career move-for-move. Land the truest read. Bite comes from accuracy.",
+    "LENS FOR THIS PASS: precision. Find the single most exact, non-obvious player on the candidate roster whose real arc rhymes with this career move-for-move. Land the truest read. Bite comes from accuracy.",
   roast:
     "LENS FOR THIS PASS: the roast. Locate the self-image gap and the one thing they half-know and have never heard said this cleanly. Push the screenshot_line to its sharpest TRUE form. Stay accurate and never cross into cruelty or the uncontrollable.",
   pattern:
     "LENS FOR THIS PASS: the pattern. Read for the recurring behavior across the whole tape — the move they keep making — and build the comp and the tendency badge around that pattern, not a single moment.",
   best:
-    "THIS IS THE ONLY PASS, so deliver the single best card on BOTH axes at once. Find the most precise, non-obvious player in the pool whose real arc rhymes with this career move-for-move, AND land the sharpest, truest, most screenshot-worthy line the tape earns. Maximum accuracy and maximum earned bite together, inside every gate, never crossing into cruelty or the uncontrollable.",
+    "THIS IS THE ONLY PASS, so deliver the single best card on BOTH axes at once. Find the most precise, non-obvious player on the candidate roster whose real arc rhymes with this career move-for-move, AND land the sharpest, truest, most screenshot-worthy line the tape earns. Maximum accuracy and maximum earned bite together, inside every gate, never crossing into cruelty or the uncontrollable.",
 };
 
 // ---- User message -----------------------------------------------------------
@@ -126,6 +138,7 @@ export function buildUserMessage(
   careerText: string,
   answers: QuizAnswers,
   lens: Lens,
+  candidates: TaggedPlayer[],
 ): string {
   const career = careerText.trim();
   const careerBlock = career
@@ -145,6 +158,8 @@ export function buildUserMessage(
     .join("\n");
 
   return [
+    buildRosterBlock(candidates),
+    "",
     careerBlock,
     "",
     "ANSWERS:",
