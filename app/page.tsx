@@ -386,6 +386,24 @@ function Disclaimer() {
 function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void }) {
   const sponsorUrl =
     "mailto:hello@careerplayercomp.com?subject=Sponsoring%20the%20scouting%20room";
+  // Pull the live "careers scouted" total for social proof — a sponsor (or big
+  // account) hitting this page mid-spike sees the demand. Hidden at 0 / on
+  // failure so it never shows a bare "0".
+  const [scoutedTotal, setScoutedTotal] = useState<number | null>(null);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/scouted")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { total?: number } | null) => {
+        if (live && d && typeof d.total === "number" && d.total > 0) {
+          setScoutedTotal(d.total);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
   return (
     <div
       className="paper-bg"
@@ -435,6 +453,31 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
         template spitting out a name. That costs real money every run, and
         today&rsquo;s scouting budget is spent. The room reopens tomorrow.
       </p>
+
+      {scoutedTotal !== null && (
+        <div style={{ marginBottom: 30, textAlign: "center" }}>
+          <div
+            style={{
+              font: "700 clamp(34px, 7vw, 46px) var(--font-display)",
+              color: "var(--green)",
+              lineHeight: 1,
+            }}
+          >
+            {scoutedTotal.toLocaleString()}
+          </div>
+          <div
+            style={{
+              font: "500 10px var(--font-mono)",
+              color: "var(--muted, #5a5347)",
+              letterSpacing: "0.28em",
+              textTransform: "uppercase",
+              marginTop: 8,
+            }}
+          >
+            Careers scouted
+          </div>
+        </div>
+      )}
 
       <div
         style={{
