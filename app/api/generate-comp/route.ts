@@ -127,6 +127,9 @@ async function checkLimits(ip: string): Promise<LimitState> {
       prefix: "cpc:ip",
     });
     const { success } = await ratelimit.limit(ip);
+    // Rate-limited requests must NOT count toward the daily cap — otherwise
+    // free 429s (one hot IP or a stuck retry loop) trip the kill-switch for everyone.
+    if (!success) return { rateLimited: true, spendExhausted: false };
 
     // Global daily spend kill-switch: a per-UTC-day counter.
     const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -234,7 +237,7 @@ function validateAnswers(a: unknown): QuizAnswers | null {
     out[k] = o[k] as string;
   }
   for (const k of ["q9", "q10"] as const) {
-    if (typeof o[k] === "string") out[k] = o[k] as string;
+    if (typeof o[k] === "string") out[k] = (o[k] as string).slice(0, 1_000);
   }
   return out as QuizAnswers;
 }
@@ -255,7 +258,9 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
 
-  const careerText = typeof body.careerText === "string" ? body.careerText : "";
+  // Cap input: LinkedIn exports run ~2-10K chars; an uncapped paste/PDF
+  // multiplies token cost up to 4x on the retry path or 400s outright.
+  const careerText = (typeof body.careerText === "string" ? body.careerText : "").slice(0, 20_000);
   const answers = validateAnswers(body.answers);
   if (!answers) {
     return Response.json(

@@ -199,7 +199,9 @@ export default function Page() {
       // auto-advance after a brief beat (BACK still works)
       window.setTimeout(() => {
         if (qIndex + 1 < TOTAL_QUESTIONS) {
-          setQIndex((i) => i + 1);
+          // Absolute, not functional: a double-tap fires two timers and both
+          // must land on the SAME next question (was skipping/crashing).
+          setQIndex(qIndex + 1);
         } else {
           setQIndex(0);
           setState((s) => ({ ...s, screen: "optional9" }));
