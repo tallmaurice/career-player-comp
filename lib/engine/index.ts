@@ -74,7 +74,8 @@ export function buildRosterBlock(candidates: TaggedPlayer[]): string {
     build: p.tags.build,
     trajectory: p.tags.trajectory,
     prominence: p.tags.prominence,
-    era: p.tags.era,
+    // era intentionally omitted: position_era already carries the decade, and
+    // tags.era is only used server-side by retrieval's variety spread.
     descriptors: p.tags.descriptors,
     hook: p.tags.hook,
     distinctive_detail: p.distinctive_detail,
@@ -111,7 +112,9 @@ const ANSWER_LABELS: Record<keyof QuizAnswers, string> = {
   q6: "SELF-IMAGE GAP",
   q7: "ENDGAME",
   q8: "MOTIVATION",
-  q9: "SECRET WEAPON (the thing nobody says out loud)",
+  // Label must NOT contain "nobody says out loud" — the prompt bans that exact
+  // phrase in output; feeding it as a label coached the leak.
+  q9: "SECRET WEAPON",
   q10: "RESUME SAFETY-NET",
 };
 

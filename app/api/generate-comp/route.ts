@@ -199,6 +199,9 @@ async function generateCandidate(
         {
           model: MODEL,
           max_tokens: GEN_MAX_TOKENS,
+          // Locked decision (build-state): low temp so same input = same comp.
+          // Was never wired in — prod ran at API default 1.0 until 2026-07-01.
+          temperature: 0.2,
           system: SYSTEM_BLOCKS,
           messages: [
             {

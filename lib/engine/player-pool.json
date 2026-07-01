@@ -438,12 +438,10 @@
   "league": "NBA",
   "tags": {
    "archetype": [
-    "facilitator",
-    "specialist"
+    "facilitator"
    ],
    "build": [
-    "craftsman",
-    "operator"
+    "craftsman"
    ],
    "trajectory": [
     "lifer",
@@ -458,7 +456,7 @@
     "elite-specialist",
     "quiet-leader"
    ],
-   "hook": "Match this player when sustained excellence in one non-glamorous skill — run the same way, every night, for two decades — produces all-time records with zero flash and zero rings."
+   "hook": "The comp for two decades in one organization running the same narrow craft to all-time-record volume with zero titles — the gates are one-org tenure, record-setting output in a single skill, and the missing ring; not the comp for everyday quiet excellence."
   }
  },
  {
@@ -522,12 +520,10 @@
   "league": "NBA",
   "tags": {
    "archetype": [
-    "anchor",
-    "specialist"
+    "anchor"
    ],
    "build": [
-    "glue",
-    "craftsman"
+    "glue"
    ],
    "trajectory": [
     "lifer",
@@ -542,7 +538,7 @@
     "locker-room-glue",
     "won-it-all"
    ],
-   "hook": "Match this player when the career outlasts the playing value and the final years are spent as the unofficial keeper of institutional standards — undrafted, local, and irreplaceable not because of what they do on the floor but because of what they hold together off it."
+   "hook": "The comp for the undrafted hometown lifer who stayed two decades in one building and spent the final third barely playing while keeping the standards — the gate is the long past-peak last chapter inside the same institution, not general locker-room value."
   }
  },
  {
@@ -737,10 +733,9 @@
     "craftsman"
    ],
    "trajectory": [
-    "slow-climb",
-    "franchise-architect"
+    "slow-climb"
    ],
-   "prominence": "role",
+   "prominence": "star",
    "era": "2010s",
    "descriptors": [
     "coach-on-floor",
@@ -782,14 +777,13 @@
     "reinventor",
     "chased-the-ring"
    ],
-   "prominence": "role",
+   "prominence": "star",
    "era": "2010s",
    "descriptors": [
     "clutch",
     "defensive-stopper",
     "won-it-all",
-    "quiet-leader",
-    "overlooked"
+    "quiet-leader"
    ],
    "hook": "The comp for a former star who deliberately shrank their role and got rewarded for it in the biggest moment — ego subordinated to winning, peak came off the bench."
   }
@@ -861,8 +855,7 @@
     "operator"
    ],
    "trajectory": [
-    "steady-prime",
-    "chased-the-ring"
+    "steady-prime"
    ],
    "prominence": "starter",
    "era": "2010s",
@@ -872,7 +865,7 @@
     "won-it-all",
     "defensive-stopper"
    ],
-   "hook": "The comp for a genuinely selfless two-way contributor who keeps accepting a smaller role on better teams — respected everywhere, never the headline, always the reason it works."
+   "hook": "The comp for the two-way piece contenders keep trading for — imported mid-career, twice, as the final piece of someone else's title core; the gate is being acquired for the last mile, not self-reported selflessness."
   }
  },
  {
@@ -1063,18 +1056,16 @@
     "glue"
    ],
    "trajectory": [
-    "steady-prime",
-    "late-bloomer"
+    "steady-prime"
    ],
    "prominence": "starter",
    "era": "2010s",
    "descriptors": [
     "longevity",
-    "iron-man",
     "won-it-all",
     "quiet-leader"
    ],
-   "hook": "The comp for the reliable professional who did everything right for over a decade and finally got the ring in their late thirties — patience and consistency as the whole arc."
+   "hook": "The comp for the high-pedigree seventeen-year starter whose ring finally arrives at thirty-eight in a visibly reduced role — the gates are the late payoff AND the role shrink that bought it, not a decade of doing things right."
   }
  },
  {
@@ -2818,9 +2809,11 @@
     "one-team-loyal",
     "quiet-leader",
     "longevity",
-    "coach-on-floor"
+    "coach-on-floor",
+    "won-it-all",
+    "high-pedigree"
    ],
-   "hook": "The comp for a low-ego floor general who made institutional continuity a career identity — two decades in one place, running the offense, holding it together without drama."
+   "hook": "The comp for a #1-pedigree floor general who ran one franchise for two full decades and won everything available while doing it — the gates are extreme single-org tenure PLUS titles at every level, not drama-free steadiness."
   }
  },
  {
@@ -3465,7 +3458,6 @@
    "era": "current",
    "descriptors": [
     "overlooked",
-    "one-team-loyal",
     "coach-on-floor"
    ],
    "hook": "Match for a career that started with draft-day doubts and a mid-career trade before emerging as an elite orchestrator who elevates everyone around them — the value is in what the team becomes, not personal numbers."
@@ -4720,10 +4712,9 @@
     "operator"
    ],
    "trajectory": [
-    "lifer",
     "steady-prime"
    ],
-   "prominence": "role",
+   "prominence": "star",
    "era": "80s",
    "descriptors": [
     "won-it-all",
@@ -4731,7 +4722,7 @@
     "longevity",
     "quiet-leader"
    ],
-   "hook": "The comp for a career where the defining trait was simply never wearing out — a steady complementary anchor who outlasted every contemporary and accumulated rings by being the unflashy constant."
+   "hook": "The comp for the nine-time All-Star third option who played a record twenty-one seasons and aged slower than every flashier teammate — the gates are two-plus decades of elite durability AND star-level production in a deliberately unglamorous lane, not long tenure alone."
   }
  },
  {
@@ -6864,11 +6855,9 @@
     "specialist"
    ],
    "build": [
-    "craftsman",
     "glue"
    ],
    "trajectory": [
-    "lifer",
     "steady-prime"
    ],
    "prominence": "role",
@@ -6876,10 +6865,9 @@
    "descriptors": [
     "iron-man",
     "won-it-all",
-    "longevity",
-    "one-team-loyal"
+    "longevity"
    ],
-   "hook": "The comp for a career where availability itself was the superpower — not explosive, not a headliner — but the record-setter who showed up every single night for sixteen seasons and made that reliability the entire professional identity."
+   "hook": "The comp for a career whose defining fact is a literal unbroken streak — sixteen seasons without missing a single game, in a supporting role on great teams; the gate is the attendance record itself, not general reliability."
   }
  },
  {
@@ -7236,10 +7224,10 @@
    "era": "2010s",
    "descriptors": [
     "quiet-leader",
-    "overlooked",
-    "longevity"
+    "longevity",
+    "won-it-all"
    ],
-   "hook": "The comp for a career defined by absolute mastery of one thing — pure facilitation — where the stats are historic but the name never became the story, because the story was always everyone else."
+   "hook": "The comp for historic pure facilitation — record assist numbers, a title, and a name that stayed smaller than the people it set up; the gate is measurable enablement at record scale, not team-first temperament."
   }
  },
  {
@@ -7967,11 +7955,9 @@
   "league": "NBA",
   "tags": {
    "archetype": [
-    "specialist",
-    "anchor"
+    "specialist"
    ],
    "build": [
-    "craftsman",
     "operator"
    ],
    "trajectory": [
@@ -7982,7 +7968,7 @@
    "era": "90s",
    "descriptors": [
     "one-team-loyal",
-    "defensive-anchor",
+    "defensive-stopper",
     "quiet-leader",
     "coach-on-floor"
    ],
