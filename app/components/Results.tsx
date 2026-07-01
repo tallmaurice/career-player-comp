@@ -49,7 +49,7 @@ const CONTACT_URL =
 // URI-Too-Long on a long full_report. So we build the card URL from ONLY the
 // fields the image uses — full_report and the other unrendered prose are
 // dropped from the payload, which keeps the URL short and well under any limit.
-// (base64url encoder mirrors encodeComp() in app/page.tsx.)
+// (UTF-8-safe base64url so /api/card can decode it straight off the query.)
 function encodeCardComp(comp: Comp): string {
   const slim = {
     player_name: comp.player_name,
@@ -305,16 +305,16 @@ export default function Results({
   onHome,
   tipUrl,
   scoutedNumber,
-}: // cardImageUrl is still part of ResultsProps (and passed by page.tsx), but we
-// no longer read it here: the card URL is now derived from a slim, 414-safe
-// payload below (see cardUrl / encodeCardComp).
-ResultsProps) {
+}: ResultsProps) {
   // Match the desktop vs 390px mobile artboard with one component, flipping live
   // across the shared 768px breakpoint (see @/lib/useIsMobile).
   const isMobile = useIsMobile();
   // After Share fires, the tip copy softens from the long pitch to the short
   // post-share line (mirrors the export's data-tip-target / .tip-soft swap).
   const [shared, setShared] = useState(false);
+  // Desktop clipboard fallback feedback: swap the Share label to "Link copied ✓"
+  // for a beat (the copy is otherwise invisible to the user).
+  const [copied, setCopied] = useState(false);
 
   const badges = comp.badges.slice(0, 3);
   const reportParagraphs = toParagraphs(comp.full_report);
@@ -325,8 +325,8 @@ ResultsProps) {
     status: tightenStatus(comp.stat_line.contract_status),
   };
 
-  // Build the card-image URLs from the SLIM payload (see encodeCardComp), not the
-  // full-comp `cardImageUrl` prop, so a long full_report can't 414 the GET.
+  // Build the card-image URLs from the SLIM payload (see encodeCardComp), never
+  // the full comp, so a long full_report can't 414 the GET.
   // STORY (tall) is what users download/share as a file — it fits the full card
   // (badges, contract, draft) without the feed's 1200x630 overflow. FEED (wide)
   // is only the OG/link-preview image when sharing the URL itself.
@@ -432,8 +432,10 @@ ResultsProps) {
             return;
           }
         }
-      } catch {
-        // file share unsupported or cancelled — try URL share next
+      } catch (err) {
+        // User dismissed the share sheet: done — don't open a second one.
+        if (err instanceof Error && err.name === "AbortError") return;
+        // file share unsupported — try URL share next
       }
       // 2) Share the absolute card URL as a link (feed = the wide OG preview).
       try {
@@ -443,8 +445,9 @@ ResultsProps) {
           url: new URL(cardUrlFeed, window.location.origin).toString(),
         });
         return;
-      } catch {
-        // cancelled or failed — fall through to copy/download
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
+        // failed — fall through to copy/download
       }
     }
 
@@ -453,6 +456,8 @@ ResultsProps) {
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(absolute);
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 2000);
         return;
       }
     } catch {
@@ -559,7 +564,7 @@ ResultsProps) {
               gap: 30,
             }}
           >
-            <CardTilt />
+            <CardTilt comp={comp} badges={badges} stat={stat} />
             {/* standout line / pull quote = screenshot_line */}
             <div style={{ maxWidth: 560, textAlign: "center" }}>
               <div
@@ -757,7 +762,7 @@ ResultsProps) {
                   flex: 1,
                 }}
               >
-                Share Report &nbsp;&rarr;
+                {copied ? "Link copied ✓" : <>Share Report &nbsp;&rarr;</>}
               </button>
               <button
                 type="button"
@@ -984,7 +989,7 @@ ResultsProps) {
         </div>
 
         {/* hero tilt card — FIRST on mobile (card before the scout's words) */}
-        <CardTilt mobile />
+        <CardTilt comp={comp} badges={badges} stat={stat} mobile />
 
         {/* standout line / pull quote = screenshot_line */}
         <div style={{ padding: "0 22px 4px", textAlign: "center" }}>
@@ -1133,7 +1138,7 @@ ResultsProps) {
               width: "100%",
             }}
           >
-            Share Report &nbsp;&rarr;
+            {copied ? "Link copied ✓" : <>Share Report &nbsp;&rarr;</>}
           </button>
           <button
             type="button"
@@ -1307,351 +1312,364 @@ ResultsProps) {
       </div>
     );
   }
+}
 
-  // ---------------------------------------------------------------------------
-  // The hero tilt paper-card. Pointer- and touch-driven 3D tilt via useTilt;
-  // the on-screen card keeps the grain/tilt/noise the satori card route can't
-  // render. `mobile` toggles the smaller artboard's font sizes/padding.
-  // ---------------------------------------------------------------------------
-  function CardTilt({ mobile = false }: { mobile?: boolean }) {
-    // Pointer + touch tilt, reduced-motion-aware. The resting lean
-    // (rotateX(-5deg) rotateY(8deg)) and the eased snap-back live in .tilt-card.
-    const { wrapRef, cardRef } = useTilt();
+// ---------------------------------------------------------------------------
+// The hero tilt paper-card. Pointer- and touch-driven 3D tilt via useTilt;
+// the on-screen card keeps the grain/tilt/noise the satori card route can't
+// render. `mobile` toggles the smaller artboard's font sizes/padding.
+// Module scope on purpose: declared inside Results it was re-created on every
+// render, so any parent state change (e.g. Share/Download flipping `shared`)
+// remounted it and replayed the OVR count-up + intro tilt.
+// ---------------------------------------------------------------------------
+function CardTilt({
+  comp,
+  badges,
+  stat,
+  mobile = false,
+}: {
+  comp: Comp;
+  badges: Badge[];
+  stat: { seasons: string; teams: string; pivots: string; status: string };
+  mobile?: boolean;
+}) {
+  // Pointer + touch tilt, reduced-motion-aware. The resting lean
+  // (rotateX(-5deg) rotateY(8deg)) and the eased snap-back live in .tilt-card.
+  const { wrapRef, cardRef } = useTilt();
 
-    // OVR count-up reveal: the hero number ticks 0 -> comp.ovr on mount (the 2K
-    // "player reveal" beat). Reduced-motion users get the final number instantly.
-    // The satori download card always uses the static comp.ovr, so this is purely
-    // on-screen and never affects the saved image.
-    const [shownOvr, setShownOvr] = useState(0);
-    useEffect(() => {
-      const reduce =
-        typeof window !== "undefined" &&
-        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-      if (reduce) {
-        setShownOvr(comp.ovr);
-        return;
+  // OVR count-up reveal: the hero number ticks 0 -> comp.ovr on mount (the 2K
+  // "player reveal" beat). Reduced-motion users get the final number instantly.
+  // The satori download card always uses the static comp.ovr, so this is purely
+  // on-screen and never affects the saved image.
+  const [shownOvr, setShownOvr] = useState(0);
+  useEffect(() => {
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setShownOvr(comp.ovr);
+      return;
+    }
+    let raf = 0;
+    let start = 0;
+    const dur = 1000;
+    const tick = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min(1, (ts - start) / dur);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      setShownOvr(Math.round(eased * comp.ovr));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Contract display: "$142M · 4 YRS" on the value line, descriptor as the note.
+  const c = comp.contract ?? { value: "", years: "", descriptor: "" };
+  const yrs = c.years
+    ? /^\d+$/.test(c.years.trim())
+      ? `${c.years.trim()} YRS`
+      : c.years.trim().toUpperCase()
+    : "";
+  const contractValue = [c.value, yrs].filter(Boolean).join(" · ");
+  const contractNote = c.descriptor ?? "";
+
+  return (
+    <div
+      className="tilt-wrap"
+      ref={wrapRef}
+      style={
+        mobile
+          ? { padding: "16px 22px 22px" }
+          : { display: "flex", justifyContent: "center", alignItems: "flex-start" }
       }
-      let raf = 0;
-      let start = 0;
-      const dur = 1000;
-      const tick = (ts: number) => {
-        if (!start) start = ts;
-        const p = Math.min(1, (ts - start) / dur);
-        const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
-        setShownOvr(Math.round(eased * comp.ovr));
-        if (p < 1) raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-      return () => cancelAnimationFrame(raf);
-    }, []);
-
-    // Contract display: "$142M · 4 YRS" on the value line, descriptor as the note.
-    const c = comp.contract ?? { value: "", years: "", descriptor: "" };
-    const yrs = c.years
-      ? /^\d+$/.test(c.years.trim())
-        ? `${c.years.trim()} YRS`
-        : c.years.trim().toUpperCase()
-      : "";
-    const contractValue = [c.value, yrs].filter(Boolean).join(" · ");
-    const contractNote = c.descriptor ?? "";
-
-    return (
+    >
       <div
-        className="tilt-wrap"
-        ref={wrapRef}
-        style={
-          mobile
-            ? { padding: "16px 22px 22px" }
-            : { display: "flex", justifyContent: "center", alignItems: "flex-start" }
-        }
+        ref={cardRef}
+        className="tilt-card paper-card"
+        style={mobile ? { padding: "26px 22px" } : { width: 580, padding: "44px 42px" }}
       >
+        <div className="stamp" style={mobile ? { top: 12, right: 12 } : undefined}>
+          <span className="dept">SCOUTING DEPT.</span>
+          <span className="cls">{mobile ? "CLASS A" : "CLASS A · CONFIDENTIAL"}</span>
+        </div>
+
         <div
-          ref={cardRef}
-          className="tilt-card paper-card"
-          style={mobile ? { padding: "26px 22px" } : { width: 580, padding: "44px 42px" }}
+          className="layer-z1"
+          style={{
+            font: mobile
+              ? "500 9px 'JetBrains Mono', monospace"
+              : "500 10px 'JetBrains Mono', monospace",
+            letterSpacing: mobile ? "0.2em" : "0.22em",
+            color: "#6b655a",
+            marginBottom: mobile ? 12 : 14,
+          }}
         >
-          <div className="stamp" style={mobile ? { top: 12, right: 12 } : undefined}>
-            <span className="dept">SCOUTING DEPT.</span>
-            <span className="cls">{mobile ? "CLASS A" : "CLASS A · CONFIDENTIAL"}</span>
-          </div>
+          [ SCOUTING REPORT ]
+        </div>
 
+        <div
+          className="layer-z1 file-no"
+          style={mobile ? { marginBottom: 16, fontSize: 9 } : { marginBottom: 22 }}
+        >
+          FILE No. 2026-4471
+        </div>
+
+        {/* player_name + OVR/POT hero badge (2K-style overall rating) */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: mobile ? 12 : 20,
+            marginBottom: mobile ? 8 : 10,
+          }}
+        >
           <div
-            className="layer-z1"
+            className="layer-z3"
             style={{
               font: mobile
-                ? "500 9px 'JetBrains Mono', monospace"
-                : "500 10px 'JetBrains Mono', monospace",
-              letterSpacing: mobile ? "0.2em" : "0.22em",
-              color: "#6b655a",
-              marginBottom: mobile ? 12 : 14,
-            }}
-          >
-            [ SCOUTING REPORT ]
-          </div>
-
-          <div
-            className="layer-z1 file-no"
-            style={mobile ? { marginBottom: 16, fontSize: 9 } : { marginBottom: 22 }}
-          >
-            FILE No. 2026-4471
-          </div>
-
-          {/* player_name + OVR/POT hero badge (2K-style overall rating) */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: mobile ? 12 : 20,
-              marginBottom: mobile ? 8 : 10,
-            }}
-          >
-            <div
-              className="layer-z3"
-              style={{
-                font: mobile
-                  ? "700 44px/0.92 'Barlow Condensed'"
-                  : "700 76px/0.92 'Barlow Condensed'",
-                color: "#211e17",
-                textTransform: "uppercase",
-                letterSpacing: "-0.008em",
-                flex: 1,
-                minWidth: 0,
-              }}
-            >
-              {comp.player_name}
-            </div>
-            <div
-              className="layer-z3"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                flexShrink: 0,
-              }}
-            >
-              <div
-                style={{
-                  font: mobile
-                    ? "700 42px/0.86 'Barlow Condensed'"
-                    : "700 68px/0.86 'Barlow Condensed'",
-                  color: "#2f6043",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {shownOvr}
-              </div>
-              <div
-                style={{
-                  font: mobile
-                    ? "500 9px 'JetBrains Mono', monospace"
-                    : "500 11px 'JetBrains Mono', monospace",
-                  color: "#6b655a",
-                  letterSpacing: "0.24em",
-                  marginTop: mobile ? 1 : 2,
-                }}
-              >
-                OVR
-              </div>
-              <div
-                style={{
-                  font: mobile
-                    ? "500 8px 'JetBrains Mono', monospace"
-                    : "500 10px 'JetBrains Mono', monospace",
-                  color: "#a8a090",
-                  letterSpacing: "0.14em",
-                  marginTop: mobile ? 3 : 5,
-                }}
-              >
-                POT {comp.pot}
-              </div>
-            </div>
-          </div>
-
-          {/* position_era */}
-          <div
-            className="layer-z2"
-            style={{
-              font: mobile
-                ? "500 10px 'JetBrains Mono', monospace"
-                : "500 12px 'JetBrains Mono', monospace",
-              color: "#6b655a",
-              letterSpacing: "0.16em",
-              marginBottom: mobile ? 14 : 26,
-            }}
-          >
-            {comp.position_era}
-          </div>
-
-          {/* archetype_title */}
-          <div
-            className="layer-z2"
-            style={{
-              font: mobile
-                ? "600 17px 'Barlow Condensed'"
-                : "600 26px 'Barlow Condensed'",
-              color: "#2f6043",
-              letterSpacing: "0.04em",
+                ? "700 44px/0.92 'Barlow Condensed'"
+                : "700 76px/0.92 'Barlow Condensed'",
+              color: "#211e17",
               textTransform: "uppercase",
-              marginBottom: mobile ? 14 : 22,
+              letterSpacing: "-0.008em",
+              flex: 1,
+              minWidth: 0,
             }}
           >
-            {comp.archetype_title}
+            {comp.player_name}
           </div>
-
-          <div
-            style={{
-              height: 1,
-              background: "rgba(47,96,67,0.32)",
-              marginBottom: mobile ? 14 : 24,
-            }}
-          />
-
-          {/* badges — color-coded by category (see BADGE_COLOR) */}
           <div
             className="layer-z3"
             style={{
               display: "flex",
-              gap: mobile ? 5 : 8,
-              marginBottom: mobile ? 16 : 26,
-              flexWrap: "wrap",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              flexShrink: 0,
             }}
           >
-            {badges.map((b: Badge, i) => {
-              const c = BADGE_COLOR[b.category];
-              const rank = TIER_RANK[b.tier] ?? 2;
-              return (
-                <span
-                  key={i}
-                  title={`${b.tier} · ${b.earned_by}`}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: mobile ? 5 : 6,
-                    font: mobile
-                      ? "500 9px 'JetBrains Mono', monospace"
-                      : "500 11px 'JetBrains Mono', monospace",
-                    letterSpacing: mobile ? "0.14em" : "0.16em",
-                    padding: mobile ? "5px 8px" : "7px 11px",
-                    background: mobile ? undefined : `${c}0f`, // ~6% tint on desktop
-                    border: `1px solid ${c}`,
-                    color: c,
-                    borderRadius: 3,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {b.label}
-                  <span style={{ display: "inline-flex", gap: 2 }}>
-                    {[0, 1, 2, 3].map((p) => (
-                      <span
-                        key={p}
-                        style={{
-                          width: mobile ? 3 : 4,
-                          height: mobile ? 3 : 4,
-                          borderRadius: "50%",
-                          background: p < rank ? c : "transparent",
-                          border: `1px solid ${c}`,
-                          opacity: p < rank ? 1 : 0.35,
-                        }}
-                      />
-                    ))}
-                  </span>
-                </span>
-              );
-            })}
+            <div
+              style={{
+                font: mobile
+                  ? "700 42px/0.86 'Barlow Condensed'"
+                  : "700 68px/0.86 'Barlow Condensed'",
+                color: "#2f6043",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {shownOvr}
+            </div>
+            <div
+              style={{
+                font: mobile
+                  ? "500 9px 'JetBrains Mono', monospace"
+                  : "500 11px 'JetBrains Mono', monospace",
+                color: "#6b655a",
+                letterSpacing: "0.24em",
+                marginTop: mobile ? 1 : 2,
+              }}
+            >
+              OVR
+            </div>
+            <div
+              style={{
+                font: mobile
+                  ? "500 8px 'JetBrains Mono', monospace"
+                  : "500 10px 'JetBrains Mono', monospace",
+                color: "#a8a090",
+                letterSpacing: "0.14em",
+                marginTop: mobile ? 3 : 5,
+              }}
+            >
+              POT {comp.pot}
+            </div>
           </div>
+        </div>
 
-          {/* card_summary — prints ON the card (desktop only, per export) */}
-          {!mobile && (
-            <>
-              <div
-                className="layer-z1"
+        {/* position_era */}
+        <div
+          className="layer-z2"
+          style={{
+            font: mobile
+              ? "500 10px 'JetBrains Mono', monospace"
+              : "500 12px 'JetBrains Mono', monospace",
+            color: "#6b655a",
+            letterSpacing: "0.16em",
+            marginBottom: mobile ? 14 : 26,
+          }}
+        >
+          {comp.position_era}
+        </div>
+
+        {/* archetype_title */}
+        <div
+          className="layer-z2"
+          style={{
+            font: mobile
+              ? "600 17px 'Barlow Condensed'"
+              : "600 26px 'Barlow Condensed'",
+            color: "#2f6043",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            marginBottom: mobile ? 14 : 22,
+          }}
+        >
+          {comp.archetype_title}
+        </div>
+
+        <div
+          style={{
+            height: 1,
+            background: "rgba(47,96,67,0.32)",
+            marginBottom: mobile ? 14 : 24,
+          }}
+        />
+
+        {/* badges — color-coded by category (see BADGE_COLOR) */}
+        <div
+          className="layer-z3"
+          style={{
+            display: "flex",
+            gap: mobile ? 5 : 8,
+            marginBottom: mobile ? 16 : 26,
+            flexWrap: "wrap",
+          }}
+        >
+          {badges.map((b: Badge, i) => {
+            const c = BADGE_COLOR[b.category];
+            const rank = TIER_RANK[b.tier] ?? 2;
+            return (
+              <span
+                key={i}
+                title={`${b.tier} · ${b.earned_by}`}
                 style={{
-                  font: "400 14px/1.6 'Inter'",
-                  color: "#4a463d",
-                  marginBottom: 26,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: mobile ? 5 : 6,
+                  font: mobile
+                    ? "500 9px 'JetBrains Mono', monospace"
+                    : "500 11px 'JetBrains Mono', monospace",
+                  letterSpacing: mobile ? "0.14em" : "0.16em",
+                  padding: mobile ? "5px 8px" : "7px 11px",
+                  background: mobile ? undefined : `${c}0f`, // ~6% tint on desktop
+                  border: `1px solid ${c}`,
+                  color: c,
+                  borderRadius: 3,
+                  textTransform: "uppercase",
                 }}
               >
-                {comp.card_summary}
-              </div>
-              <div
-                style={{
-                  height: 1,
-                  background: "rgba(33,30,23,0.12)",
-                  marginBottom: 20,
-                }}
-              />
-            </>
-          )}
-          {mobile && (
-            <>
-              <div
-                className="layer-z1"
-                style={{
-                  font: "400 12.5px/1.6 'Inter'",
-                  color: "#4a463d",
-                  marginBottom: 16,
-                }}
-              >
-                {comp.card_summary}
-              </div>
-              <div
-                style={{
-                  height: 1,
-                  background: "rgba(33,30,23,0.12)",
-                  marginBottom: 12,
-                }}
-              />
-            </>
-          )}
+                {b.label}
+                <span style={{ display: "inline-flex", gap: 2 }}>
+                  {[0, 1, 2, 3].map((p) => (
+                    <span
+                      key={p}
+                      style={{
+                        width: mobile ? 3 : 4,
+                        height: mobile ? 3 : 4,
+                        borderRadius: "50%",
+                        background: p < rank ? c : "transparent",
+                        border: `1px solid ${c}`,
+                        opacity: p < rank ? 1 : 0.35,
+                      }}
+                    />
+                  ))}
+                </span>
+              </span>
+            );
+          })}
+        </div>
 
-          {/* stat_line — 4 cols: SEASONS / TEAMS / PIVOTS / STATUS */}
+        {/* card_summary — prints ON the card (desktop only, per export) */}
+        {!mobile && (
+          <>
+            <div
+              className="layer-z1"
+              style={{
+                font: "400 14px/1.6 'Inter'",
+                color: "#4a463d",
+                marginBottom: 26,
+              }}
+            >
+              {comp.card_summary}
+            </div>
+            <div
+              style={{
+                height: 1,
+                background: "rgba(33,30,23,0.12)",
+                marginBottom: 20,
+              }}
+            />
+          </>
+        )}
+        {mobile && (
+          <>
+            <div
+              className="layer-z1"
+              style={{
+                font: "400 12.5px/1.6 'Inter'",
+                color: "#4a463d",
+                marginBottom: 16,
+              }}
+            >
+              {comp.card_summary}
+            </div>
+            <div
+              style={{
+                height: 1,
+                background: "rgba(33,30,23,0.12)",
+                marginBottom: 12,
+              }}
+            />
+          </>
+        )}
+
+        {/* stat_line — 4 cols: SEASONS / TEAMS / PIVOTS / STATUS */}
+        <div
+          className="layer-z2"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4,1fr)",
+            gap: mobile ? 8 : 14,
+          }}
+        >
+          <StatCell label={mobile ? "SEAS" : "SEASONS"} value={stat.seasons} mobile={mobile} />
+          <StatCell label="TEAMS" value={stat.teams} mobile={mobile} />
+          <StatCell label="PIVOTS" value={stat.pivots} mobile={mobile} />
+          <StatCell label="STATUS" value={stat.status} mobile={mobile} accent />
+        </div>
+
+        {/* contract value + draft slot (Tier 1 on-card enrichment) */}
+        {(comp.contract?.value || comp.draft?.pick) && (
           <div
             className="layer-z2"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4,1fr)",
+              gridTemplateColumns: "1fr 1fr",
               gap: mobile ? 8 : 14,
+              marginTop: mobile ? 12 : 16,
+              paddingTop: mobile ? 12 : 16,
+              borderTop: "1px solid rgba(33,30,23,0.1)",
             }}
           >
-            <StatCell label={mobile ? "SEAS" : "SEASONS"} value={stat.seasons} mobile={mobile} />
-            <StatCell label="TEAMS" value={stat.teams} mobile={mobile} />
-            <StatCell label="PIVOTS" value={stat.pivots} mobile={mobile} />
-            <StatCell label="STATUS" value={stat.status} mobile={mobile} accent />
+            <DealCell
+              label="CONTRACT"
+              value={contractValue}
+              note={contractNote}
+              mobile={mobile}
+            />
+            <DealCell
+              label="DRAFT"
+              value={comp.draft?.pick ?? ""}
+              note={comp.draft?.note ?? ""}
+              mobile={mobile}
+              accent
+            />
           </div>
-
-          {/* contract value + draft slot (Tier 1 on-card enrichment) */}
-          {(comp.contract?.value || comp.draft?.pick) && (
-            <div
-              className="layer-z2"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: mobile ? 8 : 14,
-                marginTop: mobile ? 12 : 16,
-                paddingTop: mobile ? 12 : 16,
-                borderTop: "1px solid rgba(33,30,23,0.1)",
-              }}
-            >
-              <DealCell
-                label="CONTRACT"
-                value={contractValue}
-                note={contractNote}
-                mobile={mobile}
-              />
-              <DealCell
-                label="DRAFT"
-                value={comp.draft?.pick ?? ""}
-                note={comp.draft?.note ?? ""}
-                mobile={mobile}
-                accent
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 // ---- small presentational helpers -------------------------------------------

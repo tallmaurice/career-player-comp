@@ -84,19 +84,17 @@ export function buildRosterBlock(candidates: TaggedPlayer[]): string {
   return `CANDIDATE ROSTER (${slim.length} players, pre-matched to this career — relevant but varied; assign exactly ONE, read all of them first):\n${JSON.stringify(slim)}`;
 }
 
-// ---- Lens variations for best-of-3 ------------------------------------------
+// ---- Lens variations ---------------------------------------------------------
 
 /** A generation lens. Steers emphasis without changing the task or the schema.
- *  Lives in the user message so the cached system prefix never varies. */
-export type Lens = "sharp" | "roast" | "pattern" | "best";
+ *  Lives in the user message so the cached system prefix never varies. The
+ *  route uses "best" (the single pass) with "roast" as the retry fallback;
+ *  the old best-of-3 lenses ("sharp"/"pattern") were removed as dead code. */
+export type Lens = "roast" | "best";
 
 const LENS_NOTE: Record<Lens, string> = {
-  sharp:
-    "LENS FOR THIS PASS: precision. Find the single most exact, non-obvious player on the candidate roster whose real arc rhymes with this career move-for-move. Land the truest read. Bite comes from accuracy.",
   roast:
     "LENS FOR THIS PASS: the roast. Locate the self-image gap and the one thing they half-know and have never heard said this cleanly. Push the screenshot_line to its sharpest TRUE form. Stay accurate and never cross into cruelty or the uncontrollable.",
-  pattern:
-    "LENS FOR THIS PASS: the pattern. Read for the recurring behavior across the whole tape — the move they keep making — and build the comp and the tendency badge around that pattern, not a single moment.",
   best:
     "THIS IS THE ONLY PASS, so deliver the single best card on BOTH axes at once. Find the most precise, non-obvious player on the candidate roster whose real arc rhymes with this career move-for-move, AND land the sharpest, truest, most screenshot-worthy line the tape earns. Maximum accuracy and maximum earned bite together, inside every gate, never crossing into cruelty or the uncontrollable.",
 };

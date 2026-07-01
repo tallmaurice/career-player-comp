@@ -14,7 +14,8 @@
 // for no quality gain we'd validated. So v1 ships single-pass: fast, cheap, and
 // exactly what we tested. Best-of-3 can return later on a plan with more time.
 //
-// Caching: the system string (v7 prompt + injected pool) is byte-identical
+// Caching: the system string (the v7 prompt alone, ~13k tokens — the candidate
+// roster is injected per-request into the USER message) is byte-identical
 // across every request, so it is the prompt-cache prefix — marked with
 // cache_control: ephemeral. Per-request content lives after the breakpoint.
 //
@@ -29,9 +30,10 @@ import { retrieveCandidates } from "@/lib/engine/retrieval";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 // Vercel function budget. On the Pro plan the ceiling is 300s; we set 120 so a
-// COLD-cache run (the ~204-player pool makes the system prompt ~60k input
-// tokens, and a cold ephemeral cache must prefill all of it before generating —
-// the real cause of the "scout took too long" timeouts) has ample headroom.
+// COLD-cache run (the system prompt is ~13k input tokens now that the pool
+// moved to a per-request roster in the user message, but a cold ephemeral cache
+// must still prefill all of it before generating — historically the cause of
+// the "scout took too long" timeouts at ~60k) has ample headroom.
 // Warm-cache runs (steady traffic) finish far faster; this is just the ceiling.
 export const maxDuration = 120;
 
@@ -53,14 +55,14 @@ const OVERALL_TIMEOUT_MS = 105_000;
 const PER_IP_LIMIT = 5; // requests
 const PER_IP_WINDOW = "1 h" as const;
 // Global daily kill-switch: max non-bypass generations per UTC day — the hard
-// ceiling on a runaway bill. Worst-case cost per comp ≈ $0.20 (cold prefill);
-// far less warm, and the rebuild shrank the prompt so real cost is lower still.
-// So worst-case daily spend ≈ this count × ~$0.20. To set a $ ceiling:
-// count = $ / 0.20.
+// ceiling on a runaway bill. Cost per comp ≈ $0.06 warm / ≈ $0.13 cold (the
+// ~13k-token cached system prompt is the swing between the two).
+// So worst-case daily spend ≈ this count × ~$0.13. To set a $ ceiling:
+// count = $ / 0.13.
 // LAUNCH WEEK (set 2026-06-30, bumped 2500→5000 the night before launch so a
 // viral spike — e.g. a radio mention — isn't cut off mid-moment). Worst case
-// (all cold) ≈ $1000, but warm launch traffic runs ~$0.08-0.12/comp so realistic
-// spend is ~$400-600. REVISIT after this week (Maurice) — drop back down once the
+// (all cold) ≈ $650; warm launch traffic runs ~$0.06/comp so realistic spend is
+// well under that. REVISIT after this week (Maurice) — drop back down once the
 // spike passes. When this trips, the front end shows the branded "scouts are out"
 // page (sponsor + tip).
 const DAILY_SPEND_CAP = 5000;
@@ -82,13 +84,13 @@ const SYSTEM_BLOCKS: Anthropic.TextBlockParam[] = [
   {
     type: "text",
     text: SYSTEM_STRING,
-    // 1-hour cache TTL (vs the 5-minute default). Keeps the ~60k-token system
+    // 1-hour cache TTL (vs the 5-minute default). Keeps the ~13k-token system
     // prompt warm for a full hour after each comp, so sporadic launch traffic
     // (people trickling in minutes-to-an-hour apart) gets a cheap cache read
-    // (~$0.04) instead of a fresh cold write (~$0.20). The 1h write costs 2x vs
-    // the 5m write's 1.25x, so a truly isolated comp is slightly pricier, but
-    // any clustering within the hour wins big; the daily spend cap bounds the
-    // downside either way.
+    // (comp ≈ $0.06 warm) instead of a fresh cold write (≈ $0.13). The 1h write
+    // costs 2x vs the 5m write's 1.25x, so a truly isolated comp is slightly
+    // pricier, but any clustering within the hour wins big; the daily spend cap
+    // bounds the downside either way.
     cache_control: { type: "ephemeral", ttl: "1h" },
   },
 ];

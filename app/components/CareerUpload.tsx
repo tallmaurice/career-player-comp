@@ -35,14 +35,19 @@ const MONO = "'JetBrains Mono', monospace";
 const DISPLAY = "'Barlow Condensed'";
 const BODY = "'Inter'";
 
-// File-extraction status, shown on the "ADDED" chip.
-type FileStatus = "reading" | "ok" | "thin" | "error";
+// File-extraction status, shown on the "ADDED" chip. "notpdf" = a non-PDF was
+// dropped/selected (never extracted; steer to the paste path).
+type FileStatus = "reading" | "ok" | "thin" | "error" | "notpdf";
 
 export default function CareerUpload({
   onContinue,
   onHome,
+  initialText,
 }: CareerUploadProps) {
-  const [pasteText, setPasteText] = useState("");
+  // Prefill with any career text already captured this session (BACK from Q1
+  // lands here), so the earlier paste/extraction isn't silently wiped and the
+  // Continue CTA stays available.
+  const [pasteText, setPasteText] = useState(initialText ?? "");
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileText, setFileText] = useState("");
   const [fileStatus, setFileStatus] = useState<FileStatus | null>(null);
@@ -74,7 +79,14 @@ export default function CareerUpload({
     // PDF only. Extraction happens here, in the browser.
     const isPdf =
       file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-    if (!isPdf) return;
+    if (!isPdf) {
+      // Not a PDF (drag-and-drop skips the picker's accept filter): surface it
+      // on the chip instead of silently ignoring the drop.
+      setFileName(file.name);
+      setFileText("");
+      setFileStatus("notpdf");
+      return;
+    }
 
     setFileName(file.name);
     setFileStatus("reading");
@@ -403,9 +415,9 @@ export default function CareerUpload({
                             marginBottom: 3,
                           }}
                         >
-                          On your phone (iPhone)
+                          On your phone
                         </div>
-                        Your profile &rarr; tap{" "}
+                        iPhone: Your profile &rarr; tap{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
                           <span aria-hidden>&bull;&bull;&bull;</span>
                         </strong>{" "}
@@ -417,7 +429,19 @@ export default function CareerUpload({
                         <strong style={{ color: INK, fontWeight: 600 }}>
                           Save to Files
                         </strong>{" "}
-                        (saves a PDF).
+                        (saves a PDF). On Android, use the same{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          <span aria-hidden>&bull;&bull;&bull;</span>
+                        </strong>{" "}
+                        menu:{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          Share via
+                        </strong>{" "}
+                        &rarr;{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          Save as PDF
+                        </strong>
+                        .
                       </div>
                       <div>
                         <div
@@ -464,7 +488,7 @@ export default function CareerUpload({
                       borderLeft:
                         fileStatus === "ok"
                           ? `3px solid ${GREEN}`
-                          : fileStatus === "thin" || fileStatus === "error"
+                          : fileStatus === "thin" || fileStatus === "error" || fileStatus === "notpdf"
                             ? "3px solid #bd5024"
                             : "1px solid rgba(33,30,23,0.16)",
                       borderRadius: 4,
@@ -482,7 +506,7 @@ export default function CareerUpload({
                         background: "transparent",
                       }}
                     >
-                      PDF
+                      {fileStatus === "notpdf" ? "FILE" : "PDF"}
                     </div>
                     <div
                       style={{
@@ -546,8 +570,8 @@ export default function CareerUpload({
                     </button>
                   </div>
 
-                  {/* thin / failed extraction: steer to the paste box (Option B) */}
-                  {(fileStatus === "thin" || fileStatus === "error") && (
+                  {/* thin / failed / non-PDF: steer to the paste box (Option B) */}
+                  {(fileStatus === "thin" || fileStatus === "error" || fileStatus === "notpdf") && (
                     <div
                       style={{
                         marginTop: 10,
@@ -557,7 +581,9 @@ export default function CareerUpload({
                     >
                       {fileStatus === "thin"
                         ? "We couldn't pull readable text from that PDF (it may be scanned or image-only). "
-                        : "Something went wrong reading that PDF. "}
+                        : fileStatus === "notpdf"
+                          ? "PDF only — that file won't work. "
+                          : "Something went wrong reading that PDF. "}
                       Paste your work history in the box on the right instead.
                     </div>
                   )}

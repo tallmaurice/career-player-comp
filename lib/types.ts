@@ -184,6 +184,9 @@ export interface CareerUploadProps {
    *  screen the wordmark doubles as back (its only nav was a return to
    *  landing), so a dedicated onBack is no longer needed. */
   onHome: () => void;
+  /** Career text already captured this session (set when BACK from Q1 returns
+   *  here). Prefills the paste box so the earlier input isn't silently lost. */
+  initialText?: string;
 }
 
 /** The shape of one multiple-choice quiz question. */
@@ -236,8 +239,6 @@ export interface ResultsProps {
   onHome: () => void;
   /** Stripe Payment Link (external URL) for the tip. */
   tipUrl: string;
-  /** URL of the server-rendered card PNG for native share + download. */
-  cardImageUrl: string;
   /** This user's ordinal in the running "careers scouted" count (social proof).
    *  Omitted when the counter isn't available (no Redis configured). */
   scoutedNumber?: number;

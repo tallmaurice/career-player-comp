@@ -49,19 +49,6 @@ const INITIAL: AppState = {
   result: null,
 };
 
-/** base64url-encode the comp so /api/card can render it without any storage.
- *  Runs only on the client (it builds the Results share URL after interaction). */
-function encodeComp(comp: Comp): string {
-  const json = JSON.stringify(comp);
-  // UTF-8 safe base64 (handles é, ·, ñ, etc. in player names/prose), then URL-safe.
-  const b64 = btoa(
-    encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (_, h) =>
-      String.fromCharCode(parseInt(h, 16)),
-    ),
-  );
-  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
 export default function Page() {
   const [state, setState] = useState<AppState>(INITIAL);
   // 0..7 while in the quiz; which question is showing.
@@ -247,6 +234,7 @@ export default function Page() {
         <CareerUpload
           onContinue={onUploadContinue}
           onHome={onHome}
+          initialText={state.careerText}
         />
       );
 
@@ -343,7 +331,6 @@ export default function Page() {
             onAppeal={reset}
             onHome={onHome}
             tipUrl={TIP_URL}
-            cardImageUrl={`/api/card?format=feed&data=${encodeComp(state.result)}`}
             scoutedNumber={state.scouted}
           />
           <Disclaimer />

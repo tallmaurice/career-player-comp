@@ -72,6 +72,8 @@ body {
 /* ---- typewriter caret (verbatim) --------------------------------------- */
 @keyframes caretBlink { 50% { opacity:0; } }
 .tw-caret { display:inline-block; width:9px; height:20px; background:#2f6043; vertical-align:-4px; margin-left:4px; animation: caretBlink 1s steps(1) infinite; }
+/* must come AFTER the base rule above (same specificity) to win the cascade */
+@media (prefers-reduced-motion: reduce) { .tw-caret { animation:none; } }
 
 /* ---- upload drop zone / paste area (verbatim) -------------------------- */
 .drop-zone { transition: border-color 140ms ease, background 140ms ease; cursor:pointer; }
@@ -182,8 +184,7 @@ body {
    to the landing screen and resets the flow (onHome). */
 .cpc-home { transition: opacity 120ms ease; cursor:pointer; }
 .cpc-home:hover { opacity:0.6; }
-textarea[data-rotate]::placeholder { color:#a8a090; opacity:1; transition: opacity 480ms ease; }
-textarea[data-rotate].ph-fade::placeholder { opacity:0; }
+textarea[data-rotate]::placeholder { color:#a8a090; opacity:1; }
 
 /* ---- legal / static content pages (privacy, terms) -------------------- */
 .legal { font: 400 15px/1.7 var(--font-body); color: var(--muted); }

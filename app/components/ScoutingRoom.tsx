@@ -151,10 +151,29 @@ export default function ScoutingRoom(_props: ScoutingRoomProps) {
           </g>
         </svg>
 
-        <div className="sr-line" style={{ color: "var(--ink)" }} aria-live="polite">
+        {/* The typewriter mutates every 30-58ms — far too chatty for a live
+            region — so it's hidden from screen readers and the static
+            visually-hidden line below announces instead. */}
+        <div className="sr-line" style={{ color: "var(--ink)" }} aria-hidden="true">
           <span>{text}</span>
           <span className="tw-caret" />
         </div>
+        <span
+          role="status"
+          style={{
+            position: "absolute",
+            width: 1,
+            height: 1,
+            margin: -1,
+            padding: 0,
+            overflow: "hidden",
+            clip: "rect(0 0 0 0)",
+            whiteSpace: "nowrap",
+            border: 0,
+          }}
+        >
+          The scout is reading your career.
+        </span>
 
         <div className="sr-note" style={{ color: "#6b655a" }}>
           A real scout is reading your whole career, not spitting out a

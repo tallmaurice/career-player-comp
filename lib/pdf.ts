@@ -55,5 +55,3 @@ export async function extractPdfText(file: File): Promise<ExtractResult> {
 
   return { text, usable: text.length >= MIN_USEFUL_CHARS };
 }
-
-export { MIN_USEFUL_CHARS };
