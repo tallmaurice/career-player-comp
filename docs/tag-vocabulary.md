@@ -90,8 +90,14 @@ discriminates nothing. These match résumé keywords + the sharper quiz signals.
 
 ## `hook` (freeform, ONE sentence)
 What makes THIS player a specific comp — the structural rhyme a career must
-match to earn them. Example (Battier): "The unselfish role player whose value is
-invisible in the box score and obvious to everyone he plays with."
+match to earn them. The hook must carry a CONSTRAINING career-shape condition,
+never a universally flattering pitch: a hook like "value invisible in the box
+score" with no gate matches every underrated career and turns the player into a
+pool magnet (this is exactly how Battier over-fired at launch). Example
+(Battier, post-audit): "The comp for a high-pedigree specialist who joins teams
+that are already good and does the specific unglamorous work that tips them to
+great — the credentialed final piece who chose winning over numbers, not the
+overlooked grinder."
 
 ---
 

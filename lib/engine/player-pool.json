@@ -677,8 +677,8 @@
   "altitude": "role",
   "temperament": "specialist",
   "arc": "steady-prime",
-  "distinctive_detail": "The no-stats All-Star: contributed almost entirely in ways the box score missed, doing the unselfish dirty work that made good teams great.",
-  "work_style": "Took the hard defensive assignment and made the smart play, valuable precisely because his impact was invisible.",
+  "distinctive_detail": "The no-stats All-Star: a decorated top-10 pick who turned himself into the final piece of championship teams, contributing almost entirely in ways the box score missed.",
+  "work_style": "Took the hard defensive assignment and made the smart play, the trusted last piece on teams already built to win.",
   "career_traits": [
    "high-IQ fitter",
    "value off the box score",
@@ -690,27 +690,23 @@
   "league": "NBA",
   "tags": {
    "archetype": [
-    "specialist",
-    "anchor"
+    "specialist"
    ],
    "build": [
-    "glue",
-    "craftsman"
+    "glue"
    ],
    "trajectory": [
-    "steady-prime",
-    "org-capped"
+    "steady-prime"
    ],
    "prominence": "role",
    "era": "2000s",
    "descriptors": [
     "won-it-all",
     "defensive-stopper",
-    "overlooked",
     "locker-room-glue",
     "high-pedigree"
    ],
-   "hook": "Match this player when the value is almost entirely off the box score — a high-IQ complement whose contribution is invisible in the stats but makes every team measurably better, valued more by analytics than by narrative."
+   "hook": "The comp for a high-pedigree specialist who joins teams that are already good and does the specific unglamorous work that tips them to great — the credentialed final piece who chose winning over numbers, not the overlooked grinder."
   }
  },
  {
