@@ -417,20 +417,18 @@ export default function CareerUpload({
                         >
                           On your phone
                         </div>
-                        The LinkedIn app is a dead end here: no PDF export,
-                        and it won&rsquo;t even let you copy text. What works:{" "}
+                        The LinkedIn app is a dead end here (no PDF export,
+                        no copying text). Best move on a phone:{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          type your history straight into the box
+                          upload a r&eacute;sum&eacute; PDF you already have
                         </strong>{" "}
-                        (Title, Company, Years is plenty), copy it from{" "}
+                        &mdash; the fuller the r&eacute;sum&eacute;, the deeper
+                        the report. In a pinch,{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          linkedin.com in your browser
-                        </strong>{" "}
-                        (text is copyable there, unlike the app), or upload{" "}
-                        <strong style={{ color: INK, fontWeight: 600 }}>
-                          any r&eacute;sum&eacute; PDF
-                        </strong>{" "}
-                        you already have.
+                          type your history into the box
+                        </strong>
+                        : the scout reads whatever you give it, so more detail
+                        means a sharper read.
                       </div>
                       <div>
                         <div
