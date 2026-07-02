@@ -37,7 +37,7 @@ const BODY = "'Inter'";
 
 // File-extraction status, shown on the "ADDED" chip. "notpdf" = a non-PDF was
 // dropped/selected (never extracted; steer to the paste path).
-type FileStatus = "reading" | "ok" | "thin" | "error" | "notpdf";
+type FileStatus = "reading" | "ok" | "thin" | "error" | "notpdf" | "olddoc";
 
 export default function CareerUpload({
   onContinue,
@@ -76,15 +76,21 @@ export default function CareerUpload({
   async function handleFiles(files: FileList | null) {
     const file = files?.[0];
     if (!file) return;
-    // PDF only. Extraction happens here, in the browser.
-    const isPdf =
-      file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-    if (!isPdf) {
-      // Not a PDF (drag-and-drop skips the picker's accept filter): surface it
-      // on the chip instead of silently ignoring the drop.
+    // PDF, Word (.docx), or plain text. Extraction happens here, in the browser.
+    const name = file.name.toLowerCase();
+    const isPdf = file.type === "application/pdf" || name.endsWith(".pdf");
+    const isDocx =
+      name.endsWith(".docx") ||
+      file.type ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    const isTxt = name.endsWith(".txt") || file.type === "text/plain";
+    if (!isPdf && !isDocx && !isTxt) {
+      // Unsupported (drag-and-drop skips the picker's accept filter): surface it
+      // on the chip instead of silently ignoring the drop. Legacy binary .doc
+      // gets its own message — no reliable browser parser exists for it.
       setFileName(file.name);
       setFileText("");
-      setFileStatus("notpdf");
+      setFileStatus(name.endsWith(".doc") ? "olddoc" : "notpdf");
       return;
     }
 
@@ -92,7 +98,11 @@ export default function CareerUpload({
     setFileStatus("reading");
     setFileText("");
     try {
-      const { text, usable } = await extractPdfText(file);
+      const { text, usable } = isPdf
+        ? await extractPdfText(file)
+        : isDocx
+          ? await (await import("@/lib/docx")).extractDocxText(file)
+          : await (await import("@/lib/docx")).extractTxtText(file);
       if (usable) {
         setFileText(text);
         setFileStatus("ok");
@@ -297,8 +307,8 @@ export default function CareerUpload({
                   marginBottom: "clamp(16px, 2vw, 22px)",
                 }}
               >
-                Drop a PDF here, or use the button below. PDF only. A résumé or
-                a LinkedIn export both work.
+                Drop a file here, or use the button below. PDF, Word (.docx),
+                or plain text. A résumé or a LinkedIn export both work.
               </div>
 
               {/* explicit, obvious upload button — so the zone isn't an invisible
@@ -420,7 +430,7 @@ export default function CareerUpload({
                         The LinkedIn app is a dead end here (no PDF export,
                         no copying text). Best move on a phone:{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          upload a r&eacute;sum&eacute; PDF you already have
+                          upload a r&eacute;sum&eacute; you already have (PDF or Word)
                         </strong>{" "}
                         &mdash; the fuller the r&eacute;sum&eacute;, the deeper
                         the report. In a pinch,{" "}
@@ -475,7 +485,7 @@ export default function CareerUpload({
                       borderLeft:
                         fileStatus === "ok"
                           ? `3px solid ${GREEN}`
-                          : fileStatus === "thin" || fileStatus === "error" || fileStatus === "notpdf"
+                          : fileStatus === "thin" || fileStatus === "error" || fileStatus === "notpdf" || fileStatus === "olddoc"
                             ? "3px solid #bd5024"
                             : "1px solid rgba(33,30,23,0.16)",
                       borderRadius: 4,
@@ -493,7 +503,13 @@ export default function CareerUpload({
                         background: "transparent",
                       }}
                     >
-                      {fileStatus === "notpdf" ? "FILE" : "PDF"}
+                      {fileStatus === "notpdf" || fileStatus === "olddoc"
+                        ? "FILE"
+                        : fileName?.toLowerCase().endsWith(".docx")
+                          ? "DOCX"
+                          : fileName?.toLowerCase().endsWith(".txt")
+                            ? "TXT"
+                            : "PDF"}
                     </div>
                     <div
                       style={{
@@ -558,7 +574,7 @@ export default function CareerUpload({
                   </div>
 
                   {/* thin / failed / non-PDF: steer to the paste box (Option B) */}
-                  {(fileStatus === "thin" || fileStatus === "error" || fileStatus === "notpdf") && (
+                  {(fileStatus === "thin" || fileStatus === "error" || fileStatus === "notpdf" || fileStatus === "olddoc") && (
                     <div
                       style={{
                         marginTop: 10,
@@ -567,11 +583,13 @@ export default function CareerUpload({
                       }}
                     >
                       {fileStatus === "thin"
-                        ? "We couldn't pull readable text from that PDF (it may be scanned or image-only). "
+                        ? "We couldn't pull readable text from that file (it may be scanned or image-only). "
                         : fileStatus === "notpdf"
-                          ? "PDF only — that file won't work. "
-                          : "Something went wrong reading that PDF. "}
-                      Paste your work history in the box on the right instead.
+                          ? "That file type won't work — PDF, Word (.docx), or plain text only. "
+                          : fileStatus === "olddoc"
+                            ? "That's the old Word format (.doc) — re-save it as .docx or PDF first. "
+                            : "Something went wrong reading that file. "}
+                      Or paste your work history in the box on the right instead.
                     </div>
                   )}
                 </>
@@ -580,7 +598,7 @@ export default function CareerUpload({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="application/pdf,.pdf"
+                accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt,text/plain"
                 onChange={(e) => handleFiles(e.target.files)}
                 style={{ display: "none" }}
               />
