@@ -417,31 +417,17 @@ export default function CareerUpload({
                         >
                           On your phone
                         </div>
-                        iPhone: Your profile &rarr; tap{" "}
+                        The LinkedIn app can&rsquo;t export the PDF (Share
+                        via&hellip; only shares a link). Fastest on a phone:{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          <span aria-hidden>&bull;&bull;&bull;</span>
+                          paste your work history
                         </strong>{" "}
-                        &rarr;{" "}
+                        instead, or upload{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          Share via&hellip;
+                          any r&eacute;sum&eacute; PDF
                         </strong>{" "}
-                        &rarr;{" "}
-                        <strong style={{ color: INK, fontWeight: 600 }}>
-                          Save to Files
-                        </strong>{" "}
-                        (saves a PDF). On Android, use the same{" "}
-                        <strong style={{ color: INK, fontWeight: 600 }}>
-                          <span aria-hidden>&bull;&bull;&bull;</span>
-                        </strong>{" "}
-                        menu:{" "}
-                        <strong style={{ color: INK, fontWeight: 600 }}>
-                          Share via
-                        </strong>{" "}
-                        &rarr;{" "}
-                        <strong style={{ color: INK, fontWeight: 600 }}>
-                          Save as PDF
-                        </strong>
-                        .
+                        you already have. The real export lives on a computer
+                        (below).
                       </div>
                       <div>
                         <div
