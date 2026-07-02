@@ -417,17 +417,20 @@ export default function CareerUpload({
                         >
                           On your phone
                         </div>
-                        The LinkedIn app can&rsquo;t export the PDF (Share
-                        via&hellip; only shares a link). Fastest on a phone:{" "}
+                        The LinkedIn app is a dead end here: no PDF export,
+                        and it won&rsquo;t even let you copy text. What works:{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
-                          paste your work history
+                          type your history straight into the box
                         </strong>{" "}
-                        instead, or upload{" "}
+                        (Title, Company, Years is plenty), copy it from{" "}
+                        <strong style={{ color: INK, fontWeight: 600 }}>
+                          linkedin.com in your browser
+                        </strong>{" "}
+                        (text is copyable there, unlike the app), or upload{" "}
                         <strong style={{ color: INK, fontWeight: 600 }}>
                           any r&eacute;sum&eacute; PDF
                         </strong>{" "}
-                        you already have. The real export lives on a computer
-                        (below).
+                        you already have.
                       </div>
                       <div>
                         <div
