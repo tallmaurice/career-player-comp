@@ -223,7 +223,7 @@ function LandingDesktop({
               <span style={{ color: "#211e17", fontWeight: 500 }}>
                 Private by default.
               </span>{" "}
-              Your PDF is read in your browser. We store none of it.
+              Your info is read in your browser. We store none of it.
             </div>
           </div>
           <div
@@ -713,7 +713,7 @@ function LandingMobile({
             <span style={{ color: "#211e17", fontWeight: 500 }}>
               Private by default.
             </span>{" "}
-            Your PDF is read in your browser. We store none of it.
+            Your info is read in your browser. We store none of it.
           </div>
         </div>
       </div>

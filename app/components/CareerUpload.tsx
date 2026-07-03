@@ -340,7 +340,7 @@ export default function CareerUpload({
                 <span aria-hidden style={{ font: `600 14px ${BODY}`, lineHeight: 1 }}>
                   {hasUsableFile ? "↻" : "↑"}
                 </span>
-                {hasUsableFile ? "Choose a different file" : "Choose PDF file"}
+                {hasUsableFile ? "Choose a different file" : "Choose file"}
               </button>
 
               {/* LinkedIn-PDF helper — the #1 upload friction is people not
