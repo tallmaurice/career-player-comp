@@ -83,7 +83,11 @@ export default function CareerUpload({
       name.endsWith(".docx") ||
       file.type ===
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    const isTxt = name.endsWith(".txt") || file.type === "text/plain";
+    const isTxt =
+      name.endsWith(".txt") ||
+      name.endsWith(".md") ||
+      file.type === "text/plain" ||
+      file.type === "text/markdown";
     if (!isPdf && !isDocx && !isTxt) {
       // Unsupported (drag-and-drop skips the picker's accept filter): surface it
       // on the chip instead of silently ignoring the drop. Legacy binary .doc
@@ -308,7 +312,7 @@ export default function CareerUpload({
                 }}
               >
                 Drop a file here, or use the button below. PDF, Word (.docx),
-                or plain text. A résumé or a LinkedIn export both work.
+                .txt, or .md. A résumé or a LinkedIn export both work.
               </div>
 
               {/* explicit, obvious upload button — so the zone isn't an invisible
@@ -509,7 +513,9 @@ export default function CareerUpload({
                           ? "DOCX"
                           : fileName?.toLowerCase().endsWith(".txt")
                             ? "TXT"
-                            : "PDF"}
+                            : fileName?.toLowerCase().endsWith(".md")
+                              ? "MD"
+                              : "PDF"}
                     </div>
                     <div
                       style={{
@@ -585,7 +591,7 @@ export default function CareerUpload({
                       {fileStatus === "thin"
                         ? "We couldn't pull readable text from that file (it may be scanned or image-only). "
                         : fileStatus === "notpdf"
-                          ? "That file type won't work — PDF, Word (.docx), or plain text only. "
+                          ? "That file type won't work — PDF, Word (.docx), .txt, or .md only. "
                           : fileStatus === "olddoc"
                             ? "That's the old Word format (.doc) — re-save it as .docx or PDF first. "
                             : "Something went wrong reading that file. "}
@@ -598,7 +604,7 @@ export default function CareerUpload({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt,text/plain"
+                accept="application/pdf,.pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt,text/plain,.md,text/markdown"
                 onChange={(e) => handleFiles(e.target.files)}
                 style={{ display: "none" }}
               />
