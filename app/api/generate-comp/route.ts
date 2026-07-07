@@ -133,6 +133,17 @@ async function checkLimits(ip: string): Promise<LimitState> {
     // free 429s (one hot IP or a stuck retry loop) trip the kill-switch for everyone.
     if (!success) return { rateLimited: true, spendExhausted: false };
 
+    // Balance-flip: Anthropic balance can't be read via API, so this anchors to
+    // a known point instead — 2026-07-07 10:30am ET: 11,016 total scouted with
+    // $336.91 of credits left. At ~9.5c/run, ~13,500 total = ~$100 remaining.
+    // Trips the same scouts-out flow as the daily cap. Raise after refunding.
+    const BUDGET_FLIP_TOTAL = 13500;
+    const totalRaw = await redis.get<number | string | null>("cpc:scouted:total");
+    const totalNow = typeof totalRaw === "number" ? totalRaw : Number(totalRaw ?? 0);
+    if (Number.isFinite(totalNow) && totalNow >= BUDGET_FLIP_TOTAL) {
+      return { rateLimited: false, spendExhausted: true };
+    }
+
     // Global daily spend kill-switch: a per-UTC-day counter.
     const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const spendKey = `cpc:spend:${day}`;
