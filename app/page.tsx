@@ -580,6 +580,37 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
         </div>
       </div>
 
+      <div
+        style={{
+          marginTop: 26,
+          font: "500 11px var(--font-mono)",
+          color: "var(--muted, #5a5347)",
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          lineHeight: 2,
+        }}
+      >
+        The room is closed. The tape is still running:
+        <br />
+        <a
+          href="https://x.com/careerplayrcomp"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "var(--green)", fontWeight: 700, textDecoration: "none" }}
+        >
+          @careerplayrcomp on X
+        </a>
+        {" \u00b7 "}
+        <a
+          href="https://instagram.com/careerplayercomp"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "var(--green)", fontWeight: 700, textDecoration: "none" }}
+        >
+          @careerplayercomp on IG
+        </a>
+      </div>
+
       <button
         type="button"
         onClick={onReset}
