@@ -65,7 +65,7 @@ const PER_IP_WINDOW = "1 h" as const;
 // well under that. REVISIT after this week (Maurice) — drop back down once the
 // spike passes. When this trips, the front end shows the branded "scouts are out"
 // page (sponsor + tip).
-const DAILY_SPEND_CAP = 5000;
+const DAILY_SPEND_CAP = 10000;
 // IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
 const BYPASS_IPS = new Set(
   (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
