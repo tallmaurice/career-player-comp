@@ -238,9 +238,61 @@ async function generateCandidate(
 
 // ---- Handler ----------------------------------------------------------------
 
+// ---- Paid skip-the-line pass (Stripe Checkout session ID as single-use token) ----
+// Verify with Stripe (paid + livemode), reject if already burned in Redis.
+// The pass is BURNED only after a successful generation (see the 200 return),
+// so a failed run never eats a $2 payment. A used pass silently falls through
+// to the normal free-tier limits instead of erroring.
+async function passRedis() {
+  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
+  const { Redis } = await import("@upstash/redis");
+  return new Redis({ url, token });
+}
+
+async function verifyPass(sessionId: string): Promise<boolean> {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return false;
+  try {
+    const redis = await passRedis();
+    if (!redis) return false;
+    const used = await redis.get(`cpc:pass:${sessionId}`);
+    if (used) return false;
+    const res = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+      { headers: { Authorization: `Bearer ${key}` } },
+    );
+    if (!res.ok) return false;
+    const sess = (await res.json()) as {
+      payment_status?: string;
+      livemode?: boolean;
+    };
+    return sess.payment_status === "paid" && sess.livemode === true;
+  } catch {
+    return false;
+  }
+}
+
+async function burnPass(sessionId: string): Promise<void> {
+  try {
+    const redis = await passRedis();
+    if (redis) {
+      await redis.set(`cpc:pass:${sessionId}`, "used", {
+        nx: true,
+        ex: 60 * 60 * 24 * 30,
+      });
+    }
+  } catch {
+    // A burn failure risks one extra free run for a paid user; acceptable.
+  }
+}
+
 interface RequestBody {
   careerText?: unknown;
   answers?: unknown;
+  paidSession?: unknown;
 }
 
 function validateAnswers(a: unknown): QuizAnswers | null {
@@ -288,7 +340,18 @@ export async function POST(req: Request): Promise<Response> {
 
   // ---- Limits ----
   const ip = clientIp(req);
-  const { rateLimited, spendExhausted } = await checkLimits(ip);
+  // A verified, unused $2 pass bypasses both the per-IP limiter and the
+  // free-budget kill-switches for exactly one run.
+  const paidSessionRaw =
+    typeof body.paidSession === "string" ? body.paidSession.slice(0, 200) : "";
+  const paidSession = /^cs_[A-Za-z0-9_]+$/.test(paidSessionRaw)
+    ? paidSessionRaw
+    : "";
+  const paidPass = paidSession ? await verifyPass(paidSession) : false;
+
+  const { rateLimited, spendExhausted } = paidPass
+    ? { rateLimited: false, spendExhausted: false }
+    : await checkLimits(ip);
   if (spendExhausted) {
     // Global daily cap tripped -> the branded "scouts are out for the day" page.
     return Response.json(
@@ -342,6 +405,9 @@ export async function POST(req: Request): Promise<Response> {
       );
     }
     const scouted = await recordScouted(ip);
+    if (paidPass && paidSession) {
+      await burnPass(paidSession);
+    }
     return Response.json(
       { comp, scouted: scouted ?? undefined },
       { status: 200 },

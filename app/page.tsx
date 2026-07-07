@@ -38,6 +38,7 @@ import Results from "./components/Results";
 const TOTAL_QUESTIONS = QUESTIONS.length; // 8
 const AUTO_ADVANCE_MS = 320; // brief pause so the "[ SELECTED ]" state registers
 const MIN_LOADING_MS = 3000; // hold the scouting-room theater at least this long
+const SKIP_URL = "https://buy.stripe.com/fZu8wQaOh9cL0Ooepb0Jq01";
 const TIP_URL =
   process.env.NEXT_PUBLIC_STRIPE_TIP_URL ??
   "https://buy.stripe.com/3cIeVe09Ddt1dBadl70Jq00";
@@ -57,6 +58,19 @@ export default function Page() {
   // When the global daily spend cap trips, the API returns reason:"daily_cap";
   // we render the branded "scouts are out" page instead of the retry screen.
   const [errorReason, setErrorReason] = useState<string | null>(null);
+
+  // $2 skip-the-line pass: Stripe redirects back with ?paid=cs_... — capture
+  // it (ref feeds the generate call; state shows the banner), then clean the URL.
+  const paidRef = useRef<string | null>(null);
+  const [paidBanner, setPaidBanner] = useState(false);
+  useEffect(() => {
+    const sid = new URLSearchParams(window.location.search).get("paid");
+    if (sid && /^cs_[A-Za-z0-9_]+$/.test(sid)) {
+      paidRef.current = sid;
+      setPaidBanner(true);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   // Guard so React 18 StrictMode double-invoke doesn't fire two generations.
   const generatingRef = useRef(false);
@@ -109,6 +123,7 @@ export default function Page() {
         body: JSON.stringify({
           careerText: state.careerText,
           answers: state.answers,
+          paidSession: paidRef.current,
         }),
       });
 
@@ -220,9 +235,39 @@ export default function Page() {
 
   // ---- render ---------------------------------------------------------------
 
+  // Paid-pass reassurance strip: shows after the Stripe redirect until the
+  // report generates, so the buyer knows the $2 registered.
+  const banner = paidBanner ? (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        background: "var(--green)",
+        color: "#f1ece0",
+        font: "600 12px var(--font-mono)",
+        letterSpacing: "0.12em",
+        textTransform: "uppercase",
+        textAlign: "center",
+        padding: "9px 12px",
+      }}
+    >
+      Paid pass active &mdash; the scout is ready when you are
+    </div>
+  ) : null;
+
+  const screenFor = (node: React.ReactNode) => (
+    <>
+      {banner}
+      {node}
+    </>
+  );
+
   switch (state.screen) {
     case "landing":
-      return (
+      return screenFor(
         <>
           <Landing onStart={onStart} onHome={onHome} />
           <Disclaimer />
@@ -304,7 +349,7 @@ export default function Page() {
       // the branded "scouts are out for the day" page (tip + sponsor).
       if (error) {
         if (errorReason === "daily_cap") {
-          return <ScoutsOut tipUrl={TIP_URL} onReset={reset} />;
+          return <ScoutsOut tipUrl={TIP_URL} skipUrl={SKIP_URL} onReset={reset} />;
         }
         return (
           <RetryScreen
@@ -407,7 +452,15 @@ function Disclaimer() {
 // spend cap trips. Honest scarcity in the scout's voice (every report is a real
 // AI read, which costs real money), converting to the tip jar ("another round")
 // and the #1 sponsor inventory ("keep the room open"). Not a fake apology.
-function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void }) {
+function ScoutsOut({
+  tipUrl,
+  skipUrl,
+  onReset,
+}: {
+  tipUrl: string;
+  skipUrl: string;
+  onReset: () => void;
+}) {
   const sponsorUrl =
     "mailto:hello@careerplayercomp.com?subject=Sponsoring%20the%20scouting%20room";
   // Pull the live "careers scouted" total for social proof — a sponsor (or big
@@ -466,7 +519,7 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
           marginBottom: 20,
         }}
       >
-        The scouts are out for the day.
+        The free scouts are out for the day.
       </div>
       <p
         style={{
@@ -478,7 +531,8 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
       >
         Every report here is a real AI scout reading your whole career, not a
         template spitting out a name. That costs real money every run, and
-        today&rsquo;s scouting budget is spent. The room reopens tomorrow.
+        today&rsquo;s free scouting budget is spent. The room reopens for free
+        tomorrow.
       </p>
 
       {scoutedTotal !== null && (
@@ -534,11 +588,36 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
         }}
       >
         <a
-          href={sponsorUrl}
+          href={skipUrl}
           className="cta-green"
           style={{
             background: "var(--green)",
             color: "#f1ece0",
+            padding: "15px 18px",
+            borderRadius: 10,
+            font: "600 15px var(--font-body)",
+            textDecoration: "none",
+          }}
+        >
+          Get your report anyway &mdash; $2
+        </a>
+        <div
+          style={{
+            font: "400 12.5px/1.5 var(--font-body)",
+            color: "var(--muted, #5a5347)",
+            marginBottom: 16,
+          }}
+        >
+          Two bucks covers your read and helps keep the free room open for the
+          next person.
+        </div>
+        <a
+          href={sponsorUrl}
+          className="cta-green"
+          style={{
+            background: "transparent",
+            border: "1.5px solid var(--green)",
+            color: "var(--green)",
             textDecoration: "none",
             padding: "17px 24px",
             font: "700 14px var(--font-body)",
