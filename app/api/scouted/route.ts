@@ -1,7 +1,7 @@
 // =============================================================================
 // GET /api/scouted  — the public "careers scouted" total (landing social proof)
 //
-// Returns: 200 { total: number }   total >= 0
+// Returns: 200 { total: number, today: number }   both >= 0\n// today = runs so far this UTC day (reads the existing cpc:spend:<day> counter)
 //
 // Reads the global Redis counter `cpc:scouted:total` that /api/generate-comp
 // INCRs on every successful comp (see recordScouted there). Read-only: it never
@@ -23,16 +23,26 @@ export async function GET(): Promise<Response> {
   const token =
     process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
   if (!url || !token) {
-    return Response.json({ total: 0 }, { status: 200 });
+    return Response.json({ total: 0, today: 0 }, { status: 200 });
   }
 
   try {
     const { Redis } = await import("@upstash/redis");
     const redis = new Redis({ url, token });
-    const raw = await redis.get<number | string | null>("cpc:scouted:total");
-    const total = typeof raw === "number" ? raw : Number(raw ?? 0);
+    // Today's velocity: the per-UTC-day run counter that /api/generate-comp
+    // already INCRs for the daily spend cap. Read-only here; ~= scouts today.
+    const day = new Date().toISOString().slice(0, 10);
+    const [rawTotal, rawToday] = await redis.mget<(number | string | null)[]>(
+      "cpc:scouted:total",
+      `cpc:spend:${day}`,
+    );
+    const total = typeof rawTotal === "number" ? rawTotal : Number(rawTotal ?? 0);
+    const today = typeof rawToday === "number" ? rawToday : Number(rawToday ?? 0);
     return Response.json(
-      { total: Number.isFinite(total) && total > 0 ? total : 0 },
+      {
+        total: Number.isFinite(total) && total > 0 ? total : 0,
+        today: Number.isFinite(today) && today > 0 ? today : 0,
+      },
       {
         status: 200,
         // Let the edge/CDN cache the count briefly so a viral spike doesn't hit
@@ -41,6 +51,6 @@ export async function GET(): Promise<Response> {
       },
     );
   } catch {
-    return Response.json({ total: 0 }, { status: 200 });
+    return Response.json({ total: 0, today: 0 }, { status: 200 });
   }
 }
