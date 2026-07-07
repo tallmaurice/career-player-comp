@@ -64,11 +64,23 @@ export default function Page() {
   const paidRef = useRef<string | null>(null);
   const [paidBanner, setPaidBanner] = useState(false);
   useEffect(() => {
+    // The pass must survive reloads/app-switches (mobile browsers kill pages
+    // constantly), so it lives in localStorage until a report succeeds. A real
+    // customer lost his $2 pass to exactly this on 7/7.
     const sid = new URLSearchParams(window.location.search).get("paid");
     if (sid && /^cs_[A-Za-z0-9_]+$/.test(sid)) {
-      paidRef.current = sid;
-      setPaidBanner(true);
+      try {
+        window.localStorage.setItem("cpc_pass", sid);
+      } catch {}
       window.history.replaceState({}, "", window.location.pathname);
+    }
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem("cpc_pass");
+    } catch {}
+    if (stored && /^cs_[A-Za-z0-9_]+$/.test(stored)) {
+      paidRef.current = stored;
+      setPaidBanner(true);
     }
   }, []);
 
@@ -148,6 +160,14 @@ export default function Page() {
       await holdMin(); // keep the scouting room up for the full beat
       if (stale()) return;
       generatingRef.current = false;
+      if (paidRef.current) {
+        // Pass was burned server-side on this success; retire it locally too.
+        try {
+          window.localStorage.removeItem("cpc_pass");
+        } catch {}
+        paidRef.current = null;
+        setPaidBanner(false);
+      }
       setState((s) => ({
         ...s,
         result: data.comp!,
