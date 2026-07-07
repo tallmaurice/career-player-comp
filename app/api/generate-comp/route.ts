@@ -173,7 +173,12 @@ async function checkLimits(ip: string): Promise<LimitState> {
     // $247.35 left; observed warm cost ~6.7c/run, so ~14,500 total = ~$100
     // remaining. Trips the same scouts-out flow (now with the $2 valve) as the
     // daily cap. Re-anchor after every top-up.
-    const BUDGET_FLIP_TOTAL = 14500;
+    // Re-anchored 7/7 ~5pm: 14,520 total @ $103.62 left. No top-up by choice —
+    // the $2 valve + credit-death backstop replace the old $100 reserve. This
+    // budgets ~$93 of free runs (a ~$10 floor stays): covers the 7/8 free day
+    // and change. Re-anchor with observed post-wave cost (cache hits drop as
+    // traffic thins — expect >6.7c/run) tomorrow evening.
+    const BUDGET_FLIP_TOTAL = 15900;
     const totalRaw = await redis.get<number | string | null>("cpc:scouted:total");
     const totalNow = typeof totalRaw === "number" ? totalRaw : Number(totalRaw ?? 0);
     if (Number.isFinite(totalNow) && totalNow >= BUDGET_FLIP_TOTAL) {
