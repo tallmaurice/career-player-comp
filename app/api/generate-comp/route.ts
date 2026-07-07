@@ -68,13 +68,7 @@ const PER_IP_WINDOW = "1 h" as const;
 // Tunable from Vercel (Settings -> Environment Variables -> DAILY_SPEND_CAP,
 // then Redeploy). Default 700 runs/day ~= $47/day at the observed ~6.7c/run.
 // This paces the FREE tier; the $2 valve and sponsors are unlimited past it.
-// 2026-07-07 grandfather: launch-wave day rides to the balance-flip (~$100
-// reserve) instead of the daily pace. Self-expires at 8am ET 7/8; safe to
-// delete this line any time after.
-const DAILY_SPEND_CAP =
-  scoutDay() === "2026-07-07"
-    ? 999999
-    : Number(process.env.DAILY_SPEND_CAP ?? 700);
+const DAILY_SPEND_CAP = Number(process.env.DAILY_SPEND_CAP ?? 700);
 
 // The "scout day" rolls at 8:00am EASTERN, not midnight UTC — so the free
 // budget opens with the American morning instead of getting burned overnight.
