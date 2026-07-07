@@ -65,7 +65,7 @@ const PER_IP_WINDOW = "1 h" as const;
 // well under that. REVISIT after this week (Maurice) — drop back down once the
 // spike passes. When this trips, the front end shows the branded "scouts are out"
 // page (sponsor + tip).
-const DAILY_SPEND_CAP = 10000;
+const DAILY_SPEND_CAP = 9100;
 // IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
 const BYPASS_IPS = new Set(
   (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
@@ -355,6 +355,24 @@ export async function POST(req: Request): Promise<Response> {
       status: (err as { status?: unknown } | null)?.status ?? null,
       message: err instanceof Error ? err.message : String(err),
     });
+    // Out-of-credits / auth-dead upstream = the room is genuinely closed, not a
+    // blip. Render the branded scouts-out page (same reason the cap uses) so a
+    // dead balance never shows users a raw retry error mid-wave.
+    const upstreamStatus = (err as { status?: unknown } | null)?.status;
+    const upstreamMsg = err instanceof Error ? err.message : String(err);
+    const creditsDead =
+      upstreamStatus === 401 ||
+      ((upstreamStatus === 400 || upstreamStatus === 402) &&
+        /credit|billing|balance/i.test(upstreamMsg));
+    if (creditsDead) {
+      return Response.json(
+        {
+          error: "The scouts are out for the day. Back tomorrow.",
+          reason: "daily_cap",
+        },
+        { status: 429 },
+      );
+    }
     return Response.json(
       { error: "The scout's having a moment. Try again in a few seconds." },
       { status: 503 },
