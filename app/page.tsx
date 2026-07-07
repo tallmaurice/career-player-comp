@@ -414,14 +414,17 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
   // account) hitting this page mid-spike sees the demand. Hidden at 0 / on
   // failure so it never shows a bare "0".
   const [scoutedTotal, setScoutedTotal] = useState<number | null>(null);
+  // Today's count: the sponsor-facing velocity number. On a viral day, "N today
+  // before the budget ran out" is the whole pitch — demand you can timestamp.
+  const [scoutedToday, setScoutedToday] = useState<number | null>(null);
   useEffect(() => {
     let live = true;
     fetch("/api/scouted")
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: { total?: number } | null) => {
-        if (live && d && typeof d.total === "number" && d.total > 0) {
-          setScoutedTotal(d.total);
-        }
+      .then((d: { total?: number; today?: number } | null) => {
+        if (!live || !d) return;
+        if (typeof d.total === "number" && d.total > 0) setScoutedTotal(d.total);
+        if (typeof d.today === "number" && d.today > 0) setScoutedToday(d.today);
       })
       .catch(() => {});
     return () => {
@@ -487,7 +490,7 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
               lineHeight: 1,
             }}
           >
-            {scoutedTotal.toLocaleString()}
+            {(scoutedToday ?? scoutedTotal).toLocaleString()}
           </div>
           <div
             style={{
@@ -498,8 +501,23 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
               marginTop: 8,
             }}
           >
-            Careers scouted
+            {scoutedToday !== null
+              ? "careers scouted today alone"
+              : "careers scouted"}
           </div>
+          {scoutedToday !== null && (
+            <div
+              style={{
+                font: "500 10px var(--font-mono)",
+                color: "var(--muted, #5a5347)",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                marginTop: 10,
+              }}
+            >
+              {scoutedTotal.toLocaleString()} all-time · demand outran the budget
+            </div>
+          )}
         </div>
       )}
 
