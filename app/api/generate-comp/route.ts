@@ -65,7 +65,36 @@ const PER_IP_WINDOW = "1 h" as const;
 // well under that. REVISIT after this week (Maurice) — drop back down once the
 // spike passes. When this trips, the front end shows the branded "scouts are out"
 // page (sponsor + tip).
-const DAILY_SPEND_CAP = 25000;
+// Tunable from Vercel (Settings -> Environment Variables -> DAILY_SPEND_CAP,
+// then Redeploy). Default 700 runs/day ~= $47/day at the observed ~6.7c/run.
+// This paces the FREE tier; the $2 valve and sponsors are unlimited past it.
+const DAILY_SPEND_CAP = Number(process.env.DAILY_SPEND_CAP ?? 700);
+
+// The "scout day" rolls at 8:00am EASTERN, not midnight UTC — so the free
+// budget opens with the American morning instead of getting burned overnight.
+function scoutDay(): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((x) => x.type === t)?.value ?? "0";
+  let y = Number(get("year"));
+  let m = Number(get("month"));
+  let d = Number(get("day"));
+  const h = Number(get("hour")) % 24;
+  if (h < 8) {
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    dt.setUTCDate(dt.getUTCDate() - 1);
+    y = dt.getUTCFullYear();
+    m = dt.getUTCMonth() + 1;
+    d = dt.getUTCDate();
+  }
+  return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
 // IPs that skip ALL limits (your own, for testing/demos). Comma-separated env var.
 const BYPASS_IPS = new Set(
   (process.env.RATE_LIMIT_BYPASS_IPS ?? "")
@@ -146,8 +175,7 @@ async function checkLimits(ip: string): Promise<LimitState> {
     }
 
     // Global daily spend kill-switch: a per-UTC-day counter.
-    const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const spendKey = `cpc:spend:${day}`;
+    const spendKey = `cpc:spend:${scoutDay()}`;
     const count = await redis.incr(spendKey);
     if (count === 1) {
       await redis.expire(spendKey, 60 * 60 * 48);

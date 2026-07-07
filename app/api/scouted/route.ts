@@ -29,9 +29,30 @@ export async function GET(): Promise<Response> {
   try {
     const { Redis } = await import("@upstash/redis");
     const redis = new Redis({ url, token });
-    // Today's velocity: the per-UTC-day run counter that /api/generate-comp
-    // already INCRs for the daily spend cap. Read-only here; ~= scouts today.
-    const day = new Date().toISOString().slice(0, 10);
+    // Today's velocity: the per-day run counter that /api/generate-comp INCRs
+    // for the daily spend cap. Day boundary = 8am EASTERN (must match
+    // scoutDay() in generate-comp/route.ts). Read-only here.
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date());
+    const get = (t: string) => parts.find((x) => x.type === t)?.value ?? "0";
+    let y = Number(get("year"));
+    let m = Number(get("month"));
+    let d = Number(get("day"));
+    const h = Number(get("hour")) % 24;
+    if (h < 8) {
+      const dt = new Date(Date.UTC(y, m - 1, d));
+      dt.setUTCDate(dt.getUTCDate() - 1);
+      y = dt.getUTCFullYear();
+      m = dt.getUTCMonth() + 1;
+      d = dt.getUTCDate();
+    }
+    const day = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const [rawTotal, rawToday] = await redis.mget<(number | string | null)[]>(
       "cpc:scouted:total",
       `cpc:spend:${day}`,

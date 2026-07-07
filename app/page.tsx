@@ -531,8 +531,8 @@ function ScoutsOut({
       >
         Every report here is a real AI scout reading your whole career, not a
         template spitting out a name. That costs real money every run, and
-        today&rsquo;s free scouting budget is spent. The room reopens for free
-        tomorrow.
+        today&rsquo;s free scouting budget is spent. The free room reopens at
+        8am Eastern.
       </p>
 
       {scoutedTotal !== null && (
