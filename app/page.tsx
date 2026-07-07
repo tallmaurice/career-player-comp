@@ -490,7 +490,10 @@ function ScoutsOut({ tipUrl, onReset }: { tipUrl: string; onReset: () => void })
               lineHeight: 1,
             }}
           >
-            {(scoutedToday ?? scoutedTotal).toLocaleString()}
+            {Math.min(
+              scoutedToday ?? scoutedTotal,
+              scoutedTotal,
+            ).toLocaleString()}
           </div>
           <div
             style={{
