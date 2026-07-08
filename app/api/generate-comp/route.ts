@@ -70,11 +70,11 @@ const PER_IP_WINDOW = "1 h" as const;
 // This paces the FREE tier; the $2 valve and sponsors are unlimited past it.
 const DAILY_SPEND_CAP = Number(process.env.DAILY_SPEND_CAP ?? 700);
 
-// Free-room HOURS (ET): open 8am, close 9pm. Overnight = lowest-value free
+// Free-room HOURS (ET): open 8am, close 8pm — a clean 12-hour window. Overnight = lowest-value free
 // distribution at the priciest per-run (cold cache); the $2 valve stays on
 // 24/7. Env-tunable: FREE_OPEN_HOUR / FREE_CLOSE_HOUR.
 const FREE_OPEN_HOUR = Number(process.env.FREE_OPEN_HOUR ?? 8);
-const FREE_CLOSE_HOUR = Number(process.env.FREE_CLOSE_HOUR ?? 21);
+const FREE_CLOSE_HOUR = Number(process.env.FREE_CLOSE_HOUR ?? 20);
 
 function etHour(): number {
   const parts = new Intl.DateTimeFormat("en-US", {
