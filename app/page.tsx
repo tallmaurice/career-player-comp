@@ -453,15 +453,47 @@ function Disclaimer() {
         </a>
       </div>
       For entertainment. Not affiliated with the NBA, WNBA, or any player.
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginTop: 10 }}>
+        <a
+          href={TIP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "var(--faint)" }}
+        >
+          Tip the scouts
+        </a>{" "}
+        ·{" "}
+        <a href="mailto:hello@careerplayercomp.com" style={{ color: "var(--faint)" }}>
+          Email
+        </a>{" "}
+        ·{" "}
         <a href="/privacy" style={{ color: "var(--faint)" }}>
           Privacy
         </a>{" "}
         ·{" "}
         <a href="/terms" style={{ color: "var(--faint)" }}>
           Terms
+        </a>
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <a
+          href="https://www.linkedin.com/in/mauricepeebles"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "var(--faint)" }}
+        >
+          Maurice Peebles
         </a>{" "}
-        · © 2026 Drapetomania LLC
+        ·{" "}
+        <a
+          href="https://drapetomania.run"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "var(--faint)" }}
+        >
+          Drapetomania
+        </a>{" "}
+        · <span style={{ whiteSpace: "nowrap" }}>© 2026 Drapetomania LLC</span>
       </div>
     </div>
   );
