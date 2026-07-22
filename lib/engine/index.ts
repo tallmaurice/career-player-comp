@@ -178,6 +178,54 @@ export type ParseResult =
   | { ok: true; comp: Comp }
   | { ok: false; reason: "json" | "shape" | "out_of_pool"; detail: string };
 
+/** Repair the two things Sonnet-5 does that break JSON.parse inside string
+ *  values, without a model retry:
+ *   1. raw control chars (literal newlines/tabs inside a value)
+ *   2. UNESCAPED inner double-quotes — the model quotes a phrase with literal "
+ *      marks inside a value, which ends the string early and fails the parse,
+ *      forcing a ~30s retry.
+ *
+ *  Walks the text tracking string/escape state. For an unescaped " while inside
+ *  a string, it decides closing vs. inner by lookahead: a real closing quote is
+ *  followed (after whitespace) by a structural delimiter (, : } ] or EOF); any
+ *  other next char means the " is content and gets escaped. This is IDENTITY on
+ *  already-valid JSON (valid strings never carry raw control chars or unescaped
+ *  quotes), so it can only fix a malformed response, never alter a good one.
+ *  Ported from career-music-comp; residual oddities still fall back to a retry. */
+function repairJsonString(s: string): string {
+  let out = "";
+  let inStr = false;
+  let esc = false;
+  const isWs = (c: string) => c === " " || c === "\t" || c === "\n" || c === "\r";
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (esc) { out += ch; esc = false; continue; }
+    if (ch === "\\") { out += ch; esc = true; continue; }
+    if (ch === '"') {
+      if (!inStr) { inStr = true; out += ch; continue; }
+      let j = i + 1;
+      while (j < s.length && isWs(s[j])) j++;
+      const nc = s[j];
+      if (nc === undefined || nc === "," || nc === ":" || nc === "}" || nc === "]") {
+        inStr = false;
+        out += ch; // structural closing quote
+      } else {
+        out += '\\"'; // inner content quote -> escape it, stay in the string
+      }
+      continue;
+    }
+    if (inStr) {
+      const code = ch.charCodeAt(0);
+      if (code < 0x20) {
+        out += ch === "\n" ? "\\n" : ch === "\r" ? "\\r" : ch === "\t" ? "\\t" : "\\u" + code.toString(16).padStart(4, "0");
+        continue;
+      }
+    }
+    out += ch;
+  }
+  return out;
+}
+
 /** Strip a leading/trailing ```json fence if the model added one, then locate
  *  the outermost JSON object. */
 function extractJson(text: string): string | null {
@@ -189,7 +237,7 @@ function extractJson(text: string): string | null {
   const first = t.indexOf("{");
   const last = t.lastIndexOf("}");
   if (first === -1 || last === -1 || last < first) return null;
-  return t.slice(first, last + 1);
+  return repairJsonString(t.slice(first, last + 1));
 }
 
 function isNonEmptyString(v: unknown): v is string {
