@@ -26,6 +26,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { Comp, QuizAnswers } from "@/lib/types";
 import { SYSTEM_STRING, buildUserMessage, parseComp, PLAYER_POOL } from "@/lib/engine";
 import { retrieveCandidates } from "@/lib/engine/retrieval";
+import { runVoiceRepair } from "@/lib/engine/voice-checks";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,6 +47,16 @@ const MODEL = "claude-sonnet-4-6";
 // when done (~1200-1600 tokens typical now), so this only sets headroom (enough
 // that a long résumé's season table can't truncate the JSON), not latency.
 const GEN_MAX_TOKENS = 2400;
+// A long résumé (his runs ~12K characters) fills a longer season table and
+// longer paragraphs; at 2400 the JSON can run out of room before it closes.
+const LONG_RESUME_CHARS = 6_000;
+const LONG_RESUME_MAX_TOKENS = 3600;
+// The voice checks' one repair call (lib/engine/voice-checks.ts): a cheap model
+// rewrites only the passages the checks flag. It never blocks a report: if it
+// fails or runs long, the unrepaired comp goes out.
+const REPAIR_MODEL = "claude-haiku-5-5";
+const REPAIR_MAX_TOKENS = 2000;
+const REPAIR_TIMEOUT_MS = 20_000;
 // Abort comfortably under maxDuration so the user gets the friendly message, not
 // a 504. Streaming keeps the call robust across the full budget. 105s leaves
 // room even for a cold prefill + the full generation, with margin to respond.
@@ -238,6 +249,7 @@ function textFromMessage(msg: Anthropic.Message): string {
 async function generateCandidate(
   client: Anthropic,
   userMessage: string,
+  maxTokens: number,
   signal: AbortSignal,
 ): Promise<Comp | null> {
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -250,7 +262,7 @@ async function generateCandidate(
       .stream(
         {
           model: MODEL,
-          max_tokens: GEN_MAX_TOKENS,
+          max_tokens: maxTokens,
           // Locked decision (build-state): low temp so same input = same comp.
           // Was never wired in — prod ran at API default 1.0 until 2026-07-01.
           temperature: 0.2,
@@ -273,6 +285,42 @@ async function generateCandidate(
     if (parsed.ok) return parsed.comp;
   }
   return null;
+}
+
+/** The voice checks after parsing, with their one repair call. Whatever the
+ *  repair leaves is logged, not retried; any failure keeps the comp as it was. */
+async function voiceRepair(
+  client: Anthropic,
+  comp: Comp,
+  careerText: string,
+  signal: AbortSignal,
+): Promise<Comp> {
+  try {
+    const r = await runVoiceRepair(comp, careerText, async (system, user) => {
+      const msg = await client.messages.create(
+        {
+          model: REPAIR_MODEL,
+          max_tokens: REPAIR_MAX_TOKENS,
+          // Haiku 5.5 thinks by default; a copy-desk rewrite doesn't need it.
+          thinking: { type: "disabled" },
+          system,
+          messages: [{ role: "user", content: user }],
+        },
+        { signal: AbortSignal.any([signal, AbortSignal.timeout(REPAIR_TIMEOUT_MS)]) },
+      );
+      return textFromMessage(msg);
+    });
+    if (r.remaining.length) {
+      console.warn(
+        `[generate-comp] voice checks: ${r.found.length} found, ${r.applied.length} repaired, still failing:`,
+        r.remaining.map((i) => `${i.path} (${i.problems.join(", ")})`).join("; "),
+      );
+    }
+    return r.comp;
+  } catch (err) {
+    console.error("[generate-comp] voice repair failed; sending the unrepaired comp:", err);
+    return comp;
+  }
 }
 
 // ---- Handler ----------------------------------------------------------------
@@ -421,12 +469,14 @@ export async function POST(req: Request): Promise<Response> {
     // Only this shortlist is shown to the model — it forces variety across users
     // (the ~12-20-names-only problem) and keeps the per-call payload small.
     const { candidates } = retrieveCandidates(careerText, answers, PLAYER_POOL);
+    const maxTokens = careerText.length > LONG_RESUME_CHARS ? LONG_RESUME_MAX_TOKENS : GEN_MAX_TOKENS;
 
     // The balanced "best" lens: maximum accuracy AND maximum earned bite in one
     // pass (the v7 spot-check config). The system prompt makes both co-primary.
     let comp = await generateCandidate(
       anthropic,
       buildUserMessage(careerText, answers, "best", candidates),
+      maxTokens,
       controller.signal,
     );
     // If the first pass failed twice (rare), one fallback on the roast lens.
@@ -434,6 +484,7 @@ export async function POST(req: Request): Promise<Response> {
       comp = await generateCandidate(
         anthropic,
         buildUserMessage(careerText, answers, "roast", candidates),
+        maxTokens,
         controller.signal,
       );
     }
@@ -443,6 +494,7 @@ export async function POST(req: Request): Promise<Response> {
         { status: 503 },
       );
     }
+    comp = await voiceRepair(anthropic, comp, careerText, controller.signal);
     const scouted = await recordScouted(ip);
     if (paidPass && paidSession) {
       await burnPass(paidSession);
