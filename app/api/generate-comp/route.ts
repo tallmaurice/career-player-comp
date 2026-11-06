@@ -51,12 +51,15 @@ const GEN_MAX_TOKENS = 2400;
 // longer paragraphs; at 2400 the JSON can run out of room before it closes.
 const LONG_RESUME_CHARS = 6_000;
 const LONG_RESUME_MAX_TOKENS = 3600;
-// The voice checks' one repair call (lib/engine/voice-checks.ts): a cheap model
+// The voice checks' one repair call (lib/engine/voice-checks.ts): a model
 // rewrites only the passages the checks flag. It never blocks a report: if it
-// fails or runs long, the unrepaired comp goes out.
-const REPAIR_MODEL = "claude-haiku-5-5";
+// fails or runs long, the unrepaired comp goes out. Round 5's Haiku repair left
+// jokes in place, so the default is Sonnet 5.5; REPAIR_MODEL switches it.
+const REPAIR_MODEL = process.env.REPAIR_MODEL || "claude-sonnet-5-5";
+// Sonnet 5.5's "off" is between_tools (it rejects "disabled"); Haiku 5.5 thinks unless told not to.
+const REPAIR_THINKING = REPAIR_MODEL.includes("sonnet-5") ? ({ type: "between_tools" } as const) : ({ type: "disabled" } as const);
 const REPAIR_MAX_TOKENS = 2000;
-const REPAIR_TIMEOUT_MS = 20_000;
+const REPAIR_TIMEOUT_MS = 40_000;
 // Abort comfortably under maxDuration so the user gets the friendly message, not
 // a 504. Streaming keeps the call robust across the full budget. 105s leaves
 // room even for a cold prefill + the full generation, with margin to respond.
@@ -301,8 +304,8 @@ async function voiceRepair(
         {
           model: REPAIR_MODEL,
           max_tokens: REPAIR_MAX_TOKENS,
-          // Haiku 5.5 thinks by default; a copy-desk rewrite doesn't need it.
-          thinking: { type: "disabled" },
+          // A copy-desk rewrite doesn't need thinking.
+          thinking: REPAIR_THINKING as never,
           system,
           messages: [{ role: "user", content: user }],
         },

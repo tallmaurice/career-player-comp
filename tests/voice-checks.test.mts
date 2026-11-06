@@ -15,6 +15,7 @@ const examples: Comp[] = FEW_SHOT_EXAMPLES.split("COMP:\n")
 /** Example 1 with every prose field replaced by a two-word line, so it passes every check. */
 function blank(): Comp {
   const c = structuredClone(examples[0]);
+  c.player_name = "Test Player"; // not a worked example's player
   let n = 0;
   const line = () => `Quiet w${++n}.`;
   for (const k of ["archetype_title", "ovr_rationale", "card_summary", "screenshot_line", "why_this_player", "secondary_comp", "front_office_fit", "comp_tone"]) c[k] = line();
@@ -164,4 +165,52 @@ test("repair: a rewrite that comes back unchanged doesn't count as applied", asy
   const r = await vc.runVoiceRepair(c, "", async () => JSON.stringify({ "1": "He rebuilt the desk." }));
   assert.deepEqual(r.applied, []);
   assert.equal(r.remaining.length, 1);
+});
+
+test("pronoun: \"a man\", \"the guy\", \"this guy\" about the person are caught", () => {
+  for (const phrase of ["A man who rebuilt the desk.", "The guy ran the room.", "This guy never left.", "A woman with a plan."]) {
+    const c = blank();
+    c.card_summary = phrase;
+    assert.deepEqual(problems(c), ["card_summary:pronoun"], phrase);
+  }
+  const c = blank();
+  c.why_this_player = "The guy ran the room."; // the player's field, not the person's
+  assert.deepEqual(problems(c), []);
+  c.card_summary = "A man who rebuilt the desk.";
+  assert.deepEqual(problems(c, "She/her. Editor."), []); // stated pronouns: not checked
+});
+
+test("banned: slop words and the scaffolding phrases are caught anywhere in the prose; journeyman isn't", () => {
+  for (const phrase of ["You leverage every room.", "A seamless handoff.", "The part worth saying out loud is the tenure.", "A robust résumé.", "She unlocked the desk.", "At the end of the day, you stayed."]) {
+    const c = blank();
+    c.full_report = `Quiet a1.\n\n${phrase}\n\nQuiet a3.`;
+    assert.deepEqual(problems(c), ["full_report:banned"], phrase);
+  }
+  const c = blank();
+  c.card_summary = "A journeyman with a lock on the desk and a long view.";
+  assert.deepEqual(problems(c), []);
+  c.card_summary = "Your journey ran through five desks.";
+  assert.deepEqual(problems(c), ["card_summary:banned"]);
+});
+
+test("copy: a worked example's player sends the screenshot_line to the repair with the example's line", () => {
+  const c = blank();
+  c.player_name = "Nick Collison";
+  c.screenshot_line = "Brand new line.";
+  const items = vc.findVoiceIssues(c, "");
+  assert.deepEqual(items.map((i: Comp) => `${i.path}:${i.problems}`), ["screenshot_line:copy"]);
+  assert.match(items[0].notes[0], /manager track twice/);
+  c.player_name = "Becky Hammon";
+  assert.deepEqual(problems(c), []);
+});
+
+test("repair: the player always goes along; the résumé only for a count, a repeated joke or a copied line", () => {
+  const c = blank();
+  c.card_summary = "A seamless run.";
+  let sent = JSON.parse(vc.repairMessage(vc.findVoiceIssues(c, "R"), "R", "Test Player"));
+  assert.equal(sent.resume, undefined);
+  assert.equal(sent.player, "Test Player");
+  c.card_summary = "Six outlets in fifteen years.";
+  sent = JSON.parse(vc.repairMessage(vc.findVoiceIssues(c, "R"), "R", "Test Player"));
+  assert.equal(sent.resume, "R");
 });

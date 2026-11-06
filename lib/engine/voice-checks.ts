@@ -10,10 +10,16 @@
 //               not prose, so its counts stand.
 //   crutch:     the ", which is the most..." / ", which is exactly what..." tag,
 //               more than once per report (the first one stays).
-//   copy:       six or more words in a row shared with the worked examples.
+//   copy:       six or more words in a row shared with the worked examples; or,
+//               when the picked player is one a worked example uses (Billups,
+//               Nick Young, Collison), the whole screenshot_line, sent to the
+//               repair with that example's line to stay away from.
+//   banned:     the prompt's slop list, references/banned-phrases.md's hard bans
+//               and the scaffolding phrases ("the part worth saying out loud").
 //   theme:      the same joke or image in more than two fields (a theme word
 //               family, or a three-word phrase once names and stopwords are set
 //               aside). The screenshot_line and the best one other keep it.
+// pronoun also catches "a man", "a woman", "the guy", "this guy" about the person.
 // runVoiceRepair() finds them, sends only the offending passages to a model the
 // caller supplies (one call, never a loop), splices the rewrites back in and
 // checks again. Whatever the repair leaves behind is reported, not retried.
@@ -23,7 +29,7 @@
 import type { Comp } from "@/lib/types";
 import { FEW_SHOT_EXAMPLES } from "./system-prompt";
 
-export type VoiceProblem = "pronoun" | "isnt-shape" | "count" | "crutch" | "copy" | "theme";
+export type VoiceProblem = "pronoun" | "isnt-shape" | "count" | "crutch" | "copy" | "theme" | "banned";
 
 /** One passage to rewrite: a sentence (or two, for the two-sentence shape)
  *  inside the field at `path` ("card_summary", "badges.1.earned_by", ...).
@@ -155,7 +161,21 @@ function namesIn(sents: Sentence[], comp: Comp): Set<string> {
 const STATED = /\b(?:he|she|they)\s*\/\s*(?:him|her|them|his|hers|they|theirs)\b|\bpronouns?\s*[:(]/i;
 export const statesPronouns = (careerText: string): boolean => STATED.test(careerText);
 
-const PRONOUN = /\b(?:he|she|him|her|his|hers|himself|herself)\b/i;
+const PRONOUN = /\b(?:he|she|him|her|his|hers|himself|herself)\b|\b(?:a|the|this|that|one)\s+(?:man|woman|guy|gal|lady|dude|gentleman)\b/i;
+
+// The prompt's slop list, references/banned-phrases.md's hard bans, and the
+// prompt's own scaffolding phrases. Word forms count (unlocks, unlocked).
+const BANNED: Array<[string, RegExp]> = [
+  ...["delve", "unlock", "empower", "leverage", "elevate", "navigate", "foster", "harness", "streamline", "supercharge", "reimagine", "disrupt"].map(
+    (w): [string, RegExp] => [w, new RegExp(`\\b${w}(?:s|d|ed|ing|e|es)?\\b`, "i")],
+  ),
+  ...["dive deep", "diving deep", "dove deep", "seamless", "seamlessly", "robust", "game-changing", "game changing", "thought leader", "move the needle", "north star", "transformative",
+    "tapestry", "holistic", "value proposition", "journey", "ecosystem", "future-proof", "best-in-class", "cutting-edge", "powerful tool", "scale your", "excited to share",
+    "humbled", "thrilled to announce", "in today's fast-paced world", "at the end of the day", "self-image gap", "the part worth saying out loud",
+    "the thing nobody says out loud", "the part nobody says", "which brings us to the gap"].map((w): [string, RegExp] => [w, new RegExp(`\\b${w.replace(/[-' ]/g, "[-'’ ]")}\\b`, "i")]),
+];
+const bannedIn = (text: string): string[] =>
+  BANNED.filter(([, re]) => re.test(text.replace(/[’]/g, "'"))).map(([w]) => w);
 // The affirming clause, including the was/were and he/she/they forms of the same move.
 const AFFIRM = String.raw`(?:that['’]s|that is|that was|it['’]s|it is|it was|this is|you['’]re|you are|you were|he['’]s|he is|she['’]s|she is|they['’]re|they are)\b`;
 // Only a negated "to be" (is not, isn't, that's not, you were not...): the shape denies
@@ -263,6 +283,22 @@ function copiedRun(text: string): string | null {
   return null;
 }
 
+// The worked examples' players and their screenshot_lines.
+let exampleLines: Map<string, string> | null = null;
+function exampleScreenshotLines(): Map<string, string> {
+  if (exampleLines) return exampleLines;
+  exampleLines = new Map();
+  for (const block of FEW_SHOT_EXAMPLES.split("COMP:\n").slice(1)) {
+    try {
+      const c = JSON.parse(block.slice(0, block.lastIndexOf("}") + 1));
+      if (c.player_name && c.screenshot_line) exampleLines.set(String(c.player_name).toLowerCase(), c.screenshot_line);
+    } catch {
+      /* an example that doesn't parse has no line to guard */
+    }
+  }
+  return exampleLines;
+}
+
 /** Every passage that breaks a rule, merged per field so no two overlap.
  *  `skip` leaves checks out (the tests run the worked examples without `copy`). */
 export function findVoiceIssues(comp: Comp, careerText: string, opts: { skip?: VoiceProblem[] } = {}): RepairItem[] {
@@ -287,7 +323,20 @@ export function findVoiceIssues(comp: Comp, careerText: string, opts: { skip?: V
       const run = copiedRun(s.text);
       if (run) hits.push({ ...s, problem: "copy", note: `repeats "${run}" from the examples` });
     }
+    if (on("banned")) {
+      const b = bannedIn(s.text);
+      if (b.length) hits.push({ ...s, problem: "banned", note: `uses ${b.map((x) => `"${x}"`).join(", ")}, which the report may not; say the plain thing` });
+    }
   });
+
+  if (on("copy")) {
+    // Picked a worked example's player: its screenshot_line is the likeliest thing to echo.
+    const line = exampleScreenshotLines().get(`${comp.player_name}`.toLowerCase());
+    const mine = comp.screenshot_line;
+    if (line && typeof mine === "string" && mine.trim()) {
+      hits.push({ path: "screenshot_line", start: 0, end: mine.length, problem: "copy", note: `this player is also a worked example's; don't echo the worked example's line ("${line}") in joke, fact or shape` });
+    }
+  }
 
   if (on("crutch")) {
     // The first tag (screenshot_line first, then the full_report) stays; every later one goes.
@@ -330,21 +379,24 @@ export function findVoiceIssues(comp: Comp, careerText: string, opts: { skip?: V
 export const REPAIR_SYSTEM = `You are the copy desk for Career Player Comp, a comedy product that compares a person's career to one NBA or WNBA player in a scouting report. You get passages from one report, each with its problems and notes, and, when a fix needs facts, the person's résumé. Rewrite each passage so every problem is gone. Unless a problem says otherwise, keep its facts, its joke and roughly its length, and change as few words as you can.
 
 Problems:
-- pronoun: the passage calls the person he, she, him, her, his, hers, himself or herself, and the résumé gives no pronouns. Write to the person as "you", or drop the pronoun. A pronoun for the basketball player can stay.
+- pronoun: the passage calls the person he, she, him, her, his, hers, himself or herself, or "a man", "a woman", "the guy", "this guy", and the résumé gives no pronouns. Write to the person as "you", or drop the pronoun. A pronoun for the basketball player can stay.
 - isnt-shape: the passage says what something isn't, then what it is ("That's not X, that's Y"; "It isn't X. It's Y."). Say the true thing directly, as one statement.
 - count: the passage counts employers, jobs, outlets, stops, places, teams or titles ("six outlets", "one company"). Name them from the résumé ("the same company" for one), or drop the count.
 - crutch: the passage ends on a ", which is the most..." or ", which is exactly what..." tag the report has already used. Land the joke inside the sentence, without that tag.
-- copy: the passage repeats words from the prompt's examples (the notes quote them). Say it in new words.
-- theme: this joke or image is already in other fields (the notes say which). Write a new joke from a different résumé fact, in the same form and about the same length: a badge label stays a short Title Case label, a weakness stays a weakness. No two theme rewrites use the same fact.
+- copy: the passage repeats words from the prompt's examples, or the player is also one a worked example uses and the notes quote that example's line. Write a new joke from a different résumé fact, in new words and a different sentence shape; keep the player. Echoing the quoted line's joke, fact or shape fails.
+- banned: the passage uses a phrase the report may not (the notes name it). Say the plain thing.
+- theme: this joke or image is already in other fields (the notes say which). Throw that joke away. Pick one résumé fact the notes' joke does not touch (a specific project, a title, a place, a skill, an oddity) and write a new joke from it, in the same form and about the same length: a badge label stays a short Title Case label, a weakness stays a weakness. A theme rewrite must not mention leaving, staying, loyalty, handing off, titles or keeping score if the notes name that joke, even in passing. No two theme rewrites use the same fact.
 
 Every rewrite: the funny part ends the sentence, with no sentence after it that explains it; no advice; no count of employers or stops; years only as the résumé's dates give them; nothing that says what something isn't, then what it is.
 
 Return JSON only, nothing before or after: {"<id>": "<rewritten passage>", ...} with one entry for every id.`;
 
 // No surrounding paragraph goes along: in round 5 Haiku pasted it back into its rewrite.
-export function repairMessage(items: RepairItem[], careerText = ""): string {
-  const needsFacts = items.some((it) => it.problems.includes("theme") || it.problems.includes("count"));
+export function repairMessage(items: RepairItem[], careerText = "", player = ""): string {
+  // A count, a repeated joke or a copied line needs a different résumé fact, so the résumé goes along (it is most of the message's cost); the other fixes don't.
+  const needsFacts = items.some((it) => it.problems.some((p) => p === "theme" || p === "count" || p === "copy"));
   return JSON.stringify({
+    ...(player ? { player } : {}),
     ...(needsFacts && careerText.trim() ? { resume: careerText } : {}),
     passages: items.map(({ id, path, problems, notes, text }) => ({ id, field: path, problems, ...(notes?.length ? { notes } : {}), text })),
   });
@@ -386,7 +438,7 @@ export async function runVoiceRepair(
 ): Promise<VoiceRepairResult> {
   const found = findVoiceIssues(comp, careerText);
   if (!found.length) return { comp, found, applied: [], rewrites: {}, remaining: [], called: false };
-  const reply = await callModel(REPAIR_SYSTEM, repairMessage(found, careerText));
+  const reply = await callModel(REPAIR_SYSTEM, repairMessage(found, careerText, comp.player_name));
   const { comp: repaired, applied, rewrites } = applyRepair(comp, found, reply);
   return { comp: repaired, found, applied, rewrites, remaining: findVoiceIssues(repaired, careerText), called: true };
 }

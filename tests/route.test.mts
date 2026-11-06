@@ -20,6 +20,7 @@ const { FEW_SHOT_EXAMPLES } = await import(rootUrl("lib/engine/system-prompt.ts"
 function cleanComp(): Record<string, any> {
   const b = FEW_SHOT_EXAMPLES.split("COMP:\n")[1];
   const c = JSON.parse(b.slice(0, b.lastIndexOf("}") + 1));
+  c.player_name = "Isiah Thomas"; // in the pool, and not a worked example's player
   let n = 0;
   const line = () => `Quiet w${++n}.`;
   for (const k of ["archetype_title", "ovr_rationale", "card_summary", "screenshot_line", "why_this_player", "secondary_comp", "front_office_fit", "comp_tone"]) c[k] = line();
@@ -50,7 +51,7 @@ test("a short résumé keeps the 2400-token cap, and a clean report makes no rep
   assert.equal(fake().calls[0].params.max_tokens, 2400);
 });
 
-test("a long résumé gets 3600 tokens; a flagged passage goes to one Haiku repair and comes back fixed", async () => {
+test("a long résumé gets 3600 tokens; a flagged passage goes to one Haiku repair and comes back fixed (Sonnet 5.5 by default)", async () => {
   const comp = cleanComp();
   comp.card_summary = "He rebuilt the desk in a year.";
   fake().comp = JSON.stringify(comp);
@@ -61,8 +62,8 @@ test("a long résumé gets 3600 tokens; a flagged passage goes to one Haiku repa
   assert.deepEqual(fake().calls.map((c: any) => c.kind), ["stream", "create"]);
   assert.equal(fake().calls[0].params.max_tokens, 3600);
   const repair = fake().calls[1].params;
-  assert.equal(repair.model, "claude-haiku-5-5");
-  assert.deepEqual(repair.thinking, { type: "disabled" });
+  assert.equal(repair.model, "claude-sonnet-5-5");
+  assert.deepEqual(repair.thinking, { type: "between_tools" });
   assert.equal(JSON.parse(repair.messages[0].content).passages[0].text, "He rebuilt the desk in a year.");
   assert.equal(body.comp.card_summary, "You rebuilt the desk in a year.");
 });
@@ -76,4 +77,26 @@ test("a failed repair still returns the report, unrepaired", async () => {
   const body = await res.json();
   assert.equal(res.status, 200);
   assert.equal(body.comp.card_summary, "He rebuilt the desk in a year.");
+});
+
+test("REPAIR_MODEL switches the repair model (Haiku 5.5 thinks off with \"disabled\")", async () => {
+  process.env.REPAIR_MODEL = "claude-haiku-5-5";
+  try {
+    const { POST: post2 } = await import(rootUrl("app/api/generate-comp/route.ts") + "?haiku");
+    const comp = cleanComp();
+    comp.card_summary = "He rebuilt the desk in a year.";
+    fake().comp = JSON.stringify(comp);
+    fake().repair = JSON.stringify({ "1": "You rebuilt the desk in a year." });
+    const res = await post2(new Request("http://localhost/api/generate-comp", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.9" },
+      body: JSON.stringify({ careerText: "Editor at a newspaper, 2015 to 2020.", answers }),
+    }));
+    assert.equal(res.status, 200);
+    const repair = fake().calls[1].params;
+    assert.equal(repair.model, "claude-haiku-5-5");
+    assert.deepEqual(repair.thinking, { type: "disabled" });
+  } finally {
+    delete process.env.REPAIR_MODEL;
+  }
 });
