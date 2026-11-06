@@ -19,7 +19,7 @@
 // across every request, so it is the prompt-cache prefix — marked with
 // cache_control: ephemeral. Per-request content lives after the breakpoint.
 //
-// Model: claude-sonnet-4-6.
+// Model: claude-sonnet-5-5.
 // =============================================================================
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -40,7 +40,9 @@ export const maxDuration = 120;
 
 // ---- Tunables ---------------------------------------------------------------
 
-const MODEL = "claude-sonnet-4-6";
+const MODEL = "claude-sonnet-5-5";
+// Sonnet 5.5 rejects temperature, and its "off" for thinking is between_tools (it rejects "disabled").
+const DRAFT_THINKING = { type: "between_tools" } as const;
 // The Comp now carries the full_report plus the enrichment fields (OVR/POT/
 // rationale, badge tiers, contract, draft, a stats-by-season table, and
 // strengths/weaknesses). max_tokens is a cap, not a target — the model stops
@@ -266,9 +268,7 @@ async function generateCandidate(
         {
           model: MODEL,
           max_tokens: maxTokens,
-          // Locked decision (build-state): low temp so same input = same comp.
-          // Was never wired in — prod ran at API default 1.0 until 2026-07-01.
-          temperature: 0.2,
+          thinking: DRAFT_THINKING as never,
           system: SYSTEM_BLOCKS,
           messages: [
             {
