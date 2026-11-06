@@ -29,7 +29,7 @@
 import type { Comp } from "@/lib/types";
 import { FEW_SHOT_EXAMPLES } from "./system-prompt";
 
-export type VoiceProblem = "pronoun" | "isnt-shape" | "count" | "crutch" | "copy" | "theme" | "banned";
+export type VoiceProblem = "pronoun" | "isnt-shape" | "count" | "crutch" | "copy" | "theme" | "banned" | "pair";
 
 /** One passage to rewrite: a sentence (or two, for the two-sentence shape)
  *  inside the field at `path` ("card_summary", "badges.1.earned_by", ...).
@@ -42,6 +42,7 @@ export type VoiceRepairResult = {
   applied: string[]; // ids whose rewrite was spliced in
   rewrites: Record<string, string>; // id -> the passage as rewritten
   remaining: RepairItem[]; // what the checks still find after the repair
+  rejected: string[]; // ids whose rewrite was thrown out (a fact not in the résumé or report, or half a badge pair); the original text stays
   called: boolean; // false when there was nothing to fix
 };
 
@@ -387,6 +388,10 @@ Problems:
 - banned: the passage uses a phrase the report may not (the notes name it). Say the plain thing.
 - theme: this joke or image is already in other fields (the notes say which). Throw that joke away. Pick one résumé fact the notes' joke does not touch (a specific project, a title, a place, a skill, an oddity) and write a new joke from it, in the same form and about the same length: a badge label stays a short Title Case label, a weakness stays a weakness. A theme rewrite must not mention leaving, staying, loyalty, handing off, titles or keeping score if the notes name that joke, even in passing. No two theme rewrites use the same fact.
 
+- pair: a badge's label and its earned_by are one badge. One of them is being rewritten, so rewrite both together: the label names what the new earned_by earns, and the earned_by explains the new label. A label stays a short Title Case label.
+
+Facts: a rewrite may use only facts that are already in the résumé or in the report. Do not add a name, a place, an employer, a person, a title or a number that appears in neither. If a note says a rewrite used facts that are in neither, redo it without them.
+
 Every rewrite: the funny part ends the sentence, with no sentence after it that explains it; no advice; no count of employers or stops; years only as the résumé's dates give them; nothing that says what something isn't, then what it is.
 
 Return JSON only, nothing before or after: {"<id>": "<rewritten passage>", ...} with one entry for every id.`;
@@ -429,16 +434,119 @@ export function applyRepair(
   return { comp: out, applied, rewrites };
 }
 
-/** Check, repair once with the caller's model, check again. The repaired comp
- *  is kept even when something still fails; `remaining` says what. */
+// ---- Facts and badge pairs -------------------------------------------------------
+
+const NOT_NAMES = new Set(["i", "you", "your", "yours", "the", "a", "an", "and", "but", "or", "so", "it", "its", "that", "this", "these", "those", "he", "she", "they", "we", "if", "when", "then", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]);
+
+function norm(w: string): string {
+  return w.toLowerCase().replace(/['’]s$/, "").replace(/['’]/g, "");
+}
+function wordSet(text: string): Set<string> {
+  const out = new Set<string>();
+  for (const w of text.match(/[\p{L}\p{N}][\p{L}\p{N}'’&-]*/gu) ?? []) {
+    const n = norm(w);
+    out.add(n);
+    if (n.endsWith("s")) out.add(n.slice(0, -1));
+  }
+  return out;
+}
+const numbersIn = (t: string): string[] => (t.match(/\d[\d,]*\d|\d/g) ?? []).map((n) => n.replace(/,/g, ""));
+function allStrings(v: unknown, out: string[] = []): string[] {
+  if (typeof v === "string") out.push(v);
+  else if (Array.isArray(v)) v.forEach((x) => allStrings(x, out));
+  else if (v && typeof v === "object") Object.values(v).forEach((x) => allStrings(x, out));
+  return out;
+}
+
+/** Proper nouns and numbers in `text` that appear in neither the résumé nor the
+ *  report. A capitalized word that only starts a sentence is skipped unless a
+ *  capitalized word follows it (a name); a Title Case badge label gets the
+ *  number check only. */
+export function inventedFacts(text: string, resume: string, comp: Comp, isLabel = false): string[] {
+  const hay = `${resume}\n${allStrings(comp).join("\n")}`;
+  const words = wordSet(hay);
+  const nums = new Set(numbersIn(hay));
+  const bad: string[] = [];
+  for (const n of numbersIn(text)) if (!nums.has(n) && !bad.includes(n)) bad.push(n);
+  if (isLabel) return bad;
+  const re = /\p{Lu}[\p{L}\p{N}'’&-]*/gu;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    const w = m[0];
+    const n = norm(w);
+    if (NOT_NAMES.has(n) || words.has(n) || bad.includes(w)) continue;
+    const starts = m.index === 0 || /[.!?:"“\n]\s*$/.test(text.slice(0, m.index));
+    if (starts && !/^\s+\p{Lu}/u.test(text.slice(m.index + w.length))) continue;
+    bad.push(w);
+  }
+  return bad;
+}
+
+const badgeOf = (path: string): number => {
+  const m = /^badges\.(\d+)\.(label|earned_by)$/.exec(path);
+  return m ? Number(m[1]) : -1;
+};
+
+/** A badge's label and earned_by travel together: whichever one the checks found,
+ *  the other is added as a passage so the model rewrites both. */
+function withBadgePairs(comp: Comp, items: RepairItem[]): RepairItem[] {
+  const out = [...items];
+  let next = items.reduce((n, it) => Math.max(n, Number(it.id) || 0), 0);
+  for (const b of new Set(items.map((it) => badgeOf(it.path)).filter((b) => b >= 0))) {
+    for (const field of ["label", "earned_by"]) {
+      const path = `badges.${b}.${field}`;
+      const text = getAt(comp, path);
+      if (typeof text !== "string" || !text.trim() || out.some((it) => it.path === path)) continue;
+      out.push({ id: String(++next), path, problems: ["pair"], text, notes: [`badge ${b + 1}: its ${field === "label" ? "earned_by" : "label"} is being rewritten, so rewrite this ${field === "label" ? "label" : "earned_by"} to match it`] });
+    }
+  }
+  return out;
+}
+
+/** Which rewrites to throw out, with why. Invented facts fail the passage; a badge
+ *  pair fails together unless both halves came back changed and clean. */
+function vet(items: RepairItem[], rewrites: Record<string, string>, resume: string, comp: Comp): Record<string, string> {
+  const bad: Record<string, string> = {};
+  for (const it of items) {
+    const rw = rewrites[it.id];
+    if (rw === undefined) continue;
+    const facts = inventedFacts(rw, resume, comp, /\.label$/.test(it.path));
+    if (facts.length) bad[it.id] = `the first rewrite used ${facts.join(", ")}, which is in neither the résumé nor the report; use only facts that are`;
+  }
+  for (const b of new Set(items.map((it) => badgeOf(it.path)).filter((b) => b >= 0))) {
+    const pair = items.filter((it) => badgeOf(it.path) === b);
+    if (pair.length !== 2) continue;
+    const incomplete = pair.some((it) => rewrites[it.id] === undefined);
+    if (incomplete || pair.some((it) => bad[it.id])) {
+      for (const it of pair) bad[it.id] ??= `badge ${b + 1}'s label and earned_by must both be rewritten together, and the label must still match the earned_by`;
+    }
+  }
+  return bad;
+}
+
+/** Check, repair, vet, send the failures back once, then keep the original text of
+ *  whatever still fails. The repaired comp is kept even when a check still finds
+ *  something; `remaining` says what. */
 export async function runVoiceRepair(
   comp: Comp,
   careerText: string,
   callModel: (system: string, user: string) => Promise<string>,
 ): Promise<VoiceRepairResult> {
   const found = findVoiceIssues(comp, careerText);
-  if (!found.length) return { comp, found, applied: [], rewrites: {}, remaining: [], called: false };
-  const reply = await callModel(REPAIR_SYSTEM, repairMessage(found, careerText, comp.player_name));
-  const { comp: repaired, applied, rewrites } = applyRepair(comp, found, reply);
-  return { comp: repaired, found, applied, rewrites, remaining: findVoiceIssues(repaired, careerText), called: true };
+  if (!found.length) return { comp, found, applied: [], rewrites: {}, remaining: [], rejected: [], called: false };
+  const items = withBadgePairs(comp, found);
+  const ask = async (list: RepairItem[]) => applyRepair(comp, list, await callModel(REPAIR_SYSTEM, repairMessage(list, careerText, comp.player_name))).rewrites;
+  let rewrites = await ask(items);
+  let bad = vet(items, rewrites, careerText, comp);
+  if (Object.keys(bad).length) {
+    // Back once: the failing passages (a badge pair stays whole), each with why.
+    const again = items.filter((it) => bad[it.id]).map((it) => ({ ...it, notes: [...(it.notes ?? []), bad[it.id]] }));
+    const second = await ask(again);
+    for (const it of again) delete rewrites[it.id];
+    Object.assign(rewrites, second);
+    bad = vet(items, rewrites, careerText, comp);
+  }
+  const rejected = items.filter((it) => bad[it.id]).map((it) => it.id);
+  const keep = Object.fromEntries(Object.entries(rewrites).filter(([id]) => !bad[id]));
+  const { comp: repaired, applied, rewrites: done } = applyRepair(comp, items.filter((it) => keep[it.id] !== undefined), JSON.stringify(keep));
+  return { comp: repaired, found, applied, rewrites: done, remaining: findVoiceIssues(repaired, careerText), rejected, called: true };
 }

@@ -133,16 +133,16 @@ test("repair: one call with the résumé when a fix needs facts, rewrites splice
   const c = blank();
   c.card_summary = "Six outlets in fifteen years. He kept moving.";
   const calls: string[] = [];
-  const r = await vc.runVoiceRepair(c, "RÉSUMÉ TEXT", async (system: string, user: string) => {
+  const r = await vc.runVoiceRepair(c, "RÉSUMÉ TEXT Barstool Complex SNY 15 years", async (system: string, user: string) => {
     calls.push(user);
     assert.equal(system, vc.REPAIR_SYSTEM);
-    return JSON.stringify({ "1": "Barstool, Complex and SNY in fifteen years.", "2": "You kept moving." });
+    return JSON.stringify({ "1": "Barstool, Complex and SNY in 15 years.", "2": "You kept moving." });
   });
   assert.equal(calls.length, 1);
   const sent = JSON.parse(calls[0]);
-  assert.equal(sent.resume, "RÉSUMÉ TEXT");
+  assert.equal(sent.resume, "RÉSUMÉ TEXT Barstool Complex SNY 15 years");
   assert.deepEqual(sent.passages.map((p: Comp) => p.problems), [["count"], ["pronoun"]]);
-  assert.equal(r.comp.card_summary, "Barstool, Complex and SNY in fifteen years. You kept moving.");
+  assert.equal(r.comp.card_summary, "Barstool, Complex and SNY in 15 years. You kept moving.");
   assert.deepEqual(r.remaining, []);
   assert.equal(c.card_summary, "Six outlets in fifteen years. He kept moving."); // the input isn't mutated
 });
@@ -213,4 +213,66 @@ test("repair: the player always goes along; the résumé only for a count, a rep
   c.card_summary = "Six outlets in fifteen years.";
   sent = JSON.parse(vc.repairMessage(vc.findVoiceIssues(c, "R"), "R", "Test Player"));
   assert.equal(sent.resume, "R");
+});
+
+test("facts: a name or number in neither the résumé nor the report is flagged; ones in either, and a sentence-opening word, are not", () => {
+  const c = blank();
+  c.card_summary = "Ran the desk at Quiet Co in 2014.";
+  const f = (t: string, label = false) => vc.inventedFacts(t, "Worked at Barstool for 9 years.", c, label);
+  assert.deepEqual(f("Barstool took 9 years."), []);
+  assert.deepEqual(f("Quiet Co hired you in 2014."), []);
+  assert.deepEqual(f("Nobody at Barstool noticed."), []);
+  assert.deepEqual(f("You left Barstool for ESPN in 2019."), ["2019", "ESPN"]);
+  assert.deepEqual(f("Marcus Hale handled it."), ["Marcus", "Hale"]);
+  assert.deepEqual(f("Deadline Whisperer 4242", true), ["4242"]); // a label gets the number check only
+});
+
+test("repair: a rewrite with an invented name goes back once; if it still fails the original text stays", async () => {
+  const c = blank();
+  c.card_summary = "Six outlets in fifteen years.";
+  const calls: string[] = [];
+  const r = await vc.runVoiceRepair(c, "Barstool and Complex", async (_s: string, user: string) => {
+    calls.push(user);
+    return JSON.stringify({ "1": calls.length === 1 ? "Barstool, Complex and ESPN." : "Barstool, Complex and Fox." });
+  });
+  assert.equal(calls.length, 2);
+  assert.match(JSON.parse(calls[1]).passages[0].notes.join(" "), /ESPN/);
+  assert.equal(r.comp.card_summary, "Six outlets in fifteen years.");
+  assert.deepEqual(r.rejected, ["1"]);
+  assert.deepEqual(r.applied, []);
+});
+
+test("repair: the second try is kept when it is clean", async () => {
+  const c = blank();
+  c.card_summary = "Six outlets in fifteen years.";
+  let n = 0;
+  const r = await vc.runVoiceRepair(c, "Barstool and Complex", async () => JSON.stringify({ "1": ++n === 1 ? "Barstool, Complex and ESPN." : "Barstool and Complex." }));
+  assert.equal(n, 2);
+  assert.equal(r.comp.card_summary, "Barstool and Complex.");
+  assert.deepEqual(r.rejected, []);
+});
+
+test("badge pair: a found earned_by sends its label along, and both are rewritten together", async () => {
+  const c = blank();
+  c.badges[0].label = "Desk Hound";
+  c.badges[0].earned_by = "He ran the desk.";
+  const calls: string[] = [];
+  const r = await vc.runVoiceRepair(c, "", async (_s: string, user: string) => {
+    calls.push(user);
+    return JSON.stringify({ "1": "You ran the desk.", "2": "Desk Runner" });
+  });
+  const sent = JSON.parse(calls[0]).passages;
+  assert.deepEqual(sent.map((p: Comp) => p.field), ["badges.0.earned_by", "badges.0.label"]);
+  assert.equal(r.comp.badges[0].earned_by, "You ran the desk.");
+  assert.equal(r.comp.badges[0].label, "Desk Runner");
+});
+
+test("badge pair: an earned_by rewrite whose label never changes is thrown out, both halves keep the original", async () => {
+  const c = blank();
+  c.badges[0].label = "Desk Hound";
+  c.badges[0].earned_by = "He ran the desk.";
+  const r = await vc.runVoiceRepair(c, "", async () => JSON.stringify({ "1": "You ran the desk.", "2": "Desk Hound" }));
+  assert.equal(r.comp.badges[0].earned_by, "He ran the desk.");
+  assert.equal(r.comp.badges[0].label, "Desk Hound");
+  assert.deepEqual(r.rejected.sort(), ["1", "2"]);
 });
