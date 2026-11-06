@@ -63,7 +63,9 @@ export const statesPronouns = (careerText: string): boolean => STATED.test(caree
 const PRONOUN = /\b(?:he|she|him|her|his|hers|himself|herself)\b/i;
 // The affirming clause, including the was/were and he/she/they forms of the same move.
 const AFFIRM = String.raw`(?:that['’]s|that is|that was|it['’]s|it is|it was|this is|you['’]re|you are|you were|he['’]s|he is|she['’]s|she is|they['’]re|they are)\b`;
-const NEG = String.raw`\b(?:not|isn['’]t|wasn['’]t|aren['’]t|weren['’]t)\b`;
+// Only a negated "to be" (is not, isn't, that's not, you were not...): the shape denies
+// what something IS. A plain "could not" or "do not" followed by "That is..." is not it.
+const NEG = String.raw`(?:\b(?:is|was|are|were|am)\s+not\b|\b(?:isn|wasn|aren|weren)['’]t\b|['’](?:s|re)\s+not\b)`;
 // "isn't X, it's Y" in one sentence (comma, semicolon, colon or dash between the clauses).
 const SAME_SENTENCE = new RegExp(`${NEG}[^.!?]*?[,;:—–]\\s*(?:but\\s+)?${AFFIRM}`, "i");
 const HAS_NEG = new RegExp(NEG, "i");
