@@ -196,9 +196,9 @@ const CRUTCH = /,\s+which\s+(?:is|was|might be|may be|could be|would be|is proba
 
 // Theme word families common to career comedy. A family in more than two fields is one joke told too often.
 const THEMES: Array<[string, RegExp]> = [
-  ["leaving", /(?<!never )\bleav(?:e|es|ing)\b|\bleft (?:before|after|for|when|once|the|a|an|it|them|every|each)\b|\bwalk(?:s|ed|ing)? (?:out|away)\b|\bmov(?:e|es|ed|ing) on\b|\bexit(?:s|ed|ing)?\b|\bdepart(?:s|ed|ing|ures?)?\b|\bquit(?:s|ting)?\b|\bresign\w*|\bnext (?:stop|job|gig|logo|building|chapter|move)\b|\bgone (?:before|by)\b|\bout the door\b|\blinkedin\b|\bweeks['’]? notice\b|\bpack(?:s|ed|ing)? up\b|\bnew logo\b|\bstep(?:s|ped|ping)? aside\b|\bway out\b/i],
+  ["leaving", /(?<!never )\bleav(?:e|es|ing)\b|\bleft (?:before|after|for|when|once|the|a|an|it|them|every|each)\b|\bwalk(?:s|ed|ing)? (?:out|away)\b|\bmov(?:e|es|ed|ing) on\b|\bexit(?:s|ed|ing)?\b|\bdepart(?:s|ed|ing|ures?)?\b|\bquit(?:s|ting)?\b|\bresign\w*|\bnext (?:stop|job|gig|logo|building|chapter|move)\b|\bgone (?:before|by)\b|\bout the door\b|\blinkedin\b|\bweeks['’]? notice\b|\bpack(?:s|ed|ing)? up\b|\bnew logo\b|\bstep(?:s|ped|ping)? aside\b|\bway out\b|\bshown the door\b|\bmoving van\b/i],
   ["staying", /\bstay(?:s|ed|ing)?\b(?!\s+(?:level|calm|cool|quiet|sharp|focused|great|good|ahead|humble|hungry|composed|steady|curious|relevant|awake))|\bnever (?:left|leaves|leaving|moved|moves|transferred|been traded)\b|\bsame (?:building|company|employer|district|school|classroom|hospital|unit|desk|seat|office|place|franchise|team|shop|firm|organi[sz]ation)\b|\blifers?\b|\bfree agen(?:cy|t)\b|\btrade (?:rumou?rs?|requests?)\b|\bloyal(?:ty)?\b|\bwithout (?:ever )?(?:leaving|moving|a trade)\b|\btenure\b/i],
-  ["build-then-hand-off", /\bhand(?:s|ed|ing)? (?:it |them |the \w+ )?(?:off|over)\b|\bhand-?offs?\b|\bpass(?:es|ed|ing)? (?:it|them) (?:on|off|along)\b|\bsome(?:body|one) else\b|\bthe next (?:person|editor|hire|guy|regime|owner|coach)\b|\bfrom (?:zero|scratch|nothing)\b|\bground up\b|\bsunset(?:s|ted|ting)?\b|\bexpansion (?:team|franchise)\b/i],
+  ["build-then-hand-off", /\bhand(?:s|ed|ing)? (?:it |them |the \w+ )?(?:off|over)\b|\bhand(?:s|ed|ing)? (?:it|them) to\b|\bhand-?offs?\b|\bpass(?:es|ed|ing)? (?:it|them) (?:on|off|along)\b|\bsome(?:body|one) else\b|\bthe next (?:person|editor|hire|guy|regime|owner|coach)\b|\bfrom (?:zero|scratch|nothing)\b|\bground up\b|\bsunset(?:s|ted|ting)?\b|\bexpansion (?:team|franchise)\b/i],
   ["titles and promotions", /\bpromot\w*|(?<!(?:regional|state|national|league|conference|division|world|championship) )\btitles?\b|\btitled\b|\bbusiness cards?\b|\borg chart\b|\bladder\b|\bcorner office\b|\bnameplate\b|\b(?:manager|management|principal|leadership) track\b/i],
   ["assists", /\bassists?\b|\bset(?:s|ting)? up (?:\w+ ){0,3}?(?:shots?|scorers?|buckets?|baskets?)\b|\b(?:takes?|took|taking) the (?:last |big |final |open )?shot\b|\bwhoever (?:takes|scores|shoots|gets the)\b|\bscreens? for\b|\bsetting screens\b|\bbylines?\b|\bother (?:people|guys|players|writers)(?:['’]s)? (?:score|scoring|shots?|buckets?)\b|\bshots go in\b/i],
   ["keeping score", /\bkeep(?:s|ing)? (?:the )?score\b|\bkept score\b|\bscorekeep\w*|\bscorecards?\b|\btally\b|\breceipts\b|\bgrudges?\b/i],
@@ -337,29 +337,16 @@ Problems:
 - copy: the passage repeats words from the prompt's examples (the notes quote them). Say it in new words.
 - theme: this joke or image is already in other fields (the notes say which). Write a new joke from a different résumé fact, in the same form and about the same length: a badge label stays a short Title Case label, a weakness stays a weakness. No two theme rewrites use the same fact.
 
-Every rewrite: the funny part ends the sentence, with no sentence after it that explains it; no advice; no count of employers or stops; years only as the résumé's dates give them; nothing that says what something isn't, then what it is. "context", when given, is the paragraph around the passage: the rewrite has to fit it.
+Every rewrite: the funny part ends the sentence, with no sentence after it that explains it; no advice; no count of employers or stops; years only as the résumé's dates give them; nothing that says what something isn't, then what it is.
 
 Return JSON only, nothing before or after: {"<id>": "<rewritten passage>", ...} with one entry for every id.`;
 
-export function repairMessage(items: RepairItem[], careerText = "", comp?: Comp): string {
+// No surrounding paragraph goes along: in round 5 Haiku pasted it back into its rewrite.
+export function repairMessage(items: RepairItem[], careerText = ""): string {
   const needsFacts = items.some((it) => it.problems.includes("theme") || it.problems.includes("count"));
-  const paragraphOf = (it: RepairItem): string | undefined => {
-    if (it.path !== "full_report" || !comp) return undefined;
-    return comp.full_report.split(/\n\s*\n/).find((p) => p.includes(it.text));
-  };
   return JSON.stringify({
     ...(needsFacts && careerText.trim() ? { resume: careerText } : {}),
-    passages: items.map((it) => {
-      const context = paragraphOf(it);
-      return {
-        id: it.id,
-        field: it.path,
-        problems: it.problems,
-        ...(it.notes?.length ? { notes: it.notes } : {}),
-        ...(context && context !== it.text ? { context } : {}),
-        text: it.text,
-      };
-    }),
+    passages: items.map(({ id, path, problems, notes, text }) => ({ id, field: path, problems, ...(notes?.length ? { notes } : {}), text })),
   });
 }
 
@@ -381,7 +368,8 @@ export function applyRepair(
   for (const it of items) {
     const next = fixes[it.id];
     const current = getAt(out, it.path);
-    if (typeof next !== "string" || !next.trim() || typeof current !== "string" || !current.includes(it.text)) continue;
+    if (typeof next !== "string" || !next.trim() || next.trim() === it.text.trim()) continue; // unchanged is not a repair
+    if (typeof current !== "string" || !current.includes(it.text)) continue;
     setAt(out, it.path, current.replace(it.text, () => next.trim()));
     applied.push(it.id);
     rewrites[it.id] = next.trim();
@@ -398,7 +386,7 @@ export async function runVoiceRepair(
 ): Promise<VoiceRepairResult> {
   const found = findVoiceIssues(comp, careerText);
   if (!found.length) return { comp, found, applied: [], rewrites: {}, remaining: [], called: false };
-  const reply = await callModel(REPAIR_SYSTEM, repairMessage(found, careerText, comp));
+  const reply = await callModel(REPAIR_SYSTEM, repairMessage(found, careerText));
   const { comp: repaired, applied, rewrites } = applyRepair(comp, found, reply);
   return { comp: repaired, found, applied, rewrites, remaining: findVoiceIssues(repaired, careerText), called: true };
 }

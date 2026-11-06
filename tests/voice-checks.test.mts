@@ -91,7 +91,7 @@ test("theme: a joke in more than two fields keeps the screenshot_line and the be
   c.screenshot_line = "Every time it starts working, you're updating LinkedIn.";
   c.full_report = "You left before the second season at BET.\n\nQuiet b2.\n\nYou walked out of SNY once it ran.";
   c.card_summary = "Gone before anyone could ask you to stay.";
-  c.weaknesses[0] = "Leaves the building before the maintenance phase";
+  c.weaknesses[0] = "Shown the door before the maintenance phase";
   const out = problems(c);
   assert.deepEqual(out, ["card_summary:theme", "weaknesses.0:theme", "full_report:theme"]);
   const item = vc.findVoiceIssues(c, "").find((i: Comp) => i.path === "full_report");
@@ -153,7 +153,15 @@ test("repair: no call when nothing is found; the résumé stays out when no fix 
   assert.equal(r.called, false);
   const c = blank();
   c.full_report = "Quiet e1.\n\nThat's not a desk, that's a bunker. Quiet e2.\n\nQuiet e3.";
-  const sent = JSON.parse(vc.repairMessage(vc.findVoiceIssues(c, "RÉSUMÉ"), "RÉSUMÉ", c));
+  const sent = JSON.parse(vc.repairMessage(vc.findVoiceIssues(c, "RÉSUMÉ"), "RÉSUMÉ"));
   assert.equal(sent.resume, undefined);
-  assert.equal(sent.passages[0].context, "That's not a desk, that's a bunker. Quiet e2.");
+  assert.deepEqual(Object.keys(sent.passages[0]), ["id", "field", "problems", "text"]);
+});
+
+test("repair: a rewrite that comes back unchanged doesn't count as applied", async () => {
+  const c = blank();
+  c.card_summary = "He rebuilt the desk.";
+  const r = await vc.runVoiceRepair(c, "", async () => JSON.stringify({ "1": "He rebuilt the desk." }));
+  assert.deepEqual(r.applied, []);
+  assert.equal(r.remaining.length, 1);
 });
