@@ -276,3 +276,44 @@ test("badge pair: an earned_by rewrite whose label never changes is thrown out, 
   assert.equal(r.comp.badges[0].label, "Desk Hound");
   assert.deepEqual(r.rejected.sort(), ["1", "2"]);
 });
+
+test("pronoun: a gendered noun in a mixed field (\"a man who says he is\") is caught; the player's own pronoun isn't", () => {
+  const c = blank();
+  c.full_report = "Quiet w1.\n\nA man who says he is a closer, and the box score agrees.\n\nQuiet w2.";
+  assert.deepEqual(problems(c), ["full_report:pronoun"]);
+  assert.deepEqual(problems(c, "Editor. She/her."), []);
+  const d = blank();
+  d.full_report = "Quiet w1.\n\nHe ran the offense from the elbow.\n\nQuiet w2.";
+  assert.deepEqual(problems(d), []);
+  const e = blank();
+  e.why_this_player = "You called yourself a quiet man, which the tape disputes.";
+  assert.deepEqual(problems(e), ["why_this_player:pronoun"]);
+});
+
+test("pronoun: a repair that rewrites \"a man who says he is\" neutral is applied", async () => {
+  const c = blank();
+  c.card_summary = "A man who says he is a closer.";
+  const r = await vc.runVoiceRepair(c, "", async () => JSON.stringify({ "1": "You say you are a closer." }));
+  assert.deepEqual(r.applied, ["1"]);
+  assert.equal(r.comp.card_summary, "You say you are a closer.");
+  assert.deepEqual(r.remaining, []);
+});
+
+test("call-shape: \"You call it X. The record calls it Y.\" and variants are caught in any field", () => {
+  const lines = [
+    "You call it a steady career. The record calls it a coaching clinic.",
+    "You'd call it luck. The tape calls it a pattern.",
+    "The numbers call it a rebuild.",
+    "You would call it quitting.",
+  ];
+  for (const line of lines) {
+    for (const f of ["card_summary", "full_report", "why_this_player"]) {
+      const c = blank();
+      c[f] = line;
+      assert.deepEqual(problems(c), [`${f}:call-shape`], `${f}: ${line}`);
+    }
+  }
+  const ok = blank();
+  ok.card_summary = "Your mom calls it a hobby. Nobody else does.";
+  assert.deepEqual(problems(ok), []);
+});

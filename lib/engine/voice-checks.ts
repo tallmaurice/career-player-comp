@@ -19,7 +19,8 @@
 //   theme:      the same joke or image in more than two fields (a theme word
 //               family, or a three-word phrase once names and stopwords are set
 //               aside). The screenshot_line and the best one other keep it.
-// pronoun also catches "a man", "a woman", "the guy", "this guy" about the person.
+// pronoun also catches any gendered noun for the person ("a man", "the guy", "a man who says he is"), mixed fields included.
+// call-shape: "You call it X. The record calls it Y." and variants, every prose field.
 // runVoiceRepair() finds them, sends only the offending passages to a model the
 // caller supplies (one call, never a loop), splices the rewrites back in and
 // checks again. Whatever the repair leaves behind is reported, not retried.
@@ -29,7 +30,7 @@
 import type { Comp } from "@/lib/types";
 import { FEW_SHOT_EXAMPLES } from "./system-prompt";
 
-export type VoiceProblem = "pronoun" | "isnt-shape" | "count" | "crutch" | "copy" | "theme" | "banned" | "pair";
+export type VoiceProblem = "pronoun" | "isnt-shape" | "count" | "crutch" | "copy" | "theme" | "banned" | "pair" | "call-shape";
 
 /** One passage to rewrite: a sentence (or two, for the two-sentence shape)
  *  inside the field at `path` ("card_summary", "badges.1.earned_by", ...).
@@ -162,7 +163,18 @@ function namesIn(sents: Sentence[], comp: Comp): Set<string> {
 const STATED = /\b(?:he|she|they)\s*\/\s*(?:him|her|them|his|hers|they|theirs)\b|\bpronouns?\s*[:(]/i;
 export const statesPronouns = (careerText: string): boolean => STATED.test(careerText);
 
-const PRONOUN = /\b(?:he|she|him|her|his|hers|himself|herself)\b|\b(?:a|the|this|that|one)\s+(?:man|woman|guy|gal|lady|dude|gentleman)\b/i;
+const GENDER_NOUN = String.raw`(?:man|woman|guy|gal|lady|dude|gentleman|boy|girl|lad|bloke)`;
+// A gendered noun for the person, with up to two words between ("a quiet man", "the one guy").
+const GENDER_PHRASE = new RegExp(String.raw`\b(?:a|an|the|this|that|one|some|any|another|every|each|such a)\s+(?:[\w'’-]+\s+){0,2}?${GENDER_NOUN}\b`, "i");
+const PRONOUN_WORD = /\b(?:he|she|him|her|his|hers|himself|herself)\b/i;
+const PRONOUN = new RegExp(`${PRONOUN_WORD.source}|${GENDER_PHRASE.source}`, "i");
+// In the fields that mix the person and the player, a gendered noun is the person's only with "you" in the sentence, and a pronoun only when
+// it follows a "who says/claims" or reflexive, e.g. "a man who says he is", "calls himself".
+const PERSON_PRONOUN_CUE = /\bwho\s+(?:says?|said|claims?|claimed|calls?|thinks?|thought|insists?|swears?|tells?|told|believes?|knows?|admits?|promises?)\s+(?:\w+\s+)?(?:he|she)\b|\b(?:himself|herself)\b/i;
+const MIXED_PATHS = new Set(["full_report", "why_this_player", "secondary_comp", "comp_tone"]);
+
+// "You call it X. The record calls it Y." and its close variants.
+const CALL_SHAPE = /\byou(?:['’]d|['’]ll|\s+(?:would|might|could|will|may))?\s+(?:still\s+)?call\s+(?:it|this|that)\b|\bthe\s+[a-z]+(?:\s+[a-z]+)?\s+(?:calls?|would\s+call|will\s+call)\s+(?:it|this|that)\b/i;
 
 // The prompt's slop list, references/banned-phrases.md's hard bans, and the
 // prompt's own scaffolding phrases. Word forms count (unlocks, unlocked).
@@ -311,6 +323,20 @@ export function findVoiceIssues(comp: Comp, careerText: string, opts: { skip?: V
 
   sents.forEach((s, i) => {
     if (checkPronouns && person.has(s.path) && PRONOUN.test(s.text)) hits.push({ ...s, problem: "pronoun" });
+    else if (checkPronouns && MIXED_PATHS.has(s.path)) {
+      // Mixed fields also talk about the player, so only a gendered noun phrase (unless the
+      // sentence names the player) or a pronoun tied to the person is flagged.
+      const aboutYou = /\byou(?:r|rs|rself)?\b/i.test(s.text);
+      if ((aboutYou && GENDER_PHRASE.test(s.text)) || PERSON_PRONOUN_CUE.test(s.text)) hits.push({ ...s, problem: "pronoun" });
+    }
+    if (on("call-shape") && CALL_SHAPE.test(s.text)) {
+      // The pair goes to the repair as one passage.
+      const next = sents[i + 1]?.path === s.path ? sents[i + 1] : undefined;
+      const prev = sents[i - 1]?.path === s.path ? sents[i - 1] : undefined;
+      if (prev && CALL_SHAPE.test(prev.text)) {
+        /* already covered by the previous sentence's hit */
+      } else hits.push({ ...s, end: next && CALL_SHAPE.test(next.text) ? next.end : s.end, problem: "call-shape" });
+    }
     if (on("isnt-shape")) {
       const next = sents[i + 1]?.path === s.path ? sents[i + 1] : undefined;
       if (SAME_SENTENCE.test(s.text)) hits.push({ ...s, problem: "isnt-shape" });
@@ -380,7 +406,8 @@ export function findVoiceIssues(comp: Comp, careerText: string, opts: { skip?: V
 export const REPAIR_SYSTEM = `You are the copy desk for Career Player Comp, a comedy product that compares a person's career to one NBA or WNBA player in a scouting report. You get passages from one report, each with its problems and notes, and, when a fix needs facts, the person's résumé. Rewrite each passage so every problem is gone. Unless a problem says otherwise, keep its facts, its joke and roughly its length, and change as few words as you can.
 
 Problems:
-- pronoun: the passage calls the person he, she, him, her, his, hers, himself or herself, or "a man", "a woman", "the guy", "this guy", and the résumé gives no pronouns. Write to the person as "you", or drop the pronoun. A pronoun for the basketball player can stay.
+- pronoun: the passage calls the person he, she, him, her, his, hers, himself or herself, or any gendered noun for them ("a man", "a woman", "the guy", "this guy", "a man who says he is"), and the résumé gives no pronouns. Rewrite it neutral: speak to the person as "you", or drop the word. A pronoun for the basketball player can stay.
+- call-shape: the passage uses the "You call it X. The record calls it Y." move ("you'd call it", "the tape calls it", "the numbers call it"). Say the true thing directly, once, without a second voice renaming the first.
 - isnt-shape: the passage says what something isn't, then what it is ("That's not X, that's Y"; "It isn't X. It's Y."). Say the true thing directly, as one statement.
 - count: the passage counts employers, jobs, outlets, stops, places, teams or titles ("six outlets", "one company"). Name them from the résumé ("the same company" for one), or drop the count.
 - crutch: the passage ends on a ", which is the most..." or ", which is exactly what..." tag the report has already used. Land the joke inside the sentence, without that tag.
