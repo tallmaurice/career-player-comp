@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Privacy() {
   return (
-    <LegalPage title="Privacy Policy" updated="November 4, 2026">
+    <LegalPage title="Privacy Policy" updated="November 10, 2026">
       <p>
         <strong>The short version.</strong> No accounts. We do not store what
         you submit or the report we generate. No tracking cookies, no ads, and
