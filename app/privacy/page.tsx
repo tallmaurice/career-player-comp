@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Privacy() {
   return (
-    <LegalPage title="Privacy Policy" updated="June 30, 2026">
+    <LegalPage title="Privacy Policy" updated="November 10, 2026">
       <p>
         <strong>The short version.</strong> No accounts. We do not store what
         you submit or the report we generate. No tracking cookies, no ads, and
@@ -85,9 +85,13 @@ export default function Privacy() {
 
       <h2>Cookies and tracking</h2>
       <p>
-        We do not use tracking cookies, analytics, advertising pixels, or
-        third-party trackers. Because we set no non-essential cookies, there is
-        no cookie consent banner to click through.
+        We count visits with Vercel Web Analytics, which sets no cookies and
+        does not identify you. It records the page you viewed, the site that
+        sent you, your approximate location, and your browser, operating system
+        and device type, and we only see totals. We do not use tracking cookies,
+        advertising pixels, or third-party trackers. Because we set no
+        non-essential cookies, there is no cookie consent banner to click
+        through.
       </p>
 
       <h2>Service providers</h2>
@@ -101,7 +105,7 @@ export default function Privacy() {
           text.
         </li>
         <li>
-          <strong>Vercel</strong> hosts the site.
+          <strong>Vercel</strong> hosts the site and counts visits.
         </li>
         <li>
           <strong>Upstash</strong> powers rate limiting and the anonymous
