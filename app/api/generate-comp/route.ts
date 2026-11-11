@@ -157,7 +157,7 @@ const SYSTEM_BLOCKS: Anthropic.TextBlockParam[] = [
 
 // ---- Rate limiting / kill-switch (graceful no-op without Upstash) -----------
 
-type LimitState = { rateLimited: boolean; spendExhausted: boolean };
+type LimitState = { rateLimited: boolean; spendExhausted: boolean; afterHours?: boolean };
 
 async function checkLimits(ip: string): Promise<LimitState> {
   if (BYPASS_IPS.has(ip)) {
@@ -197,7 +197,7 @@ async function checkLimits(ip: string): Promise<LimitState> {
     // checkLimits entirely, so the $2 lane stays open all night.
     const h = etHour();
     if (h < FREE_OPEN_HOUR || h >= FREE_CLOSE_HOUR) {
-      return { rateLimited: false, spendExhausted: true };
+      return { rateLimited: false, spendExhausted: false, afterHours: true };
     }
 
     // Global daily spend kill-switch: a per-UTC-day counter.
@@ -439,9 +439,19 @@ export async function POST(req: Request): Promise<Response> {
     : "";
   const paidPass = paidSession ? await verifyPass(paidSession) : false;
 
-  const { rateLimited, spendExhausted } = paidPass
-    ? { rateLimited: false, spendExhausted: false }
+  const { rateLimited, spendExhausted, afterHours } = paidPass
+    ? { rateLimited: false, spendExhausted: false, afterHours: false }
     : await checkLimits(ip);
+  if (afterHours) {
+    // The free room is closed by the clock, not by the budget.
+    return Response.json(
+      {
+        error: "The scouts are out for the day. Back tomorrow.",
+        reason: "after_hours",
+      },
+      { status: 429 },
+    );
+  }
   if (spendExhausted) {
     // Global daily cap tripped -> the branded "scouts are out for the day" page.
     return Response.json(

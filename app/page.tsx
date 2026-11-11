@@ -368,8 +368,15 @@ export default function Page() {
       // unless the GLOBAL daily cap tripped, which retrying won't fix. Then show
       // the branded "scouts are out for the day" page (tip + sponsor).
       if (error) {
-        if (errorReason === "daily_cap") {
-          return <ScoutsOut tipUrl={TIP_URL} skipUrl={SKIP_URL} onReset={reset} />;
+        if (errorReason === "daily_cap" || errorReason === "after_hours") {
+          return (
+            <ScoutsOut
+              tipUrl={TIP_URL}
+              skipUrl={SKIP_URL}
+              onReset={reset}
+              afterHours={errorReason === "after_hours"}
+            />
+          );
         }
         return (
           <RetryScreen
@@ -508,10 +515,12 @@ function ScoutsOut({
   tipUrl,
   skipUrl,
   onReset,
+  afterHours = false,
 }: {
   tipUrl: string;
   skipUrl: string;
   onReset: () => void;
+  afterHours?: boolean;
 }) {
   const sponsorUrl =
     "mailto:hello@careerplayercomp.com?subject=Sponsoring%20the%20scouting%20room";
@@ -583,8 +592,9 @@ function ScoutsOut({
       >
         Every report here is a real AI scout reading your whole career, not a
         template spitting out a name. That costs real money every run, and
-        today&rsquo;s free scouting budget is spent. The free room reopens at
-        8am Eastern.
+        {afterHours
+          ? " the free room is closed outside 8am to 8pm Eastern. It reopens at 8am."
+          : " today’s free scouting budget is spent. The free room reopens at 8am Eastern."}
       </p>
 
       {scoutedTotal !== null && (
