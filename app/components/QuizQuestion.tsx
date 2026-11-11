@@ -396,6 +396,8 @@ const mobileWrap: React.CSSProperties = {
   width: "100%",
   minHeight: "100vh",
   position: "relative",
+  display: "flex",
+  flexDirection: "column",
   fontFamily: "var(--font-body)",
   overflow: "hidden",
 };
@@ -442,12 +444,11 @@ const mobileQuestion: React.CSSProperties = {
   textWrap: "balance",
 };
 const mobileFooter: React.CSSProperties = {
-  position: "absolute",
-  left: 22,
-  right: 22,
-  bottom: 22,
+  // In the flow, not pinned: it sits at the bottom when the screen is tall and
+  // drops below the last option when the screen is short.
+  marginTop: "auto",
+  padding: "28px 22px 22px",
   textAlign: "center",
-  paddingTop: 16,
 };
 const mobileFooterTxt: React.CSSProperties = {
   font: `400 9.5px ${MONO}`,
