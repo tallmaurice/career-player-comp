@@ -63,7 +63,7 @@ export default function LegalPage({
         </a>
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             color: "var(--faint)",
             letterSpacing: "0.18em",
           }}
@@ -95,7 +95,7 @@ export default function LegalPage({
         </h1>
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             color: "var(--faint)",
             letterSpacing: "0.18em",
             marginBottom: 6,
@@ -112,7 +112,7 @@ export default function LegalPage({
           marginTop: "auto",
           padding: "0 clamp(22px, 5vw, 56px) 30px",
           textAlign: "center",
-          font: `400 11px ${MONO}`,
+          font: `400 12px ${MONO}`,
           color: "var(--faint)",
           letterSpacing: "0.14em",
           lineHeight: 1.7,

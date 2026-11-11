@@ -282,7 +282,7 @@ const vLabelLeft: React.CSSProperties = {
   top: "50%",
   transform: "translateY(-50%) rotate(180deg)",
   writingMode: "vertical-rl",
-  font: `500 10px ${MONO}`,
+  font: `500 12px ${MONO}`,
   letterSpacing: "0.34em",
   color: "var(--faint)",
   zIndex: 1,
@@ -293,7 +293,7 @@ const vLabelRight: React.CSSProperties = {
   top: "50%",
   transform: "translateY(-50%)",
   writingMode: "vertical-rl",
-  font: `500 10px ${MONO}`,
+  font: `500 12px ${MONO}`,
   letterSpacing: "0.34em",
   color: "var(--faint)",
   zIndex: 1,
@@ -312,17 +312,17 @@ const desktopBackBtn: React.CSSProperties = {
   border: "1px solid rgba(33,30,23,0.18)",
   color: "var(--muted)",
   padding: "8px 14px",
-  font: `500 11px ${MONO}`,
+  font: `500 12px ${MONO}`,
   letterSpacing: "0.14em",
   borderRadius: 4,
 };
 const desktopFileNo: React.CSSProperties = {
-  font: `500 11px ${MONO}`,
+  font: `500 12px ${MONO}`,
   color: "var(--muted)",
   letterSpacing: "0.22em",
 };
 const desktopBrand: React.CSSProperties = {
-  font: `500 11px ${MONO}`,
+  font: `500 12px ${MONO}`,
   color: "var(--faint)",
   letterSpacing: "0.18em",
   // reset button chrome so the clickable wordmark looks identical to the
@@ -355,7 +355,7 @@ const desktopCenter: React.CSSProperties = {
   zIndex: 1,
 };
 const desktopOnFilm: React.CSSProperties = {
-  font: `400 11px ${MONO}`,
+  font: `400 12px ${MONO}`,
   color: "var(--green)",
   letterSpacing: "0.28em",
   marginBottom: 24,
@@ -371,7 +371,7 @@ const desktopQuestion: React.CSSProperties = {
   textWrap: "balance",
 };
 const selectedTag: React.CSSProperties = {
-  font: `500 10px ${MONO}`,
+  font: `500 12px ${MONO}`,
   color: "var(--green)",
   letterSpacing: "0.2em",
 };
@@ -386,7 +386,7 @@ const desktopFooter: React.CSSProperties = {
   zIndex: 1,
 };
 const desktopFooterTxt: React.CSSProperties = {
-  font: `400 11px ${MONO}`,
+  font: `400 12px ${MONO}`,
   color: "var(--faint)",
   letterSpacing: "0.18em",
 };
@@ -410,12 +410,12 @@ const mobileBackBtn: React.CSSProperties = {
   border: "1px solid rgba(33,30,23,0.18)",
   color: "var(--muted)",
   padding: "6px 10px",
-  font: `500 10px ${MONO}`,
+  font: `500 12px ${MONO}`,
   letterSpacing: "0.14em",
   borderRadius: 4,
 };
 const mobileFileNo: React.CSSProperties = {
-  font: `500 10px ${MONO}`,
+  font: `500 12px ${MONO}`,
   color: "var(--muted)",
   letterSpacing: "0.22em",
 };
@@ -426,7 +426,7 @@ const mobileDots: React.CSSProperties = {
   marginTop: 14,
 };
 const mobileOnFilm: React.CSSProperties = {
-  font: `400 10px ${MONO}`,
+  font: `400 12px ${MONO}`,
   color: "var(--green)",
   letterSpacing: "0.28em",
   marginBottom: 18,
@@ -450,7 +450,7 @@ const mobileFooter: React.CSSProperties = {
   paddingTop: 16,
 };
 const mobileFooterTxt: React.CSSProperties = {
-  font: `400 9.5px ${MONO}`,
+  font: `400 12px ${MONO}`,
   color: "var(--faint)",
   letterSpacing: "0.18em",
 };

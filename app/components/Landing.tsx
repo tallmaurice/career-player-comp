@@ -143,7 +143,7 @@ function LandingDesktop({
         </button>
         <div
           style={{
-            font: "400 11px var(--font-mono)",
+            font: "400 12px var(--font-mono)",
             color: "#a8a090",
             letterSpacing: "0.18em",
           }}
@@ -169,7 +169,7 @@ function LandingDesktop({
         <div>
           <div
             style={{
-              font: "400 11px var(--font-mono)",
+              font: "400 12px var(--font-mono)",
               letterSpacing: "0.28em",
               color: "#2f6043",
               marginBottom: "28px",
@@ -253,7 +253,7 @@ function LandingDesktop({
             </button>
             <div
               style={{
-                font: "400 11px var(--font-mono)",
+                font: "400 12px var(--font-mono)",
                 color: "#a8a090",
                 letterSpacing: "0.16em",
               }}
@@ -282,7 +282,7 @@ function LandingDesktop({
               />
               <div
                 style={{
-                  font: "400 11px var(--font-mono)",
+                  font: "400 12px var(--font-mono)",
                   color: "#2f6043",
                   letterSpacing: "0.18em",
                 }}
@@ -335,7 +335,7 @@ function LandingDesktop({
       >
         <div
           style={{
-            font: "400 11px var(--font-mono)",
+            font: "400 12px var(--font-mono)",
             color: "#a8a090",
             letterSpacing: "0.18em",
           }}
@@ -344,7 +344,7 @@ function LandingDesktop({
         </div>
         <div
           style={{
-            font: "400 11px var(--font-mono)",
+            font: "400 12px var(--font-mono)",
             color: "#a8a090",
             letterSpacing: "0.18em",
           }}
@@ -361,7 +361,7 @@ function HonestStat({ label, value }: { label: string; value: string }) {
     <div>
       <div
         style={{
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "#a8a090",
           letterSpacing: "0.16em",
           marginBottom: "6px",
@@ -397,7 +397,7 @@ function SampleCardDesktop() {
       </div>
       <div
         style={{
-          font: "500 10px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           letterSpacing: "0.22em",
           color: "#6b655a",
           marginBottom: "16px",
@@ -421,7 +421,7 @@ function SampleCardDesktop() {
       </div>
       <div
         style={{
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "#6b655a",
           letterSpacing: "0.14em",
           marginBottom: "18px",
@@ -493,7 +493,7 @@ function SampleCardDesktop() {
           >
             <div
               style={{
-                font: "500 9px var(--font-mono)",
+                font: "500 12px var(--font-mono)",
                 color: g.color,
                 letterSpacing: "0.14em",
               }}
@@ -516,7 +516,7 @@ function SampleCardDesktop() {
               </span>
               <span
                 className="suf"
-                style={{ fontSize: "11px", width: "8px", color: g.color }}
+                style={{ fontSize: "12px", width: "8px", color: g.color }}
               >
                 {g.suffix}
               </span>
@@ -560,7 +560,7 @@ function CardBadge({
   return (
     <span
       style={{
-        font: "500 10px var(--font-mono)",
+        font: "500 12px var(--font-mono)",
         letterSpacing: "0.14em",
         padding: "5px 9px",
         border: `1px solid ${borderColor}`,
@@ -586,7 +586,7 @@ function CardStat({
     <div>
       <div
         style={{
-          font: "400 9px var(--font-mono)",
+          font: "400 12px var(--font-mono)",
           color: "#a8a090",
           letterSpacing: "0.16em",
           marginBottom: "3px",
@@ -644,7 +644,7 @@ function LandingMobile({
           <div style={{ width: "6px", height: "6px", background: "#2f6043" }} />
           <div
             style={{
-              font: "600 11px var(--font-display)",
+              font: "600 12px var(--font-display)",
               letterSpacing: "0.22em",
             }}
           >
@@ -653,7 +653,7 @@ function LandingMobile({
         </button>
         <div
           style={{
-            font: "400 9px var(--font-mono)",
+            font: "400 12px var(--font-mono)",
             color: "#a8a090",
             letterSpacing: "0.16em",
           }}
@@ -666,7 +666,7 @@ function LandingMobile({
       <div style={{ padding: "36px 22px 20px", position: "relative", zIndex: 1 }}>
         <div
           style={{
-            font: "400 10px var(--font-mono)",
+            font: "400 12px var(--font-mono)",
             letterSpacing: "0.24em",
             color: "#2f6043",
             marginBottom: "16px",
@@ -747,7 +747,7 @@ function LandingMobile({
         </button>
         <div
           style={{
-            font: "400 10px var(--font-mono)",
+            font: "400 12px var(--font-mono)",
             color: "#a8a090",
             letterSpacing: "0.18em",
             textAlign: "center",
@@ -759,7 +759,7 @@ function LandingMobile({
         {scouted ? (
           <div
             style={{
-              font: "400 10px var(--font-mono)",
+              font: "400 12px var(--font-mono)",
               color: "#2f6043",
               letterSpacing: "0.18em",
               textAlign: "center",
@@ -783,13 +783,16 @@ function SampleCardMobile() {
         className="paper-card tilt-card"
         style={{ padding: "22px 20px" }}
       >
-      <div className="stamp" style={{ top: "12px", right: "12px" }}>
+      <div
+        className="stamp"
+        style={{ position: "relative", top: "auto", right: "auto", display: "inline-block", marginBottom: "14px" }}
+      >
         <span className="dept">SCOUTING DEPT.</span>
         <span className="cls">SAMPLE</span>
       </div>
       <div
         style={{
-          font: "500 9px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           letterSpacing: "0.2em",
           color: "#6b655a",
           marginBottom: "12px",
@@ -799,7 +802,7 @@ function SampleCardMobile() {
       </div>
       <div
         className="file-no"
-        style={{ marginBottom: "14px", fontSize: "9px" }}
+        style={{ marginBottom: "14px", fontSize: "12px" }}
       >
         FILE No. 2026-4471
       </div>
@@ -815,7 +818,7 @@ function SampleCardMobile() {
       </div>
       <div
         style={{
-          font: "500 10px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "#6b655a",
           letterSpacing: "0.14em",
           marginBottom: "14px",
@@ -875,7 +878,7 @@ function SampleCardMobile() {
             key={g.label}
             style={{
               display: "grid",
-              gridTemplateColumns: "72px 1fr 28px",
+              gridTemplateColumns: "100px 1fr 28px",
               gap: "10px",
               alignItems: "center",
               padding: "5px 0",
@@ -887,7 +890,7 @@ function SampleCardMobile() {
           >
             <div
               style={{
-                font: "500 8px var(--font-mono)",
+                font: "500 12px var(--font-mono)",
                 color: g.color,
                 letterSpacing: "0.14em",
               }}
@@ -910,7 +913,7 @@ function SampleCardMobile() {
               </span>
               <span
                 className="suf"
-                style={{ fontSize: "9px", width: "7px", color: g.color }}
+                style={{ fontSize: "12px", width: "7px", color: g.color }}
               >
                 {g.suffix}
               </span>
@@ -954,7 +957,7 @@ function CardBadgeMobile({
   return (
     <span
       style={{
-        font: "500 9px var(--font-mono)",
+        font: "500 12px var(--font-mono)",
         letterSpacing: "0.14em",
         padding: "4px 7px",
         border: `1px solid ${borderColor}`,
@@ -980,7 +983,7 @@ function CardStatMobile({
     <div>
       <div
         style={{
-          font: "400 8px var(--font-mono)",
+          font: "400 12px var(--font-mono)",
           color: "#a8a090",
           letterSpacing: "0.14em",
         }}

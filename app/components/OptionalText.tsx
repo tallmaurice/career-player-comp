@@ -168,14 +168,14 @@ export default function OptionalText({
               border: "1px solid rgba(33,30,23,0.18)",
               color: "#6b655a",
               padding: "6px 10px",
-              font: `500 10px ${MONO}`,
+              font: `500 12px ${MONO}`,
               letterSpacing: "0.14em",
               borderRadius: 4,
             }}
           >
             &larr; BACK
           </button>
-          <div style={{ font: `500 10px ${MONO}`, color: "#6b655a", letterSpacing: "0.22em" }}>
+          <div style={{ font: `500 12px ${MONO}`, color: "#6b655a", letterSpacing: "0.22em" }}>
             {cfg.counter}
           </div>
           <div style={{ width: 46 }} />
@@ -199,7 +199,7 @@ export default function OptionalText({
         <div style={{ padding: which === 9 ? "48px 22px 0" : "40px 22px 0" }}>
           <div
             style={{
-              font: `400 10px ${MONO}`,
+              font: `400 12px ${MONO}`,
               color: "#2f6043",
               letterSpacing: "0.28em",
               marginBottom: 16,
@@ -274,7 +274,7 @@ export default function OptionalText({
                 onSkip();
               }}
               style={{
-                font: `500 10px ${MONO}`,
+                font: `500 12px ${MONO}`,
                 color: "#6b655a",
                 letterSpacing: "0.16em",
                 textDecoration: "none",
@@ -355,7 +355,7 @@ export default function OptionalText({
           top: "50%",
           transform: "translateY(-50%) rotate(180deg)",
           writingMode: "vertical-rl",
-          font: `500 10px ${MONO}`,
+          font: `500 12px ${MONO}`,
           letterSpacing: "0.34em",
           color: "#a8a090",
           zIndex: 1,
@@ -370,7 +370,7 @@ export default function OptionalText({
           top: "50%",
           transform: "translateY(-50%)",
           writingMode: "vertical-rl",
-          font: `500 10px ${MONO}`,
+          font: `500 12px ${MONO}`,
           letterSpacing: "0.34em",
           color: "#a8a090",
           zIndex: 1,
@@ -399,14 +399,14 @@ export default function OptionalText({
             border: "1px solid rgba(33,30,23,0.18)",
             color: "#6b655a",
             padding: "8px 14px",
-            font: `500 11px ${MONO}`,
+            font: `500 12px ${MONO}`,
             letterSpacing: "0.14em",
             borderRadius: 4,
           }}
         >
           &larr; BACK
         </button>
-        <div style={{ font: `500 11px ${MONO}`, color: "#6b655a", letterSpacing: "0.22em" }}>
+        <div style={{ font: `500 12px ${MONO}`, color: "#6b655a", letterSpacing: "0.22em" }}>
           {cfg.counter}
         </div>
         <button
@@ -415,7 +415,7 @@ export default function OptionalText({
           aria-label="Career Player Comp — home"
           className="cpc-home"
           style={{
-            font: `500 11px ${MONO}`,
+            font: `500 12px ${MONO}`,
             color: "#a8a090",
             letterSpacing: "0.18em",
             background: "transparent",
@@ -453,7 +453,7 @@ export default function OptionalText({
       >
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             color: "#2f6043",
             letterSpacing: "0.28em",
             marginBottom: 24,
@@ -509,7 +509,7 @@ export default function OptionalText({
               onSkip();
             }}
             style={{
-              font: `500 11px ${MONO}`,
+              font: `500 12px ${MONO}`,
               color: "#6b655a",
               letterSpacing: "0.16em",
               textDecoration: "none",
