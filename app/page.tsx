@@ -419,7 +419,7 @@ function Disclaimer() {
       style={{
         textAlign: "center",
         padding: "0 22px 28px",
-        font: "400 11px var(--font-mono)",
+        font: "400 12px var(--font-mono)",
         color: "var(--faint)",
         letterSpacing: "0.14em",
       }}
@@ -561,7 +561,7 @@ function ScoutsOut({
     >
       <div
         style={{
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "var(--green)",
           letterSpacing: "0.3em",
           marginBottom: 22,
@@ -613,7 +613,7 @@ function ScoutsOut({
           </div>
           <div
             style={{
-              font: "500 10px var(--font-mono)",
+              font: "500 12px var(--font-mono)",
               color: "var(--muted, #5a5347)",
               letterSpacing: "0.28em",
               textTransform: "uppercase",
@@ -627,7 +627,7 @@ function ScoutsOut({
           {scoutedToday !== null && (
             <div
               style={{
-                font: "500 10px var(--font-mono)",
+                font: "500 12px var(--font-mono)",
                 color: "var(--muted, #5a5347)",
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
@@ -724,7 +724,7 @@ function ScoutsOut({
       <div
         style={{
           marginTop: 26,
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "var(--muted, #5a5347)",
           letterSpacing: "0.14em",
           textTransform: "uppercase",
@@ -797,7 +797,7 @@ function RetryScreen({
     >
       <div
         style={{
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "var(--green)",
           letterSpacing: "0.3em",
           marginBottom: 24,

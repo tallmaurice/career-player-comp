@@ -241,7 +241,7 @@ function buildReportHTML(comp: Comp): string {
   * { box-sizing: border-box; }
   body { font-family: 'Inter', system-ui, -apple-system, sans-serif; color: #2b2820; line-height: 1.55; margin: 0; }
   .doc { max-width: 720px; margin: 0 auto; padding: 8px 0 32px; }
-  .top { display: flex; justify-content: space-between; align-items: center; font: 600 11px/1 'JetBrains Mono', monospace; letter-spacing: .22em; color: #2f6043; text-transform: uppercase; border-bottom: 2px solid #2f6043; padding-bottom: 10px; }
+  .top { display: flex; justify-content: space-between; align-items: center; font: 600 12px/1 'JetBrains Mono', monospace; letter-spacing: .22em; color: #2f6043; text-transform: uppercase; border-bottom: 2px solid #2f6043; padding-bottom: 10px; }
   .top .file { color: #a8a090; font-weight: 400; letter-spacing: .16em; }
   h1 { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 52px; line-height: .95; text-transform: uppercase; letter-spacing: -.01em; margin: 22px 0 4px; }
   .pos { font: 500 12px 'JetBrains Mono', monospace; letter-spacing: .14em; color: #6b655a; text-transform: uppercase; }
@@ -250,23 +250,23 @@ function buildReportHTML(comp: Comp): string {
   .ratings .n { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 700; }
   .ratings .ovr .n { font-size: 40px; color: #2f6043; }
   .ratings .pot .n { font-size: 30px; color: #2b2820; }
-  .ratings .lab { font: 500 10px 'JetBrains Mono', monospace; letter-spacing: .18em; color: #6b655a; margin-left: 6px; }
+  .ratings .lab { font: 500 12px 'JetBrains Mono', monospace; letter-spacing: .18em; color: #6b655a; margin-left: 6px; }
   .rat-why { font-size: 12.5px; color: #4a463d; margin: 6px 0 18px; }
   .deal { display: flex; gap: 40px; font: 500 13px 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }
-  .deal .k { color: #a8a090; font-size: 10px; letter-spacing: .16em; display: block; margin-bottom: 3px; }
-  h2 { font: 600 10px 'JetBrains Mono', monospace; letter-spacing: .24em; color: #2f6043; text-transform: uppercase; border-bottom: 1px solid #d8d2c2; padding-bottom: 6px; margin: 26px 0 12px; }
+  .deal .k { color: #a8a090; font-size: 12px; letter-spacing: .16em; display: block; margin-bottom: 3px; }
+  h2 { font: 600 12px 'JetBrains Mono', monospace; letter-spacing: .24em; color: #2f6043; text-transform: uppercase; border-bottom: 1px solid #d8d2c2; padding-bottom: 6px; margin: 26px 0 12px; }
   p { margin: 0 0 12px; font-size: 14px; }
   .quote { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 22px; color: #2f6043; text-transform: uppercase; line-height: 1.25; }
   .grades { font: 500 13px 'JetBrains Mono', monospace; letter-spacing: .04em; }
   ul { margin: 0; padding-left: 18px; } li { margin-bottom: 7px; font-size: 13.5px; }
   .cols { display: flex; gap: 40px; } .cols > div { flex: 1; }
-  .tier { font: 500 11px 'JetBrains Mono', monospace; color: #bd5024; letter-spacing: .06em; }
+  .tier { font: 500 12px 'JetBrains Mono', monospace; color: #bd5024; letter-spacing: .06em; }
   .muted { color: #6b655a; } .colhead { color: #2f6043; }
   table.seasons { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.seasons td { padding: 8px 8px 8px 0; border-bottom: 1px solid #ece6d6; vertical-align: top; }
-  table.seasons .yr { font: 500 11px 'JetBrains Mono', monospace; color: #2f6043; white-space: nowrap; width: 92px; }
+  table.seasons .yr { font: 500 12px 'JetBrains Mono', monospace; color: #2f6043; white-space: nowrap; width: 92px; }
   table.seasons .tm { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; text-transform: uppercase; font-size: 14px; width: 160px; }
-  .foot { margin-top: 30px; padding-top: 12px; border-top: 1px solid #d8d2c2; font: 400 10px 'JetBrains Mono', monospace; letter-spacing: .12em; color: #a8a090; text-transform: uppercase; }
+  .foot { margin-top: 30px; padding-top: 12px; border-top: 1px solid #d8d2c2; font: 400 12px 'JetBrains Mono', monospace; letter-spacing: .12em; color: #a8a090; text-transform: uppercase; }
 </style></head>
 <body><div class="doc">
   <div class="top"><span>Career Player Comp · Scouting Report</span><span class="file">File No. 2026-4471</span></div>
@@ -535,7 +535,7 @@ export default function Results({
           </button>
           <div
             style={{
-              font: "400 11px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.18em",
             }}
@@ -579,7 +579,7 @@ export default function Results({
               </div>
               <div
                 style={{
-                  font: "400 10px 'JetBrains Mono', monospace",
+                  font: "400 12px 'JetBrains Mono', monospace",
                   color: "#a8a090",
                   letterSpacing: "0.2em",
                   marginTop: 12,
@@ -594,7 +594,7 @@ export default function Results({
           <div style={{ paddingTop: 54, maxWidth: 400 }}>
             <div
               style={{
-                font: "500 10px 'JetBrains Mono', monospace",
+                font: "500 12px 'JetBrains Mono', monospace",
                 color: "#2f6043",
                 letterSpacing: "0.24em",
                 marginBottom: 14,
@@ -660,7 +660,7 @@ export default function Results({
                 >
                   <div
                     style={{
-                      font: "500 11px 'JetBrains Mono', monospace",
+                      font: "500 12px 'JetBrains Mono', monospace",
                       color: g.color,
                       letterSpacing: "0.18em",
                     }}
@@ -719,7 +719,7 @@ export default function Results({
                 </div>
                 <div
                   style={{
-                    font: "400 9.5px 'JetBrains Mono', monospace",
+                    font: "400 12px 'JetBrains Mono', monospace",
                     color: "#a8a090",
                     letterSpacing: "0.2em",
                     marginTop: 3,
@@ -730,7 +730,7 @@ export default function Results({
               </div>
               <div
                 style={{
-                  font: "500 10px 'JetBrains Mono', monospace",
+                  font: "500 12px 'JetBrains Mono', monospace",
                   color: "#2f6043",
                   letterSpacing: "0.22em",
                   opacity: 0.7,
@@ -861,7 +861,7 @@ export default function Results({
                 href="#"
                 onClick={onAppealClick}
                 style={{
-                  font: "500 11px 'JetBrains Mono', monospace",
+                  font: "500 12px 'JetBrains Mono', monospace",
                   color: "#2f6043",
                   letterSpacing: "0.2em",
                   textDecoration: "none",
@@ -873,7 +873,7 @@ export default function Results({
               </a>
               <div
                 style={{
-                  font: "400 10px 'JetBrains Mono', monospace",
+                  font: "400 12px 'JetBrains Mono', monospace",
                   color: "#a8a090",
                   letterSpacing: "0.18em",
                 }}
@@ -894,7 +894,7 @@ export default function Results({
         <div style={{ maxWidth: 780, margin: "0 auto", padding: "8px 56px 80px" }}>
           <div
             style={{
-              font: "500 10px 'JetBrains Mono', monospace",
+              font: "500 12px 'JetBrains Mono', monospace",
               color: "#2f6043",
               letterSpacing: "0.24em",
               marginBottom: 14,
@@ -926,7 +926,7 @@ export default function Results({
           <div
             style={{
               marginTop: 24,
-              font: "400 11px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.18em",
             }}
@@ -970,7 +970,7 @@ export default function Results({
             <div style={{ width: 6, height: 6, background: "#2f6043" }} />
             <div
               style={{
-                font: "600 11px 'Barlow Condensed'",
+                font: "600 12px 'Barlow Condensed'",
                 letterSpacing: "0.22em",
               }}
             >
@@ -979,7 +979,7 @@ export default function Results({
           </button>
           <div
             style={{
-              font: "400 9px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.16em",
             }}
@@ -1005,7 +1005,7 @@ export default function Results({
           </div>
           <div
             style={{
-              font: "400 9px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.2em",
               marginTop: 8,
@@ -1021,7 +1021,7 @@ export default function Results({
         <div style={{ padding: "26px 22px 4px" }}>
           <div
             style={{
-              font: "400 10px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#2f6043",
               letterSpacing: "0.28em",
               marginBottom: 10,
@@ -1073,7 +1073,7 @@ export default function Results({
               >
                 <div
                   style={{
-                    font: "500 10px 'JetBrains Mono', monospace",
+                    font: "500 12px 'JetBrains Mono', monospace",
                     color: g.color,
                     letterSpacing: "0.16em",
                   }}
@@ -1229,7 +1229,7 @@ export default function Results({
         <div style={{ padding: "24px 22px 0" }}>
           <div
             style={{
-              font: "500 10px 'JetBrains Mono', monospace",
+              font: "500 12px 'JetBrains Mono', monospace",
               color: "#2f6043",
               letterSpacing: "0.22em",
               marginBottom: 12,
@@ -1260,7 +1260,7 @@ export default function Results({
           ))}
           <div
             style={{
-              font: "400 10px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.18em",
             }}
@@ -1284,7 +1284,7 @@ export default function Results({
             href="#"
             onClick={onAppealClick}
             style={{
-              font: "500 10px 'JetBrains Mono', monospace",
+              font: "500 12px 'JetBrains Mono', monospace",
               color: "#2f6043",
               letterSpacing: "0.18em",
               textDecoration: "none",
@@ -1296,7 +1296,7 @@ export default function Results({
           </a>
           <div
             style={{
-              font: "400 9px 'JetBrains Mono', monospace",
+              font: "400 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.18em",
             }}
@@ -1410,7 +1410,7 @@ function CardTilt({
 
         <div
           className="layer-z1 file-no"
-          style={mobile ? { marginBottom: 16, fontSize: 9 } : { marginBottom: 22 }}
+          style={mobile ? { marginBottom: 16, fontSize: 12 } : { marginBottom: 22 }}
         >
           FILE No. 2026-4471
         </div>
@@ -1696,7 +1696,7 @@ function CreatorCredit() {
     >
       <div
         style={{
-          font: "400 10px 'JetBrains Mono', monospace",
+          font: "400 12px 'JetBrains Mono', monospace",
           color: "#a8a090",
           letterSpacing: "0.16em",
         }}
@@ -1713,7 +1713,7 @@ function CreatorCredit() {
       </div>
       <div
         style={{
-          font: "400 11px/1.5 'Inter'",
+          font: "400 12px/1.5 'Inter'",
           color: "#a8a090",
         }}
       >
@@ -1746,7 +1746,7 @@ function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) 
     >
       <div
         style={{
-          font: "500 10px 'JetBrains Mono', monospace",
+          font: "500 12px 'JetBrains Mono', monospace",
           color: "#2f6043",
           letterSpacing: "0.24em",
           marginBottom: 12,
@@ -1775,7 +1775,7 @@ function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) 
           </span>
           <span
             style={{
-              font: "500 10px 'JetBrains Mono', monospace",
+              font: "500 12px 'JetBrains Mono', monospace",
               color: "#6b655a",
               letterSpacing: "0.18em",
             }}
@@ -1796,7 +1796,7 @@ function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) 
           </span>
           <span
             style={{
-              font: "500 10px 'JetBrains Mono', monospace",
+              font: "500 12px 'JetBrains Mono', monospace",
               color: "#a8a090",
               letterSpacing: "0.18em",
             }}
@@ -1816,7 +1816,7 @@ function RatingNote({ comp, mobile = false }: { comp: Comp; mobile?: boolean }) 
       </p>
       <p
         style={{
-          font: "400 11px/1.55 'Inter'",
+          font: "400 12px/1.55 'Inter'",
           color: "#a8a090",
           margin: 0,
         }}
@@ -1891,7 +1891,7 @@ function DepthSection({
     <>
       <div
         style={{
-          font: "500 10px 'JetBrains Mono', monospace",
+          font: "500 12px 'JetBrains Mono', monospace",
           color: "#2f6043",
           letterSpacing: "0.24em",
           marginBottom: 14,
@@ -1913,7 +1913,7 @@ function DepthSection({
     <div style={{ marginBottom: mobile ? 18 : 0 }}>
       <div
         style={{
-          font: "500 11px 'JetBrains Mono', monospace",
+          font: "500 12px 'JetBrains Mono', monospace",
           color,
           letterSpacing: "0.18em",
           marginBottom: 10,
@@ -1960,7 +1960,7 @@ function DepthSection({
         <div style={{ marginBottom: mobile ? 22 : 30 }}>
           <div
             style={{
-              font: "500 10px 'JetBrains Mono', monospace",
+              font: "500 12px 'JetBrains Mono', monospace",
               color: "#2f6043",
               letterSpacing: "0.24em",
               marginBottom: 8,
@@ -1976,7 +1976,7 @@ function DepthSection({
       {scoutedNumber != null && (
         <div
           style={{
-            font: "500 11px 'JetBrains Mono', monospace",
+            font: "500 12px 'JetBrains Mono', monospace",
             color: "#a8a090",
             letterSpacing: "0.16em",
             textTransform: "uppercase",
@@ -2019,7 +2019,7 @@ function DepthSection({
               >
                 <div
                   style={{
-                    font: "500 11px 'JetBrains Mono', monospace",
+                    font: "500 12px 'JetBrains Mono', monospace",
                     color: "#2f6043",
                     letterSpacing: "0.1em",
                   }}

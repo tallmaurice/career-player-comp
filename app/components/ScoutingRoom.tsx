@@ -85,17 +85,17 @@ export default function ScoutingRoom(_props: ScoutingRoomProps) {
       }}
     >
       <style>{`
-        .cpc-scout-room .sr-label { font: 500 11px var(--font-mono); letter-spacing: 0.32em; margin-bottom: 52px; }
+        .cpc-scout-room .sr-label { font: 500 12px var(--font-mono); letter-spacing: 0.32em; margin-bottom: 52px; }
         .cpc-scout-room .vhs { width: 132px; margin: 0 auto 44px; }
         .cpc-scout-room .sr-line { font: 500 16px var(--font-mono); letter-spacing: 0.03em; min-height: 22px; }
         .cpc-scout-room .sr-note { margin: 22px auto 0; max-width: 380px; font: 400 13px/1.55 var(--font-body); }
-        .cpc-scout-room .sr-foot { margin-top: 28px; font: 400 11px var(--font-mono); letter-spacing: 0.22em; }
+        .cpc-scout-room .sr-foot { margin-top: 28px; font: 400 12px var(--font-mono); letter-spacing: 0.22em; }
         @media (max-width: 767px) {
-          .cpc-scout-room .sr-label { font: 500 10px var(--font-mono); letter-spacing: 0.3em; margin-bottom: 40px; }
+          .cpc-scout-room .sr-label { font: 500 12px var(--font-mono); letter-spacing: 0.3em; margin-bottom: 40px; }
           .cpc-scout-room .vhs { width: 96px; margin: 0 auto 34px; }
           .cpc-scout-room .sr-line { font: 500 14px var(--font-mono); letter-spacing: 0.02em; min-height: 20px; padding: 0 24px; }
           .cpc-scout-room .sr-note { margin-top: 18px; font: 400 12.5px/1.55 var(--font-body); padding: 0 32px; }
-          .cpc-scout-room .sr-foot { margin-top: 24px; font: 400 10px var(--font-mono); letter-spacing: 0.2em; }
+          .cpc-scout-room .sr-foot { margin-top: 24px; font: 400 12px var(--font-mono); letter-spacing: 0.2em; }
         }
       `}</style>
 
