@@ -141,15 +141,6 @@ function LandingDesktop({
             CAREER PLAYER COMP
           </div>
         </button>
-        <div
-          style={{
-            font: "400 12px var(--font-mono)",
-            color: "#a8a090",
-            letterSpacing: "0.18em",
-          }}
-        >
-          [ EST. 2026 · NO ACCOUNT ]
-        </div>
       </div>
 
       {/* hero grid */}
@@ -167,16 +158,6 @@ function LandingDesktop({
       >
         {/* left column — copy + CTA + honest stats */}
         <div>
-          <div
-            style={{
-              font: "400 12px var(--font-mono)",
-              letterSpacing: "0.28em",
-              color: "#2f6043",
-              marginBottom: "28px",
-            }}
-          >
-            [ VOL. 01 · SCOUTING DEPT. ]
-          </div>
           <h1
             style={{
               font: "700 92px/0.92 var(--font-display)",
@@ -254,7 +235,7 @@ function LandingDesktop({
             <div
               style={{
                 font: "400 12px var(--font-mono)",
-                color: "#a8a090",
+                color: "#6b655a",
                 letterSpacing: "0.16em",
               }}
             >
@@ -296,15 +277,13 @@ function LandingDesktop({
               borderTop: "1px solid rgba(33,30,23,0.14)",
               paddingTop: "24px",
               display: "grid",
-              gridTemplateColumns: "repeat(3,1fr)",
+              gridTemplateColumns: "1fr",
               gap: "24px",
               maxWidth: "560px",
             }}
           >
             {/* keep in sync with the player pool count (lib/engine/player-pool.json) */}
             <HonestStat label="ARCHETYPES" value="204" />
-            <HonestStat label="ACCOUNT" value="NONE NEEDED" />
-            <HonestStat label="DATA STORED" value="NONE" />
           </div>
         </div>
 
@@ -333,19 +312,11 @@ function LandingDesktop({
           position: "relative",
         }}
       >
+        <div />
         <div
           style={{
             font: "400 12px var(--font-mono)",
-            color: "#a8a090",
-            letterSpacing: "0.18em",
-          }}
-        >
-          [ RUNS ON AI · NO ACCOUNT NEEDED · NO DATA STORED ]
-        </div>
-        <div
-          style={{
-            font: "400 12px var(--font-mono)",
-            color: "#a8a090",
+            color: "#6b655a",
             letterSpacing: "0.18em",
           }}
         >
@@ -362,7 +333,7 @@ function HonestStat({ label, value }: { label: string; value: string }) {
       <div
         style={{
           font: "500 12px var(--font-mono)",
-          color: "#a8a090",
+          color: "#6b655a",
           letterSpacing: "0.16em",
           marginBottom: "6px",
         }}
@@ -587,7 +558,7 @@ function CardStat({
       <div
         style={{
           font: "400 12px var(--font-mono)",
-          color: "#a8a090",
+          color: "#6b655a",
           letterSpacing: "0.16em",
           marginBottom: "3px",
         }}
@@ -651,29 +622,10 @@ function LandingMobile({
             CAREER PLAYER COMP
           </div>
         </button>
-        <div
-          style={{
-            font: "400 12px var(--font-mono)",
-            color: "#a8a090",
-            letterSpacing: "0.16em",
-          }}
-        >
-          [ VOL. 01 ]
-        </div>
       </div>
 
       {/* hero copy */}
-      <div style={{ padding: "36px 22px 20px", position: "relative", zIndex: 1 }}>
-        <div
-          style={{
-            font: "400 12px var(--font-mono)",
-            letterSpacing: "0.24em",
-            color: "#2f6043",
-            marginBottom: "16px",
-          }}
-        >
-          [ SCOUTING DEPT. ]
-        </div>
+      <div style={{ padding: "28px 22px 20px", position: "relative", zIndex: 1 }}>
         <h1
           style={{
             font: "700 50px/0.94 var(--font-display)",
@@ -748,13 +700,13 @@ function LandingMobile({
         <div
           style={{
             font: "400 12px var(--font-mono)",
-            color: "#a8a090",
+            color: "#6b655a",
             letterSpacing: "0.18em",
             textAlign: "center",
             marginTop: "12px",
           }}
         >
-          [ ~ 90 SECONDS · NO DATA STORED ]
+          ~ 90 SECONDS
         </div>
         {scouted ? (
           <div
@@ -984,7 +936,7 @@ function CardStatMobile({
       <div
         style={{
           font: "400 12px var(--font-mono)",
-          color: "#a8a090",
+          color: "#6b655a",
           letterSpacing: "0.14em",
         }}
       >

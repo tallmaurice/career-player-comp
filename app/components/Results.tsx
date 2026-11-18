@@ -634,9 +634,6 @@ export default function Results({
                 margin: "0 0 30px",
               }}
             >
-              <span style={{ fontStyle: "italic", color: "#6b655a" }}>
-                In summary,{" "}
-              </span>
               {comp.card_summary}
             </p>
             {/* Best Team Fit moved to its own wide section below (DepthSection). */}
@@ -720,12 +717,12 @@ export default function Results({
                 <div
                   style={{
                     font: "400 12px 'JetBrains Mono', monospace",
-                    color: "#a8a090",
+                    color: "#6b655a",
                     letterSpacing: "0.2em",
                     marginTop: 3,
                   }}
                 >
-                  [ AI SCOUT · 10,000+ CAREERS READ ]
+                  [ AI SCOUT ]
                 </div>
               </div>
               <div
@@ -1046,9 +1043,6 @@ export default function Results({
               margin: 0,
             }}
           >
-            <span style={{ fontStyle: "italic", color: "#6b655a" }}>
-              In summary,{" "}
-            </span>
             {comp.card_summary}
           </p>
         </div>

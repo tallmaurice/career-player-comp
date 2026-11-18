@@ -28,7 +28,7 @@ import { extractPdfText } from "@/lib/pdf";
 const GREEN = "#2f6043";
 const INK = "#211e17";
 const MUTED = "#6b655a";
-const FAINT = "#a8a090";
+const FAINT = "#6b655a";
 const PAPER = "#f4eede";
 const PAPER_HI = "#faf6ea";
 const MONO = "'JetBrains Mono', monospace";
@@ -204,16 +204,6 @@ export default function CareerUpload({
           boxSizing: "border-box",
         }}
       >
-        <div
-          style={{
-            font: `400 12px ${MONO}`,
-            letterSpacing: "0.28em",
-            color: GREEN,
-            marginBottom: "clamp(14px, 2vw, 20px)",
-          }}
-        >
-          [ INTAKE — CAREER FILM ]
-        </div>
         <h1
           style={{
             font: `700 clamp(38px, 6vw, 64px)/0.98 ${DISPLAY}`,
@@ -246,16 +236,6 @@ export default function CareerUpload({
         >
           {/* ---- Option A: PDF drop / browse ---- */}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div
-              style={{
-                font: `500 12px ${MONO}`,
-                color: GREEN,
-                letterSpacing: "0.22em",
-                marginBottom: 12,
-              }}
-            >
-              [ OPTION A ]
-            </div>
             <div
               className={`drop-zone${isDragging ? " is-dragging" : ""}`}
               role="button"
@@ -614,16 +594,6 @@ export default function CareerUpload({
           {/* ---- Option B: paste work history ---- */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div
-              style={{
-                font: `500 12px ${MONO}`,
-                color: GREEN,
-                letterSpacing: "0.22em",
-                marginBottom: 12,
-              }}
-            >
-              [ OPTION B ]
-            </div>
-            <div
               className="paste-area"
               style={{
                 flex: 1,
@@ -711,16 +681,6 @@ export default function CareerUpload({
               Continue to Questions &nbsp;&rarr;
             </button>
           )}
-          <div
-            className="sticky-tag"
-            style={{
-              font: `400 12px ${MONO}`,
-              color: FAINT,
-              letterSpacing: "0.16em",
-            }}
-          >
-            [ EITHER INPUT WORKS ]
-          </div>
         </div>
       </main>
 

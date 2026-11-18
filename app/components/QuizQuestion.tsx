@@ -93,7 +93,6 @@ export default function QuizQuestion({
         </div>
 
         <div style={{ padding: "56px 22px 0" }}>
-          <div style={mobileOnFilm}>[ ON FILM ]</div>
           <h2 style={mobileQuestion}>{question.prompt}</h2>
 
           <div className="form-block">
@@ -189,7 +188,6 @@ export default function QuizQuestion({
       </div>
 
       <div style={desktopCenter}>
-        <div style={desktopOnFilm}>[ ON FILM ]</div>
         <h2 style={desktopQuestion}>{question.prompt}</h2>
 
         <div className="form-block">
