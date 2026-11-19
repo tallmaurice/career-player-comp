@@ -368,8 +368,15 @@ export default function Page() {
       // unless the GLOBAL daily cap tripped, which retrying won't fix. Then show
       // the branded "scouts are out for the day" page (tip + sponsor).
       if (error) {
-        if (errorReason === "daily_cap") {
-          return <ScoutsOut tipUrl={TIP_URL} skipUrl={SKIP_URL} onReset={reset} />;
+        if (errorReason === "daily_cap" || errorReason === "after_hours") {
+          return (
+            <ScoutsOut
+              tipUrl={TIP_URL}
+              skipUrl={SKIP_URL}
+              onReset={reset}
+              afterHours={errorReason === "after_hours"}
+            />
+          );
         }
         return (
           <RetryScreen
@@ -412,7 +419,7 @@ function Disclaimer() {
       style={{
         textAlign: "center",
         padding: "0 22px 28px",
-        font: "400 11px var(--font-mono)",
+        font: "400 12px var(--font-mono)",
         color: "var(--faint)",
         letterSpacing: "0.14em",
       }}
@@ -508,10 +515,12 @@ function ScoutsOut({
   tipUrl,
   skipUrl,
   onReset,
+  afterHours = false,
 }: {
   tipUrl: string;
   skipUrl: string;
   onReset: () => void;
+  afterHours?: boolean;
 }) {
   const sponsorUrl =
     "mailto:hello@careerplayercomp.com?subject=Sponsoring%20the%20scouting%20room";
@@ -552,7 +561,7 @@ function ScoutsOut({
     >
       <div
         style={{
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "var(--green)",
           letterSpacing: "0.3em",
           marginBottom: 22,
@@ -583,8 +592,9 @@ function ScoutsOut({
       >
         Every report here is a real AI scout reading your whole career, not a
         template spitting out a name. That costs real money every run, and
-        today&rsquo;s free scouting budget is spent. The free room reopens at
-        8am Eastern.
+        {afterHours
+          ? " the free room is closed outside 8am to 8pm Eastern. It reopens at 8am."
+          : " today’s free scouting budget is spent. The free room reopens at 8am Eastern."}
       </p>
 
       {scoutedTotal !== null && (
@@ -603,7 +613,7 @@ function ScoutsOut({
           </div>
           <div
             style={{
-              font: "500 10px var(--font-mono)",
+              font: "500 12px var(--font-mono)",
               color: "var(--muted, #5a5347)",
               letterSpacing: "0.28em",
               textTransform: "uppercase",
@@ -617,7 +627,7 @@ function ScoutsOut({
           {scoutedToday !== null && (
             <div
               style={{
-                font: "500 10px var(--font-mono)",
+                font: "500 12px var(--font-mono)",
                 color: "var(--muted, #5a5347)",
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
@@ -714,7 +724,7 @@ function ScoutsOut({
       <div
         style={{
           marginTop: 26,
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "var(--muted, #5a5347)",
           letterSpacing: "0.14em",
           textTransform: "uppercase",
@@ -787,7 +797,7 @@ function RetryScreen({
     >
       <div
         style={{
-          font: "500 11px var(--font-mono)",
+          font: "500 12px var(--font-mono)",
           color: "var(--green)",
           letterSpacing: "0.3em",
           marginBottom: 24,

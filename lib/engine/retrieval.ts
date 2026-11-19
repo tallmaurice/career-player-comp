@@ -139,10 +139,10 @@ const Q8_DESC: Record<string, string[]> = {
 // Adds career-DRIVEN signal on top of the quiz so the shortlist is anchored in
 // the actual history, not just the 8 MC buckets. Deterministic substring scan.
 
-const SENIORITY_HIGH = /\b(ceo|c\.e\.o|founder|co-?founder|owner|president|chief|cto|cfo|coo|partner|managing director|executive director|head of|vp|vice president|svp|evp|principal)\b/i;
+const SENIORITY_HIGH = /\b(ceo|c\.e\.o|founder|co-?founder|owner|president|chief|cto|cfo|coo|partner|managing director|managing editor|executive director|head of|vp|vice president|svp|evp|principal)\b/i;
 const SENIORITY_MID = /\b(director|senior manager|department head|lead|team lead|manager|supervisor|head coach)\b/i;
 const SENIORITY_LOW = /\b(intern|trainee|assistant|coordinator|associate|junior|entry[- ]level|apprentice|clerk)\b/i;
-const ELITE_SCHOOL = /\b(harvard|yale|princeton|stanford|mit|wharton|columbia|dartmouth|brown university|cornell|upenn|university of pennsylvania|oxford|cambridge)\b/i;
+const ELITE_SCHOOL = /\b(harvard|yale|princeton|stanford|mit|wharton|columbia university|columbia business school|columbia law school|columbia journalism school|dartmouth|brown university|cornell|upenn|university of pennsylvania|oxford|cambridge)\b/i;
 const COMEBACK = /\b(returned|comeback|came back|after (a|an)? ?(injury|illness|leave|hiatus|gap)|relaunch|second act|reentered|re-?entered)\b/i;
 const LONGEVITY = /\b(2[0-9]\+? years|over (two|twenty) decades|three decades|3 decades|20\+ years|25 years|30 years)\b/i;
 
@@ -159,6 +159,48 @@ function estimateEmployers(text: string): number {
     else if (/^(senior |lead |head |chief |vp |director |manager )/i.test(l)) count++;
   }
   return count;
+}
+
+const TITLE_END = /^(editor|manager|director|engineer|analyst|designer|developer|associate|assistant|reporter|lead|coordinator|specialist|officer|president|producer|writer|therapist|intern|consultant|nurse|teacher|stringer|representative|desk)$/i;
+
+/** Capitalized multi-word phrases (company-like), minus job titles. */
+function orgPhrases(s: string): string[] {
+  const out: string[] = [];
+  const re = /\b(?:The\s+)?[A-Z][\w'.&]*(?:\s+[A-Z][\w'.&]*)+/g;
+  for (const m of s.match(re) ?? []) {
+    const words = m.split(/\s+/);
+    if (TITLE_END.test(words[words.length - 1])) continue;
+    out.push(m.replace(/^The\s+/, "").toLowerCase());
+  }
+  return out;
+}
+
+/** Distinct employers for the journeyman test. Counts role/date lines like
+ *  estimateEmployers, but skips bullets and "2019: ..." list lines, and counts
+ *  roles that share a company name (on the line, or on the header line above
+ *  when the line has none) as one employer. */
+function estimateDistinctEmployers(text: string): number {
+  const lines = text.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  const groups: Set<string>[] = [];
+  let singles = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    if (/^[-•*]\s/.test(l) || /^\d{4}\s*:/.test(l)) continue;
+    const counted =
+      (/\b(at|@|\||·|—|-)\b/.test(l) && /\d{4}|present/i.test(l)) ||
+      /^(senior |lead |head |chief |vp |director |manager )/i.test(l);
+    if (!counted) continue;
+    let keys = orgPhrases(l);
+    if (keys.length === 0 && i > 0) keys = orgPhrases(lines[i - 1]);
+    if (keys.length === 0) {
+      singles++;
+      continue;
+    }
+    const hit = groups.find((g) => keys.some((k) => g.has(k)));
+    if (hit) keys.forEach((k) => hit.add(k));
+    else groups.push(new Set(keys));
+  }
+  return groups.length + singles;
 }
 
 // ---- Classifier -------------------------------------------------------------
@@ -220,7 +262,7 @@ export function classifyCareer(
   if (LONGEVITY.test(text)) pushAll(descriptors, ["longevity"]);
 
   const employers = estimateEmployers(careerText);
-  if (employers >= 5) {
+  if (employers >= 5 && estimateDistinctEmployers(careerText) >= 5) {
     pushAll(trajectory, ["journeyman"]);
     pushAll(descriptors, ["journeyman-survivor"]);
   } else if (employers === 1 && careerText.trim().length > 80) {
