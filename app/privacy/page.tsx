@@ -78,7 +78,7 @@ export default function Privacy() {
 
       <h2>Payments</h2>
       <p>
-        If you choose to tip, the payment is handled by Stripe. We never see or
+        If you choose to tip or buy the $2 pass, the payment is handled by Stripe. We never see or
         store your full card details. How Stripe handles your payment
         information is governed by the Stripe privacy policy.
       </p>
@@ -112,7 +112,7 @@ export default function Privacy() {
           counters.
         </li>
         <li>
-          <strong>Stripe</strong> processes optional tips.
+          <strong>Stripe</strong> processes optional tips and the $2 pass.
         </li>
       </ul>
 
