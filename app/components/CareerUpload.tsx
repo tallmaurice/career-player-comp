@@ -138,7 +138,7 @@ export default function CareerUpload({
         flexDirection: "column",
         color: INK,
         fontFamily: `${BODY}, sans-serif`,
-        overflowX: "hidden",
+        overflowX: "clip",
       }}
     >
       {/* ---- header bar ---- */}
@@ -180,7 +180,7 @@ export default function CareerUpload({
         </div>
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             color: FAINT,
             letterSpacing: "0.18em",
             whiteSpace: "nowrap",
@@ -206,7 +206,7 @@ export default function CareerUpload({
       >
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             letterSpacing: "0.28em",
             color: GREEN,
             marginBottom: "clamp(14px, 2vw, 20px)",
@@ -248,7 +248,7 @@ export default function CareerUpload({
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div
               style={{
-                font: `500 10px ${MONO}`,
+                font: `500 12px ${MONO}`,
                 color: GREEN,
                 letterSpacing: "0.22em",
                 marginBottom: 12,
@@ -381,7 +381,7 @@ export default function CareerUpload({
                       border: "none",
                       padding: 0,
                       cursor: "pointer",
-                      font: `600 11px ${BODY}`,
+                      font: `600 12px ${BODY}`,
                       letterSpacing: "0.1em",
                       textTransform: "uppercase",
                       color: GREEN,
@@ -397,14 +397,14 @@ export default function CareerUpload({
                         height: 16,
                         borderRadius: "50%",
                         border: `1.5px solid ${GREEN}`,
-                        font: `700 10px ${BODY}`,
+                        font: `700 12px ${BODY}`,
                         lineHeight: 1,
                       }}
                     >
                       i
                     </span>
                     Need your LinkedIn PDF?
-                    <span aria-hidden style={{ font: `600 9px ${BODY}`, opacity: 0.7 }}>
+                    <span aria-hidden style={{ font: `600 12px ${BODY}`, opacity: 0.7 }}>
                       {showPdfHelp ? "▲" : "▼"}
                     </span>
                   </button>
@@ -422,7 +422,7 @@ export default function CareerUpload({
                       <div style={{ marginBottom: 9 }}>
                         <div
                           style={{
-                            font: `600 11px ${BODY}`,
+                            font: `600 12px ${BODY}`,
                             letterSpacing: "0.06em",
                             textTransform: "uppercase",
                             color: INK,
@@ -447,7 +447,7 @@ export default function CareerUpload({
                       <div>
                         <div
                           style={{
-                            font: `600 11px ${BODY}`,
+                            font: `600 12px ${BODY}`,
                             letterSpacing: "0.06em",
                             textTransform: "uppercase",
                             color: INK,
@@ -498,7 +498,7 @@ export default function CareerUpload({
                     <div
                       className="file-no"
                       style={{
-                        font: `500 10px ${MONO}`,
+                        font: `500 12px ${MONO}`,
                         color: GREEN,
                         border: "1px solid rgba(47,96,67,0.4)",
                         padding: "2px 5px",
@@ -531,7 +531,7 @@ export default function CareerUpload({
                     </div>
                     <div
                       style={{
-                        font: `500 11px ${MONO}`,
+                        font: `500 12px ${MONO}`,
                         color:
                           fileStatus === "ok"
                             ? GREEN
@@ -615,7 +615,7 @@ export default function CareerUpload({
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div
               style={{
-                font: `500 10px ${MONO}`,
+                font: `500 12px ${MONO}`,
                 color: GREEN,
                 letterSpacing: "0.22em",
                 marginBottom: 12,
@@ -683,6 +683,7 @@ export default function CareerUpload({
 
         {/* ---- continue (appears once there's input) ---- */}
         <div
+          className="sticky-cta"
           style={{
             marginTop: "clamp(26px, 4vw, 36px)",
             display: "flex",
@@ -711,8 +712,9 @@ export default function CareerUpload({
             </button>
           )}
           <div
+            className="sticky-tag"
             style={{
-              font: `400 11px ${MONO}`,
+              font: `400 12px ${MONO}`,
               color: FAINT,
               letterSpacing: "0.16em",
             }}
@@ -736,7 +738,7 @@ export default function CareerUpload({
       >
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             color: FAINT,
             letterSpacing: "0.18em",
           }}
@@ -745,7 +747,7 @@ export default function CareerUpload({
         </div>
         <div
           style={{
-            font: `400 11px ${MONO}`,
+            font: `400 12px ${MONO}`,
             color: FAINT,
             letterSpacing: "0.18em",
           }}
